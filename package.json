@@ -1,11 +1,11 @@
 {
   "name": "local-reader-extension",
-  "version": "2.3.1",
+  "version": "2.4.0",
   "private": true,
   "description": "Build-time dependencies for the Local Reader Chrome extension.",
   "scripts": {
     "vendor": "node scripts/vendor-dependencies.mjs",
-    "check": "node --check background.js && node --check reader.js && node --check tests/chrome-smoke-test.mjs"
+    "check": "node --check background.js && node --check reader.js && node --check tests/chrome-smoke-test.mjs && node tests/background-compatibility-test.mjs"
   },
   "devDependencies": {
     "@mozilla/readability": "0.6.0",

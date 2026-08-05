@@ -1,11 +1,15 @@
-chrome.action.onClicked.addListener(async (tab) => {
+const extensionApi = globalThis.browser ?? globalThis.chrome;
+
+if (!extensionApi) throw new Error("Local Reader could not find a Web Extensions API");
+
+extensionApi.action.onClicked.addListener(async (tab) => {
   if (!tab.id || !/^https?:\/\//i.test(tab.url || "")) {
     await setBadge(tab.id, "WEB", "#6b7280");
     return;
   }
 
   try {
-    await chrome.scripting.executeScript({
+    await extensionApi.scripting.executeScript({
       target: { tabId: tab.id },
       files: [
         "vendor/Readability.js",
@@ -22,9 +26,11 @@ chrome.action.onClicked.addListener(async (tab) => {
 
 async function setBadge(tabId, text, color) {
   if (!tabId) return;
-  await chrome.action.setBadgeBackgroundColor({ tabId, color });
-  await chrome.action.setBadgeText({ tabId, text });
+  await extensionApi.action.setBadgeBackgroundColor({ tabId, color });
+  await extensionApi.action.setBadgeText({ tabId, text });
   if (text) {
-    setTimeout(() => chrome.action.setBadgeText({ tabId, text: "" }), 2500);
+    setTimeout(() => {
+      void Promise.resolve(extensionApi.action.setBadgeText({ tabId, text: "" })).catch(() => {});
+    }, 2500);
   }
 }

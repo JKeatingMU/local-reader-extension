@@ -175,10 +175,10 @@
       </div>
     </header>
 
-    <p class="intro">A Chrome extension that turns articles into a clean, focused reading view, inspired by the reader experience built into Microsoft Edge. Its generic readability engine works across publishers without relying on site-specific selectors.</p>
+    <p class="intro">A browser extension for Chrome and Safari that turns articles into a clean, focused reading view, inspired by the reader experience built into Microsoft Edge.</p>
 
     <section aria-labelledby="install-heading">
-      <h2 id="install-heading">Install once</h2>
+      <h2 id="install-heading">Install in Chrome</h2>
       <ol>
         <li>Open <code>chrome://extensions</code> in Chrome.</li>
         <li>Turn on <strong>Developer mode</strong> in the top-right corner.</li>
@@ -186,7 +186,12 @@
         <li>Select the <code>local-reader-extension</code> folder containing this guide.</li>
         <li>Open Chrome’s Extensions menu—the puzzle-piece icon—and pin <strong>Local Reader</strong>.</li>
       </ol>
-      <p>If an earlier version is already loaded, click its reload button on <code>chrome://extensions</code>. Chrome will update it to <strong>Local Reader 2.3.1</strong>.</p>
+      <p>If an earlier version is already loaded, click its reload button on <code>chrome://extensions</code>. Chrome will update it to <strong>Local Reader 2.4.0</strong>.</p>
+    </section>
+
+    <section aria-labelledby="safari-heading">
+      <h2 id="safari-heading">Try in Safari</h2>
+      <p>Safari 26 can load this same folder temporarily for testing. Enable Safari’s developer features, open the <strong>Developer</strong> settings tab, choose <strong>Add Temporary Extension</strong>, and select the <code>local-reader-extension</code> folder. See <a href="SAFARI.md">the Safari test instructions</a> for the complete sequence.</p>
     </section>
 
     <section aria-labelledby="use-heading">
@@ -201,28 +206,28 @@
     </section>
 
     <aside class="privacy">
-      <strong>Private by design.</strong> The extension only requests <code>activeTab</code> and <code>scripting</code>. Chrome grants temporary access to the current tab when you click the extension; it has no persistent access to browsing history or other sites.
+      <strong>Private by design.</strong> The extension only requests <code>activeTab</code> and <code>scripting</code>. The browser grants temporary access to the current tab when you click the extension; it has no persistent access to browsing history or other sites.
     </aside>
 
     <section aria-labelledby="how-heading">
       <h2 id="how-heading">How it works</h2>
       <p>Local Reader compares the rendered page with an inertly parsed copy of the page’s original HTML, then uses the stronger article candidate. This makes extraction more reliable on dynamic sites without publisher-specific rules.</p>
       <p>Mozilla Readability identifies the headline, author and core content; DOMPurify sanitizes the result before displaying it locally. Extracted article text is never sent to an external reading or analytics service.</p>
-      <p>Read aloud uses Chrome’s built-in speech support and the voices configured on the computer. Local Reader divides the article into short passages for reliable playback and adds no external speech service.</p>
+      <p>Read aloud uses the browser’s built-in speech support and the voices it exposes from the computer. Local Reader divides the article into short passages for reliable playback and adds no external speech service.</p>
     </section>
 
     <section aria-labelledby="troubleshooting-heading">
       <h2 id="troubleshooting-heading">Troubleshooting</h2>
       <ul>
-        <li>If Chrome shows <code>WEB</code> on the extension icon, the current tab is not an ordinary web page—for example, it may be a <code>chrome://</code> settings page.</li>
+        <li>If the extension shows <code>WEB</code> on its icon, the current tab is not an ordinary web page—for example, it may be a browser settings page.</li>
         <li>If Local Reader cannot identify a complete article, wait for the page to finish loading and click the icon again.</li>
-        <li>The voice menu is supplied by Chrome and the operating system; it may take a moment to populate the first time speech is used.</li>
+        <li>The voice menu is supplied by the browser and operating system; Chrome and Safari may expose different voice lists.</li>
         <li>A reader can only process text delivered to the browser. Content absent from the rendered page cannot be extracted.</li>
         <li>After changing the extension files, open <code>chrome://extensions</code> and click the extension’s reload button.</li>
       </ul>
     </section>
 
-    <footer>Local Reader 2.3.1 for Chrome · Generic and private</footer>
+    <footer>Local Reader 2.4.0 for Chrome and Safari · Generic and private</footer>
   </main>
 </body>
 </html>

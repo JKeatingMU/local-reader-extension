@@ -387,7 +387,8 @@
       synth.cancel();
       if (synth.paused) synth.resume();
       updateSpeechControls();
-      speakNext(session);
+      const activeSession = session;
+      setTimeout(() => speakNext(activeSession), 0);
     });
 
     stop.addEventListener("click", stopSpeaking);
@@ -401,7 +402,10 @@
       }
 
       const utterance = new Utterance(chunks[chunkIndex]);
-      const voice = voices.find((candidate) => voiceKey(candidate) === voiceSelect.value);
+      const selectedVoice = voices.find((candidate) => voiceKey(candidate) === voiceSelect.value);
+      const languagePrefix = String(language || navigator.language || "").split("-")[0].toLowerCase();
+      const voice = selectedVoice || voices.find((candidate) => candidate.default) ||
+        voices.find((candidate) => candidate.lang?.toLowerCase().startsWith(languagePrefix));
       if (voice) utterance.voice = voice;
       utterance.lang = voice?.lang || language || navigator.language || "en";
       utterance.rate = Number(rateSelect.value) || 1;
@@ -611,7 +615,7 @@
       html { background: var(--lr-bg); scroll-behavior: smooth; }
       body { margin: 0; background: var(--lr-bg); color: var(--lr-text); font-family: Georgia, 'Times New Roman', serif; }
       body.lr-dark { color-scheme: dark; --lr-bg: #16191d; --lr-paper: #20242a; --lr-text: #e9e4dc; --lr-muted: #aaa39a; --lr-line: #3b4047; --lr-accent: #8ec5ff; }
-      .lr-toolbar { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; gap: 12px; padding: 10px max(16px, calc((100vw - 1240px) / 2)); border-bottom: 1px solid var(--lr-line); background: color-mix(in srgb, var(--lr-paper) 94%, transparent); backdrop-filter: blur(10px); font: 14px/1.2 system-ui, sans-serif; }
+      .lr-toolbar { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; gap: 12px; padding: 10px max(16px, calc((100vw - 1240px) / 2)); border-bottom: 1px solid var(--lr-line); background: var(--lr-paper); background: color-mix(in srgb, var(--lr-paper) 94%, transparent); backdrop-filter: blur(10px); font: 14px/1.2 system-ui, sans-serif; }
       .lr-toolbar button { min-height: 36px; padding: 7px 11px; border: 1px solid var(--lr-line); border-radius: 7px; background: var(--lr-paper); color: var(--lr-text); cursor: pointer; }
       .lr-toolbar button:hover:not(:disabled) { border-color: var(--lr-accent); color: var(--lr-accent); }
       .lr-toolbar button:disabled { cursor: default; opacity: .45; }

@@ -129,7 +129,7 @@ const inspection = await call("Runtime.evaluate", {
 const result = JSON.parse(inspection.result.value);
 
 const speechInspection = await call("Runtime.evaluate", {
-  expression: `(() => {
+  expression: `(async () => {
     const toggle = document.querySelector('#lr-speech-toggle');
     const stop = document.querySelector('#lr-speech-stop');
     const voice = document.querySelector('#lr-speech-voice');
@@ -137,6 +137,7 @@ const speechInspection = await call("Runtime.evaluate", {
     voice.value = 'test-alternate';
     rate.value = '1.5';
     toggle?.click();
+    await new Promise((resolveWait) => setTimeout(resolveWait, 20));
     const afterPlay = { label: toggle?.textContent, stopDisabled: stop?.disabled };
     speechSynthesis.current?.onend?.();
     const advancedToNextChunk = globalThis.__localReaderSpeechTest.filter(({ type }) => type === 'speak').length >= 2;
@@ -157,6 +158,7 @@ const speechInspection = await call("Runtime.evaluate", {
       firstSpokenVoice: globalThis.__localReaderSpeechTest.find(({ type }) => type === 'speak')?.voice
     });
   })()`,
+  awaitPromise: true,
   returnByValue: true
 });
 const speech = JSON.parse(speechInspection.result.value);
