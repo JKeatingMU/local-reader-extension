@@ -3,6 +3,7 @@
 
   const READER_ID = "local-reader-view";
   if (document.getElementById(READER_ID)) {
+    globalThis.speechSynthesis?.cancel();
     location.reload();
     return;
   }
@@ -68,6 +69,7 @@
       content,
       paragraphCount,
       textLength,
+      language: article.lang || document.documentElement.lang || navigator.language,
       extractionMethod: selection.method
     });
   }
@@ -280,6 +282,8 @@
               <button id="lr-smaller" type="button" aria-label="Decrease text size">A−</button>
               <button id="lr-larger" type="button" aria-label="Increase text size">A+</button>
               <button id="lr-theme" type="button" aria-label="Switch colour theme">Dark</button>
+              <button id="lr-speech-toggle" type="button">Read aloud</button>
+              <button id="lr-speech-stop" type="button" disabled>Stop</button>
               <button id="lr-print" type="button">Print</button>
             </div>
           </header>
@@ -302,6 +306,7 @@
 
     document.getElementById("lr-original").addEventListener("click", () => location.reload());
     document.getElementById("lr-print").addEventListener("click", () => window.print());
+    setupReadAloud(data.language);
 
     let fontSize = 20;
     document.getElementById("lr-smaller").addEventListener("click", () => {
@@ -316,6 +321,158 @@
       const isDark = document.body.classList.toggle("lr-dark");
       event.currentTarget.textContent = isDark ? "Light" : "Dark";
     });
+  }
+
+  function setupReadAloud(language) {
+    const toggle = document.getElementById("lr-speech-toggle");
+    const stop = document.getElementById("lr-speech-stop");
+    const synth = globalThis.speechSynthesis;
+    const Utterance = globalThis.SpeechSynthesisUtterance;
+
+    if (!synth || typeof Utterance !== "function") {
+      toggle.disabled = true;
+      toggle.textContent = "Read aloud unavailable";
+      return;
+    }
+
+    const chunks = buildSpeechChunks();
+    let state = "idle";
+    let chunkIndex = 0;
+    let session = 0;
+
+    toggle.addEventListener("click", () => {
+      if (state === "playing") {
+        synth.pause();
+        state = "paused";
+        updateSpeechControls();
+        return;
+      }
+
+      if (state === "paused") {
+        synth.resume();
+        state = "playing";
+        updateSpeechControls();
+        return;
+      }
+
+      if (!chunks.length) {
+        showNotice("Local Reader could not find any text to read aloud.");
+        return;
+      }
+
+      session += 1;
+      chunkIndex = 0;
+      state = "playing";
+      synth.cancel();
+      if (synth.paused) synth.resume();
+      updateSpeechControls();
+      speakNext(session);
+    });
+
+    stop.addEventListener("click", stopSpeaking);
+    window.addEventListener("pagehide", stopSpeaking, { once: true });
+
+    function speakNext(activeSession) {
+      if (activeSession !== session || state === "idle") return;
+      if (chunkIndex >= chunks.length) {
+        finishSpeaking();
+        return;
+      }
+
+      const utterance = new Utterance(chunks[chunkIndex]);
+      utterance.lang = language || navigator.language || "en";
+      utterance.rate = 1;
+      utterance.onend = () => {
+        if (activeSession !== session) return;
+        chunkIndex += 1;
+        speakNext(activeSession);
+      };
+      utterance.onerror = (event) => {
+        if (activeSession !== session || /canceled|interrupted/.test(event.error || "")) return;
+        finishSpeaking();
+        showNotice("Chrome could not read this article aloud with the selected system voice.");
+      };
+      synth.speak(utterance);
+    }
+
+    function stopSpeaking() {
+      session += 1;
+      synth.cancel();
+      if (synth.paused) synth.resume();
+      chunkIndex = 0;
+      state = "idle";
+      updateSpeechControls();
+    }
+
+    function finishSpeaking() {
+      chunkIndex = 0;
+      state = "idle";
+      updateSpeechControls();
+    }
+
+    function updateSpeechControls() {
+      toggle.textContent = state === "playing" ? "Pause" : state === "paused" ? "Resume" : "Read aloud";
+      toggle.setAttribute("aria-pressed", String(state !== "idle"));
+      stop.disabled = state === "idle";
+    }
+
+    updateSpeechControls();
+  }
+
+  function buildSpeechChunks() {
+    const selectors = [
+      "h1",
+      ".lr-standfirst",
+      "#lr-content h2",
+      "#lr-content h3",
+      "#lr-content h4",
+      "#lr-content h5",
+      "#lr-content h6",
+      "#lr-content p",
+      "#lr-content li",
+      "#lr-content figcaption"
+    ].join(",");
+    const readableElements = [...document.querySelectorAll(selectors)]
+      .filter((element) => !element.querySelector("p, li, h2, h3, h4, h5, h6"));
+    return readableElements.flatMap((element) => splitForSpeech(
+      element.textContent.replace(/\s+/g, " ").trim()
+    ));
+  }
+
+  function splitForSpeech(text, maxLength = 320) {
+    if (!text) return [];
+    const sentences = typeof Intl.Segmenter === "function"
+      ? [...new Intl.Segmenter(undefined, { granularity: "sentence" }).segment(text)].map(({ segment }) => segment.trim())
+      : text.split(/(?<=[.!?])\s+/);
+    const chunks = [];
+    let current = "";
+
+    for (const sentence of sentences.filter(Boolean)) {
+      const pieces = sentence.length > maxLength ? splitLongSpeechText(sentence, maxLength) : [sentence];
+      for (const piece of pieces) {
+        if (current && current.length + piece.length + 1 > maxLength) {
+          chunks.push(current);
+          current = "";
+        }
+        current = current ? `${current} ${piece}` : piece;
+      }
+    }
+
+    if (current) chunks.push(current);
+    return chunks;
+  }
+
+  function splitLongSpeechText(text, maxLength) {
+    const pieces = [];
+    let remaining = text;
+    while (remaining.length > maxLength) {
+      const breakAt = remaining.lastIndexOf(" ", maxLength);
+      const index = breakAt > maxLength / 2 ? breakAt : maxLength;
+      pieces.push(remaining.slice(0, index).trim());
+      remaining = remaining.slice(index).trim();
+    }
+    if (remaining) pieces.push(remaining);
+    return pieces;
   }
 
   function firstText(selectors, metadata = false) {
@@ -404,8 +561,10 @@
       body.lr-dark { color-scheme: dark; --lr-bg: #16191d; --lr-paper: #20242a; --lr-text: #e9e4dc; --lr-muted: #aaa39a; --lr-line: #3b4047; --lr-accent: #8ec5ff; }
       .lr-toolbar { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; gap: 12px; padding: 10px max(16px, calc((100vw - 840px) / 2)); border-bottom: 1px solid var(--lr-line); background: color-mix(in srgb, var(--lr-paper) 94%, transparent); backdrop-filter: blur(10px); font: 14px/1.2 system-ui, sans-serif; }
       .lr-toolbar button { min-height: 36px; padding: 7px 11px; border: 1px solid var(--lr-line); border-radius: 7px; background: var(--lr-paper); color: var(--lr-text); cursor: pointer; }
-      .lr-toolbar button:hover { border-color: var(--lr-accent); color: var(--lr-accent); }
-      .lr-tools { display: flex; gap: 6px; }
+      .lr-toolbar button:hover:not(:disabled) { border-color: var(--lr-accent); color: var(--lr-accent); }
+      .lr-toolbar button:disabled { cursor: default; opacity: .45; }
+      #lr-speech-toggle[aria-pressed="true"] { border-color: var(--lr-accent); color: var(--lr-accent); }
+      .lr-tools { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
       .lr-page { width: min(100%, 920px); margin: 0 auto; padding: 36px 24px 80px; }
       .lr-page > article { padding: clamp(26px, 6vw, 68px); border: 1px solid var(--lr-line); border-radius: 3px; background: var(--lr-paper); box-shadow: 0 18px 50px rgba(53, 43, 32, .08); }
       .lr-kicker { margin: 0 0 14px; color: var(--lr-accent); font: 700 12px/1.2 system-ui, sans-serif; letter-spacing: .12em; text-transform: uppercase; }

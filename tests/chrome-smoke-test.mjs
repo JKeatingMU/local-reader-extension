@@ -42,6 +42,29 @@ await call("Runtime.enable");
 await call("Page.navigate", { url: fixtureUrl });
 await new Promise((resolveWait) => setTimeout(resolveWait, fixtureName.endsWith("live") ? 7000 : 1200));
 
+const speechMock = await call("Runtime.evaluate", {
+  expression: `(() => {
+    const calls = [];
+    const synth = {
+      paused: false,
+      current: null,
+      speak(utterance) { this.current = utterance; calls.push({ type: 'speak', text: utterance.text, lang: utterance.lang }); },
+      pause() { this.paused = true; calls.push({ type: 'pause' }); },
+      resume() { this.paused = false; calls.push({ type: 'resume' }); },
+      cancel() { calls.push({ type: 'cancel' }); }
+    };
+    class MockUtterance {
+      constructor(text) { this.text = text; }
+    }
+    Object.defineProperty(globalThis, 'speechSynthesis', { configurable: true, value: synth });
+    Object.defineProperty(globalThis, 'SpeechSynthesisUtterance', { configurable: true, value: MockUtterance });
+    globalThis.__localReaderSpeechTest = calls;
+    return true;
+  })()`,
+  returnByValue: true
+});
+if (speechMock.exceptionDetails) throw new Error("Speech synthesis mock could not be installed");
+
 for (const file of ["vendor/Readability.js", "vendor/purify.min.js", "reader.js"]) {
   const source = await readFile(resolve(file), "utf8");
   const injection = await call("Runtime.evaluate", {
@@ -78,11 +101,38 @@ const inspection = await call("Runtime.evaluate", {
 });
 const result = JSON.parse(inspection.result.value);
 
+const speechInspection = await call("Runtime.evaluate", {
+  expression: `(() => {
+    const toggle = document.querySelector('#lr-speech-toggle');
+    const stop = document.querySelector('#lr-speech-stop');
+    toggle?.click();
+    const afterPlay = { label: toggle?.textContent, stopDisabled: stop?.disabled };
+    speechSynthesis.current?.onend?.();
+    const advancedToNextChunk = globalThis.__localReaderSpeechTest.filter(({ type }) => type === 'speak').length >= 2;
+    toggle?.click();
+    const afterPause = { label: toggle?.textContent, paused: speechSynthesis.paused };
+    toggle?.click();
+    const afterResume = { label: toggle?.textContent, paused: speechSynthesis.paused };
+    stop?.click();
+    return JSON.stringify({
+      afterPlay,
+      advancedToNextChunk,
+      afterPause,
+      afterResume,
+      afterStop: { label: toggle?.textContent, stopDisabled: stop?.disabled },
+      calls: globalThis.__localReaderSpeechTest,
+      firstSpokenText: globalThis.__localReaderSpeechTest.find(({ type }) => type === 'speak')?.text
+    });
+  })()`,
+  returnByValue: true
+});
+const speech = JSON.parse(speechInspection.result.value);
+
 const screenshot = await call("Page.captureScreenshot", { format: "png" });
 const screenshotPath = `/private/tmp/local-reader-${fixtureName}.png`;
 await writeFile(screenshotPath, Buffer.from(screenshot.data, "base64"));
 
-console.log(JSON.stringify({ fixtureName, ...result, screenshotPath }, null, 2));
+console.log(JSON.stringify({ fixtureName, ...result, speech, screenshotPath }, null, 2));
 
 const expectations = {
   dailymail: {
@@ -131,14 +181,25 @@ const expected = expectations[fixtureName] || expectations.article;
 if (
   !result.reader ||
   result.paragraphs < expected.minParagraphs ||
-  result.controls !== 5 ||
+  result.controls !== 7 ||
   result.images < 1 ||
   result.textLength < expected.minTextLength ||
   result.containsProductCta ||
   !result.firstParagraph?.startsWith(expected.firstPrefix) ||
   !result.lastParagraph?.endsWith(expected.lastSuffix) ||
   !result.site?.startsWith(expected.site) ||
-  !result.extractionSummary?.includes(expected.method)
+  !result.extractionSummary?.includes(expected.method) ||
+  speech.afterPlay.label !== "Pause" ||
+  speech.afterPlay.stopDisabled ||
+  !speech.advancedToNextChunk ||
+  speech.afterPause.label !== "Resume" ||
+  !speech.afterPause.paused ||
+  speech.afterResume.label !== "Pause" ||
+  speech.afterResume.paused ||
+  speech.afterStop.label !== "Read aloud" ||
+  !speech.afterStop.stopDisabled ||
+  !speech.calls.some(({ type }) => type === "speak") ||
+  !speech.firstSpokenText?.startsWith(result.title)
 ) {
   process.exitCode = 1;
 }
