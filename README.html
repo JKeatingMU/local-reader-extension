@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Daily Mail Reader for Chrome — Installation Guide</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --background: #f4f1eb;
+      --paper: #ffffff;
+      --text: #20201e;
+      --muted: #686762;
+      --line: #dedbd3;
+      --blue: #0d4a86;
+      --blue-soft: #e8f1fa;
+      --shadow: 0 18px 55px rgba(58, 48, 36, 0.1);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--background);
+      color: var(--text);
+      font: 17px/1.65 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    main {
+      width: min(900px, calc(100% - 32px));
+      margin: 48px auto;
+      padding: clamp(28px, 7vw, 72px);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 76px 1fr;
+      align-items: center;
+      gap: 22px;
+      padding-bottom: 34px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .icon {
+      display: block;
+      width: 76px;
+      height: 76px;
+      border-radius: 15px;
+    }
+
+    .eyebrow {
+      margin: 0 0 4px;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    h1, h2 { line-height: 1.15; letter-spacing: -.025em; }
+    h1 { margin: 0; font-size: clamp(34px, 6vw, 54px); }
+    h2 { margin: 44px 0 18px; font-size: 28px; }
+    p { margin: 16px 0; }
+    .intro { color: var(--muted); font-size: 20px; }
+
+    ol, ul { margin: 0; padding: 0; list-style: none; }
+    ol { counter-reset: steps; }
+
+    ol li {
+      position: relative;
+      min-height: 52px;
+      margin: 12px 0;
+      padding: 12px 16px 12px 62px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: color-mix(in srgb, var(--paper) 92%, var(--blue-soft));
+      counter-increment: steps;
+    }
+
+    ol li::before {
+      position: absolute;
+      top: 10px;
+      left: 12px;
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--blue);
+      color: white;
+      content: counter(steps);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    ul li {
+      position: relative;
+      margin: 10px 0;
+      padding-left: 24px;
+    }
+
+    ul li::before {
+      position: absolute;
+      top: .65em;
+      left: 3px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--blue);
+      content: "";
+    }
+
+    code, kbd {
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: var(--blue-soft);
+      color: #103c69;
+      font: 600 .88em/1.3 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    code { padding: 2px 6px; }
+    kbd { padding: 3px 7px; box-shadow: 0 2px 0 var(--line); }
+
+    .privacy {
+      margin-top: 34px;
+      padding: 18px 20px;
+      border-left: 4px solid var(--blue);
+      border-radius: 0 8px 8px 0;
+      background: var(--blue-soft);
+      color: #173a5e;
+    }
+
+    footer {
+      margin-top: 44px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        color-scheme: dark;
+        --background: #14171b;
+        --paper: #20242a;
+        --text: #ebe8e2;
+        --muted: #aaa59d;
+        --line: #3a4047;
+        --blue: #82bdf5;
+        --blue-soft: #1d3144;
+        --shadow: none;
+      }
+      code, kbd, .privacy { color: #d7eaff; }
+    }
+
+    @media (max-width: 560px) {
+      main { width: 100%; margin: 0; border: 0; border-radius: 0; }
+      header { grid-template-columns: 56px 1fr; gap: 14px; }
+      .icon { width: 56px; height: 56px; border-radius: 11px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <img class="icon" src="icons/icon-128.png" alt="Daily Mail Reader icon">
+      <div>
+        <p class="eyebrow">Local Chrome extension</p>
+        <h1>Daily Mail Reader</h1>
+      </div>
+    </header>
+
+    <p class="intro">A small, local Chrome extension that turns an article already loaded in the browser into a clean reader view. It does not contact another service, download article copies, or collect browsing data.</p>
+
+    <section aria-labelledby="install-heading">
+      <h2 id="install-heading">Install once</h2>
+      <ol>
+        <li>Open <code>chrome://extensions</code> in Chrome.</li>
+        <li>Turn on <strong>Developer mode</strong> in the top-right corner.</li>
+        <li>Click <strong>Load unpacked</strong>.</li>
+        <li>Select the <code>dailymail-reader-extension</code> folder containing this guide.</li>
+        <li>Open Chrome’s Extensions menu—the puzzle-piece icon—and pin <strong>Daily Mail Reader</strong>.</li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="use-heading">
+      <h2 id="use-heading">Use</h2>
+      <ol>
+        <li>Open a Daily Mail article and wait for the page to load.</li>
+        <li>Click the <strong>Daily Mail Reader</strong> toolbar icon, or press <kbd>Option</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd> on macOS—<kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd> elsewhere.</li>
+        <li>Use the reader controls to change text size, switch between light and dark themes, or print.</li>
+        <li>Click <strong>Original page</strong> to return to the normal site.</li>
+      </ol>
+    </section>
+
+    <aside class="privacy">
+      <strong>Private by design.</strong> The extension only requests <code>activeTab</code> and <code>scripting</code>. Chrome grants temporary access to the current tab when you click the extension; it has no persistent access to browsing history or other sites.
+    </aside>
+
+    <section aria-labelledby="troubleshooting-heading">
+      <h2 id="troubleshooting-heading">Troubleshooting</h2>
+      <ul>
+        <li>If Chrome shows <code>DM</code> on the extension icon, the current tab is not a <code>dailymail.com</code> page.</li>
+        <li>If the reader says the article has not loaded, wait a moment and click the icon again.</li>
+        <li>After changing the extension files, open <code>chrome://extensions</code> and click the extension’s reload button.</li>
+      </ul>
+    </section>
+
+    <footer>Daily Mail Reader for Chrome · Local installation guide</footer>
+  </main>
+</body>
+</html>
