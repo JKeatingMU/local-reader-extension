@@ -10,13 +10,13 @@ A private Chrome extension that turns articles already loaded in the browser int
 4. Select this `dailymail-reader-extension` folder. The original folder name has been retained so existing installations can be reloaded in place.
 5. Open Chrome's Extensions menu (the puzzle-piece icon) and pin **Local Reader**.
 
-If an earlier version is already loaded, open `chrome://extensions` and click its reload button. Chrome will update it to **Local Reader 2.2.0**.
+If an earlier version is already loaded, open `chrome://extensions` and click its reload button. Chrome will update it to **Local Reader 2.3.0**.
 
 ## Use
 
 1. Open an article on any ordinary `http` or `https` page and wait for it to load.
 2. Click the **Local Reader** toolbar icon, or press **Option+Shift+R** on macOS (**Alt+Shift+R** elsewhere).
-3. Click **Read aloud** to start listening. The same button pauses or resumes, and **Stop** returns to the beginning.
+3. Choose a **Voice** and **Speed**, then click **Read aloud**. The same button pauses or resumes, and **Stop** returns to the beginning. Changes made during playback apply from the next short passage.
 4. Use the other controls to change text size, switch between light and dark themes, or print.
 5. Click **Original page** to return to the normal site.
 
@@ -36,6 +36,7 @@ Readability 0.6.0 and DOMPurify 3.4.13 are included in the `vendor` folder; no r
 
 - If Chrome shows `WEB` on the extension icon, the current tab is not an ordinary web page—for example, it may be a `chrome://` settings page.
 - If Local Reader cannot identify a complete article, wait for the article to finish loading and click the icon again.
+- The voice menu is supplied by Chrome and the operating system; it may take a moment to populate the first time speech is used.
 - A reader can only process text delivered to the browser. Content that is never present in the rendered page cannot be extracted.
 - After changing extension files, open `chrome://extensions` and click the extension's reload button.
 
@@ -45,6 +46,7 @@ Readability 0.6.0 and DOMPurify 3.4.13 are included in the `vendor` folder; no r
 - `v2.0.0` introduced the generic Local Reader implementation.
 - `v2.1.0` adds a same-page HTML fallback for articles shortened by client-side code.
 - `v2.2.0` adds private, native read-aloud controls with pause, resume and stop.
+- `v2.3.0` adds selectors for the available Chrome voices and playback speed.
 
 The project is a Git repository. To inspect the preserved version without changing the working tree, run `git show v1.0.0:reader.js` from this folder.
 

@@ -45,13 +45,22 @@ await new Promise((resolveWait) => setTimeout(resolveWait, fixtureName.endsWith(
 const speechMock = await call("Runtime.evaluate", {
   expression: `(() => {
     const calls = [];
+    const availableVoices = [
+      { name: 'Test Default', lang: 'en-IE', voiceURI: 'test-default', default: true, localService: true },
+      { name: 'Test Alternate', lang: 'en-GB', voiceURI: 'test-alternate', default: false, localService: true }
+    ];
+    const listeners = {};
     const synth = {
       paused: false,
       current: null,
-      speak(utterance) { this.current = utterance; calls.push({ type: 'speak', text: utterance.text, lang: utterance.lang }); },
+      voices: [],
+      speak(utterance) { this.current = utterance; calls.push({ type: 'speak', text: utterance.text, lang: utterance.lang, rate: utterance.rate, voice: utterance.voice?.voiceURI }); },
       pause() { this.paused = true; calls.push({ type: 'pause' }); },
       resume() { this.paused = false; calls.push({ type: 'resume' }); },
-      cancel() { calls.push({ type: 'cancel' }); }
+      cancel() { calls.push({ type: 'cancel' }); },
+      getVoices() { return this.voices; },
+      addEventListener(type, listener) { listeners[type] = listener; },
+      loadTestVoices() { this.voices = availableVoices; listeners.voiceschanged?.(); }
     };
     class MockUtterance {
       constructor(text) { this.text = text; }
@@ -78,6 +87,11 @@ for (const file of ["vendor/Readability.js", "vendor/purify.min.js", "reader.js"
 }
 
 await new Promise((resolveWait) => setTimeout(resolveWait, 1600));
+await call("Runtime.evaluate", {
+  expression: "speechSynthesis.loadTestVoices()",
+  returnByValue: true
+});
+await new Promise((resolveWait) => setTimeout(resolveWait, 50));
 const inspection = await call("Runtime.evaluate", {
   expression: `(() => {
     const paragraphs = [...document.querySelectorAll('#lr-content p')];
@@ -89,6 +103,10 @@ const inspection = await call("Runtime.evaluate", {
       figures: document.querySelectorAll('#lr-content figure').length,
       images: document.querySelectorAll('#lr-content img').length,
       controls: document.querySelectorAll('.lr-toolbar button').length,
+      speechSelects: document.querySelectorAll('.lr-speech-setting select').length,
+      voiceOptions: document.querySelector('#lr-speech-voice')?.options.length,
+      voiceSelectDisabled: document.querySelector('#lr-speech-voice')?.disabled,
+      rateOptions: document.querySelector('#lr-speech-rate')?.options.length,
       extractionSummary: document.querySelector('footer span')?.textContent?.trim(),
       textLength: document.querySelector('#lr-content')?.textContent?.replace(/\\s+/g, ' ').trim().length,
       firstParagraph: paragraphs.at(0)?.textContent?.replace(/\\s+/g, ' ').trim(),
@@ -105,6 +123,10 @@ const speechInspection = await call("Runtime.evaluate", {
   expression: `(() => {
     const toggle = document.querySelector('#lr-speech-toggle');
     const stop = document.querySelector('#lr-speech-stop');
+    const voice = document.querySelector('#lr-speech-voice');
+    const rate = document.querySelector('#lr-speech-rate');
+    voice.value = 'test-alternate';
+    rate.value = '1.5';
     toggle?.click();
     const afterPlay = { label: toggle?.textContent, stopDisabled: stop?.disabled };
     speechSynthesis.current?.onend?.();
@@ -121,7 +143,9 @@ const speechInspection = await call("Runtime.evaluate", {
       afterResume,
       afterStop: { label: toggle?.textContent, stopDisabled: stop?.disabled },
       calls: globalThis.__localReaderSpeechTest,
-      firstSpokenText: globalThis.__localReaderSpeechTest.find(({ type }) => type === 'speak')?.text
+      firstSpokenText: globalThis.__localReaderSpeechTest.find(({ type }) => type === 'speak')?.text,
+      firstSpokenRate: globalThis.__localReaderSpeechTest.find(({ type }) => type === 'speak')?.rate,
+      firstSpokenVoice: globalThis.__localReaderSpeechTest.find(({ type }) => type === 'speak')?.voice
     });
   })()`,
   returnByValue: true
@@ -182,6 +206,10 @@ if (
   !result.reader ||
   result.paragraphs < expected.minParagraphs ||
   result.controls !== 7 ||
+  result.speechSelects !== 2 ||
+  result.voiceOptions !== 3 ||
+  result.voiceSelectDisabled ||
+  result.rateOptions !== 5 ||
   result.images < 1 ||
   result.textLength < expected.minTextLength ||
   result.containsProductCta ||
@@ -199,7 +227,9 @@ if (
   speech.afterStop.label !== "Read aloud" ||
   !speech.afterStop.stopDisabled ||
   !speech.calls.some(({ type }) => type === "speak") ||
-  !speech.firstSpokenText?.startsWith(result.title)
+  !speech.firstSpokenText?.startsWith(result.title) ||
+  speech.firstSpokenRate !== 1.5 ||
+  speech.firstSpokenVoice !== "test-alternate"
 ) {
   process.exitCode = 1;
 }

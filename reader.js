@@ -282,6 +282,22 @@
               <button id="lr-smaller" type="button" aria-label="Decrease text size">A−</button>
               <button id="lr-larger" type="button" aria-label="Increase text size">A+</button>
               <button id="lr-theme" type="button" aria-label="Switch colour theme">Dark</button>
+              <label class="lr-speech-setting">
+                <span>Voice</span>
+                <select id="lr-speech-voice" aria-label="Read-aloud voice" title="Voice changes apply from the next passage">
+                  <option value="">System default</option>
+                </select>
+              </label>
+              <label class="lr-speech-setting">
+                <span>Speed</span>
+                <select id="lr-speech-rate" aria-label="Read-aloud speed" title="Speed changes apply from the next passage">
+                  <option value="0.75">0.75×</option>
+                  <option value="1" selected>1×</option>
+                  <option value="1.25">1.25×</option>
+                  <option value="1.5">1.5×</option>
+                  <option value="2">2×</option>
+                </select>
+              </label>
               <button id="lr-speech-toggle" type="button">Read aloud</button>
               <button id="lr-speech-stop" type="button" disabled>Stop</button>
               <button id="lr-print" type="button">Print</button>
@@ -326,16 +342,21 @@
   function setupReadAloud(language) {
     const toggle = document.getElementById("lr-speech-toggle");
     const stop = document.getElementById("lr-speech-stop");
+    const voiceSelect = document.getElementById("lr-speech-voice");
+    const rateSelect = document.getElementById("lr-speech-rate");
     const synth = globalThis.speechSynthesis;
     const Utterance = globalThis.SpeechSynthesisUtterance;
 
     if (!synth || typeof Utterance !== "function") {
       toggle.disabled = true;
       toggle.textContent = "Read aloud unavailable";
+      voiceSelect.disabled = true;
+      rateSelect.disabled = true;
       return;
     }
 
     const chunks = buildSpeechChunks();
+    let voices = [];
     let state = "idle";
     let chunkIndex = 0;
     let session = 0;
@@ -380,8 +401,10 @@
       }
 
       const utterance = new Utterance(chunks[chunkIndex]);
-      utterance.lang = language || navigator.language || "en";
-      utterance.rate = 1;
+      const voice = voices.find((candidate) => voiceKey(candidate) === voiceSelect.value);
+      if (voice) utterance.voice = voice;
+      utterance.lang = voice?.lang || language || navigator.language || "en";
+      utterance.rate = Number(rateSelect.value) || 1;
       utterance.onend = () => {
         if (activeSession !== session) return;
         chunkIndex += 1;
@@ -416,7 +439,36 @@
       stop.disabled = state === "idle";
     }
 
+    function populateVoices() {
+      const selectedVoice = voiceSelect.value;
+      voices = [...(synth.getVoices?.() || [])].sort((left, right) => {
+        if (left.default !== right.default) return left.default ? -1 : 1;
+        const languagePrefix = String(language || "").split("-")[0].toLowerCase();
+        const leftMatches = languagePrefix && left.lang?.toLowerCase().startsWith(languagePrefix);
+        const rightMatches = languagePrefix && right.lang?.toLowerCase().startsWith(languagePrefix);
+        if (leftMatches !== rightMatches) return leftMatches ? -1 : 1;
+        return left.name.localeCompare(right.name);
+      });
+
+      voiceSelect.replaceChildren(new Option("System default", ""));
+      for (const voice of voices) {
+        const suffix = [voice.lang, voice.default ? "default" : ""].filter(Boolean).join(", ");
+        voiceSelect.append(new Option(`${voice.name}${suffix ? ` (${suffix})` : ""}`, voiceKey(voice)));
+      }
+      if ([...voiceSelect.options].some((option) => option.value === selectedVoice)) {
+        voiceSelect.value = selectedVoice;
+      }
+      voiceSelect.disabled = voices.length === 0;
+    }
+
+    populateVoices();
+    if (typeof synth.addEventListener === "function") synth.addEventListener("voiceschanged", populateVoices);
+    else synth.onvoiceschanged = populateVoices;
     updateSpeechControls();
+  }
+
+  function voiceKey(voice) {
+    return voice.voiceURI || `${voice.name}\u0000${voice.lang}`;
   }
 
   function buildSpeechChunks() {
@@ -563,8 +615,13 @@
       .lr-toolbar button { min-height: 36px; padding: 7px 11px; border: 1px solid var(--lr-line); border-radius: 7px; background: var(--lr-paper); color: var(--lr-text); cursor: pointer; }
       .lr-toolbar button:hover:not(:disabled) { border-color: var(--lr-accent); color: var(--lr-accent); }
       .lr-toolbar button:disabled { cursor: default; opacity: .45; }
+      .lr-toolbar select { min-height: 36px; padding: 6px 28px 6px 8px; border: 1px solid var(--lr-line); border-radius: 7px; background: var(--lr-paper); color: var(--lr-text); font: inherit; }
+      .lr-toolbar select:focus { border-color: var(--lr-accent); outline: 2px solid color-mix(in srgb, var(--lr-accent) 30%, transparent); outline-offset: 1px; }
       #lr-speech-toggle[aria-pressed="true"] { border-color: var(--lr-accent); color: var(--lr-accent); }
       .lr-tools { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+      .lr-speech-setting { display: flex; align-items: center; gap: 5px; color: var(--lr-muted); font-size: 12px; }
+      #lr-speech-voice { width: min(210px, 28vw); }
+      #lr-speech-rate { width: 76px; }
       .lr-page { width: min(100%, 920px); margin: 0 auto; padding: 36px 24px 80px; }
       .lr-page > article { padding: clamp(26px, 6vw, 68px); border: 1px solid var(--lr-line); border-radius: 3px; background: var(--lr-paper); box-shadow: 0 18px 50px rgba(53, 43, 32, .08); }
       .lr-kicker { margin: 0 0 14px; color: var(--lr-accent); font: 700 12px/1.2 system-ui, sans-serif; letter-spacing: .12em; text-transform: uppercase; }
@@ -590,7 +647,7 @@
       #lr-content img { display: block; width: auto; height: auto; max-width: 100%; max-height: 760px; margin: 2em auto; border-radius: 2px; object-fit: contain; background: var(--lr-bg); }
       #lr-content figcaption { margin-top: -1.5em; color: var(--lr-muted); font: 12px/1.45 system-ui, sans-serif; }
       footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--lr-line); color: var(--lr-muted); font: 12px/1.5 system-ui, sans-serif; }
-      @media (max-width: 600px) { .lr-page { padding: 0; } .lr-page > article { border: 0; padding: 34px 20px 60px; } .lr-tools button:nth-child(1), .lr-tools button:nth-child(2) { display: none; } }
+      @media (max-width: 600px) { .lr-toolbar { align-items: flex-start; } .lr-page { padding: 0; } .lr-page > article { border: 0; padding: 34px 20px 60px; } .lr-tools button:nth-child(1), .lr-tools button:nth-child(2), .lr-speech-setting > span { display: none; } #lr-speech-voice { width: min(150px, 42vw); } }
       @media print { .lr-toolbar { display: none; } html, body, .lr-page, .lr-page > article { background: white; color: black; } .lr-page { width: 100%; padding: 0; } .lr-page > article { border: 0; box-shadow: none; padding: 0; } }
     `;
   }
