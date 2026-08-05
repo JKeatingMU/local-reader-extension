@@ -16,17 +16,21 @@
 
   async function openReader() {
     const sourceUrl = location.href;
+    const sourceArticlePromise = fetchSourceArticle(sourceUrl);
     const leadImage = {
       src: firstText(['meta[property="og:image"]', 'meta[name="twitter:image"]'], true),
       alt: firstText(['meta[property="og:image:alt"]', 'meta[name="twitter:image:alt"]'], true)
     };
-    let article = parseCurrentDocument();
+    let renderedArticle = parseDocument(document);
 
-    if (!isUsable(article)) {
+    if (!isUsable(renderedArticle)) {
       await new Promise((resolve) => setTimeout(resolve, 700));
-      article = parseCurrentDocument();
+      renderedArticle = parseDocument(document);
     }
 
+    const sourceArticle = await sourceArticlePromise;
+    const selection = chooseBestArticle(renderedArticle, sourceArticle);
+    const article = selection.article;
     if (!isUsable(article)) {
       showNotice("Local Reader could not identify a complete article on this page.");
       return;
@@ -50,7 +54,7 @@
       'meta[name="description"]',
       'meta[property="og:description"]'
     ], true);
-    const byline = article.byline || "";
+    const byline = normalizeByline(article.byline || "");
     const published = article.publishedTime || firstText(["time"]);
     const siteName = article.siteName || firstText(['meta[property="og:site_name"]'], true) || hostnameLabel(sourceUrl);
 
@@ -63,12 +67,13 @@
       siteName,
       content,
       paragraphCount,
-      textLength
+      textLength,
+      extractionMethod: selection.method
     });
   }
 
-  function parseCurrentDocument() {
-    const clone = document.cloneNode(true);
+  function parseDocument(sourceDocument) {
+    const clone = sourceDocument.cloneNode(true);
     clone.querySelectorAll([
       "script",
       "style",
@@ -95,13 +100,79 @@
     }
   }
 
+  async function fetchSourceArticle(sourceUrl) {
+    if (!/^https?:\/\//i.test(sourceUrl)) return null;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 6000);
+    try {
+      const response = await fetch(sourceUrl, {
+        method: "GET",
+        credentials: "include",
+        cache: "no-store",
+        redirect: "follow",
+        headers: { Accept: "text/html,application/xhtml+xml" },
+        signal: controller.signal
+      });
+      if (!response.ok) return null;
+      const contentType = response.headers.get("content-type") || "";
+      if (!/html|xhtml/i.test(contentType)) return null;
+
+      const html = await response.text();
+      if (html.length < 400 || html.length > 10_000_000) return null;
+      const sourceDocument = new DOMParser().parseFromString(html, "text/html");
+      const base = sourceDocument.createElement("base");
+      base.href = response.url || sourceUrl;
+      sourceDocument.head.prepend(base);
+      return parseDocument(sourceDocument);
+    } catch (error) {
+      if (error?.name !== "AbortError") console.info("Local Reader source fallback was unavailable", error);
+      return null;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  function chooseBestArticle(renderedArticle, sourceArticle) {
+    if (!isUsable(renderedArticle) && !isUsable(sourceArticle)) {
+      return { article: null, method: "No complete article" };
+    }
+    if (!isUsable(renderedArticle)) {
+      return { article: sourceArticle, method: "Original page HTML" };
+    }
+    if (!isUsable(sourceArticle)) {
+      return { article: renderedArticle, method: "Rendered page" };
+    }
+
+    const rendered = articleMetrics(renderedArticle);
+    const source = articleMetrics(sourceArticle);
+    const sourceIsClearlyMoreComplete =
+      source.textLength >= rendered.textLength + 600 &&
+      source.score >= rendered.score * 1.15;
+
+    return sourceIsClearlyMoreComplete
+      ? { article: sourceArticle, method: "Original page HTML" }
+      : { article: renderedArticle, method: "Rendered page" };
+  }
+
+  function articleMetrics(article) {
+    if (!article?.content) return { textLength: 0, paragraphs: 0, score: 0 };
+    const parsed = new DOMParser().parseFromString(article.content, "text/html");
+    const textLength = article.textContent.replace(/\s+/g, " ").trim().length;
+    const paragraphs = parsed.querySelectorAll("p").length;
+    const images = parsed.querySelectorAll("img").length;
+    return {
+      textLength,
+      paragraphs,
+      score: textLength + Math.min(paragraphs, 200) * 120 + Math.min(images, 20) * 100
+    };
+  }
+
   function isUsable(article) {
-    return Boolean(
-      article &&
-      article.content &&
-      article.textContent &&
-      article.textContent.replace(/\s+/g, " ").trim().length >= 400
-    );
+    if (!article?.content || !article?.textContent) return false;
+    const text = article.textContent.replace(/\s+/g, " ").trim();
+    const errorSample = `${article.title || ""} ${text.slice(0, 500)}`;
+    return text.length >= 400 && !/access denied|verify you are human|captcha challenge/i.test(errorSample);
   }
 
   function sanitizeContent(html, baseUrl) {
@@ -222,7 +293,7 @@
               <div id="lr-content">${data.content.innerHTML}</div>
               <footer>
                 <a href="${escapeAttribute(data.sourceUrl)}">View the original article</a>
-                <span>${data.paragraphCount} paragraphs · ${data.textLength.toLocaleString()} characters</span>
+                <span>${data.paragraphCount} paragraphs · ${data.textLength.toLocaleString()} characters · ${escapeHtml(data.extractionMethod)}</span>
               </footer>
             </article>
           </main>
@@ -272,6 +343,13 @@
     } catch {
       return "Article";
     }
+  }
+
+  function normalizeByline(value) {
+    return value
+      .replace(/([a-zÀ-ÿ])(?=(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b)/g, "$1 · ")
+      .replace(/\s+/g, " ")
+      .trim();
   }
 
   function formatDate(value) {

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>A practical test of resilient article extraction — Example Gazette</title>
+  <meta property="og:title" content="A practical test of resilient article extraction">
+  <meta property="og:site_name" content="Example Gazette">
+  <meta property="og:image" content="https://example.com/local-reader-test.jpg">
+  <meta name="description" content="A synthetic article whose client-side script removes most of its paragraphs after loading.">
+</head>
+<body>
+  <main>
+    <article>
+      <h1>A practical test of resilient article extraction</h1>
+      <p class="byline">By Morgan Example</p>
+      <time datetime="2026-08-05T12:00:00Z">5 August 2026</time>
+      <p>The first paragraph remains visible after the page loads. It establishes that this is a substantial article rather than a navigation page, and gives the readability engine enough natural prose to identify the surrounding story.</p>
+      <p>The second paragraph also remains in the rendered document. A normal browser visitor would see these opening lines before a client-side subscription component replaces the rest of the story with a registration message.</p>
+      <p class="protected">The third paragraph is present in the original response but removed by JavaScript. The source fallback should recover it without relying on the publisher name, its CSS classes, or any knowledge of how the registration component is implemented.</p>
+      <p class="protected">A generic reader needs to compare plausible candidates rather than accepting the first block of prose it encounters. Paragraph count, total text length and image evidence together provide a useful indication of which representation is more complete.</p>
+      <p class="protected">This fifth paragraph adds enough natural language to make the complete source decisively stronger. It also confirms that the extractor keeps ordinary inline content while dropping scripts, forms, navigation controls and modal subscription prompts.</p>
+      <p class="protected">The sixth paragraph explains why the source document is parsed inertly. Scripts in downloaded markup must never execute, while hyperlinks and images still need the original page URL as their base so relative addresses continue to work correctly.</p>
+      <p class="protected">The seventh paragraph describes privacy boundaries. The fallback requests only the same page the user already opened, sends the browser’s existing credentials, and does not transmit article text to an external reading or analytics service.</p>
+      <p class="protected">The eighth paragraph ensures that a longer article remains correctly ordered. The reader should preserve paragraphs, headings, quotations, lists and useful media while presenting them in a consistent layout chosen by the person reading.</p>
+      <p class="protected">The ninth paragraph notes that not every difference is evidence of a paywall. Dynamic sites can render progressively, so the implementation waits briefly, compares both candidates and retains the rendered document whenever the source is not clearly more complete.</p>
+      <p class="protected">The tenth paragraph guards against error pages. A source response containing an access-denied or human-verification message must not replace a valid rendered article merely because that response contains a large quantity of unrelated explanatory text.</p>
+      <p class="protected">The eleventh paragraph confirms that publisher-specific adapters are unnecessary for this scenario. The same comparison works wherever an initial HTML response contains a complete article that is subsequently shortened by client-side code.</p>
+      <p class="protected">The final paragraph proves that the original article survived the simulated client-side paywall. Successful extraction must include this exact ending and display it after every preceding paragraph in the clean reader view.</p>
+    </article>
+  </main>
+  <script>
+    document.querySelectorAll(".protected").forEach((paragraph) => paragraph.remove());
+    const banner = document.createElement("div");
+    banner.setAttribute("role", "dialog");
+    banner.setAttribute("aria-modal", "true");
+    banner.textContent = "Register to continue reading";
+    document.body.append(banner);
+  </script>
+</body>
+</html>
+

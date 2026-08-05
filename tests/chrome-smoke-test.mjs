@@ -40,7 +40,7 @@ function call(method, params = {}) {
 await call("Page.enable");
 await call("Runtime.enable");
 await call("Page.navigate", { url: fixtureUrl });
-await new Promise((resolveWait) => setTimeout(resolveWait, 1200));
+await new Promise((resolveWait) => setTimeout(resolveWait, fixtureName.endsWith("live") ? 7000 : 1200));
 
 for (const file of ["vendor/Readability.js", "vendor/purify.min.js", "reader.js"]) {
   const source = await readFile(resolve(file), "utf8");
@@ -66,6 +66,7 @@ const inspection = await call("Runtime.evaluate", {
       figures: document.querySelectorAll('#lr-content figure').length,
       images: document.querySelectorAll('#lr-content img').length,
       controls: document.querySelectorAll('.lr-toolbar button').length,
+      extractionSummary: document.querySelector('footer span')?.textContent?.trim(),
       textLength: document.querySelector('#lr-content')?.textContent?.replace(/\\s+/g, ' ').trim().length,
       firstParagraph: paragraphs.at(0)?.textContent?.replace(/\\s+/g, ' ').trim(),
       lastParagraph: paragraphs.at(-1)?.textContent?.replace(/\\s+/g, ' ').trim(),
@@ -89,21 +90,40 @@ const expectations = {
     minTextLength: 7000,
     firstPrefix: "They’re everywhere.",
     lastSuffix: "rolled-up newspaper.",
-    site: "Mail Online"
+    site: "Mail Online",
+    method: "Rendered page"
   },
   irishtimes: {
     minParagraphs: 65,
     minTextLength: 13000,
     firstPrefix: "Is the State pension your fallback plan",
     lastSuffix: "financial wellbeing in retirement.",
-    site: "The Irish Times"
+    site: "The Irish Times",
+    method: "Rendered page"
+  },
+  irishtimeslive: {
+    minParagraphs: 65,
+    minTextLength: 13000,
+    firstPrefix: "Is the State pension your fallback plan",
+    lastSuffix: "financial wellbeing in retirement.",
+    site: "The Irish Times",
+    method: "Original page HTML"
+  },
+  clientpaywall: {
+    minParagraphs: 12,
+    minTextLength: 2400,
+    firstPrefix: "The first paragraph remains visible",
+    lastSuffix: "clean reader view.",
+    site: "Example Gazette",
+    method: "Original page HTML"
   },
   article: {
     minParagraphs: 2,
     minTextLength: 400,
     firstPrefix: "",
     lastSuffix: "",
-    site: ""
+    site: "",
+    method: ""
   }
 };
 const expected = expectations[fixtureName] || expectations.article;
@@ -117,7 +137,8 @@ if (
   result.containsProductCta ||
   !result.firstParagraph?.startsWith(expected.firstPrefix) ||
   !result.lastParagraph?.endsWith(expected.lastSuffix) ||
-  !result.site?.startsWith(expected.site)
+  !result.site?.startsWith(expected.site) ||
+  !result.extractionSummary?.includes(expected.method)
 ) {
   process.exitCode = 1;
 }

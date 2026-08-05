@@ -186,7 +186,7 @@
         <li>Select the <code>dailymail-reader-extension</code> folder containing this guide. The original folder name is retained so version 1 installations can be reloaded in place.</li>
         <li>Open Chrome’s Extensions menu—the puzzle-piece icon—and pin <strong>Local Reader</strong>.</li>
       </ol>
-      <p>If version 1 was already loaded, click its reload button on <code>chrome://extensions</code>. Chrome will update it to <strong>Local Reader 2.0.0</strong>.</p>
+      <p>If an earlier version is already loaded, click its reload button on <code>chrome://extensions</code>. Chrome will update it to <strong>Local Reader 2.1.0</strong>.</p>
     </section>
 
     <section aria-labelledby="use-heading">
@@ -205,7 +205,8 @@
 
     <section aria-labelledby="how-heading">
       <h2 id="how-heading">How it works</h2>
-      <p>Local Reader clones the fully rendered page, uses Mozilla Readability to identify the headline, author and core article content, then sanitizes the result with DOMPurify before displaying it locally. Both libraries are bundled with the extension; no remote code is loaded.</p>
+      <p>Local Reader compares the rendered page with an inertly parsed copy of the HTML returned by the same URL. It uses the source only when that contains a clearly more complete article, which recovers text removed by client-side code without publisher-specific rules.</p>
+      <p>Mozilla Readability identifies the headline, author and core content; DOMPurify sanitizes the result before displaying it locally. Extracted article text is never sent to an external reading or analytics service.</p>
     </section>
 
     <section aria-labelledby="troubleshooting-heading">
@@ -218,7 +219,7 @@
       </ul>
     </section>
 
-    <footer>Local Reader 2.0.0 for Chrome · Generic, private and entirely local</footer>
+    <footer>Local Reader 2.1.0 for Chrome · Generic and private</footer>
   </main>
 </body>
 </html>

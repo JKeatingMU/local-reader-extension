@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Local Reader",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Turns articles already loaded in Chrome into a clean, private reader view.",
   "icons": {
     "16": "icons/icon-16.png",
