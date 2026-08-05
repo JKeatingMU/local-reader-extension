@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <title>Daily Mail Reader for Chrome — Installation Guide</title>
+  <title>Local Reader for Chrome — Installation Guide</title>
   <style>
     :root {
       color-scheme: light;
@@ -168,14 +168,14 @@
 <body>
   <main>
     <header>
-      <img class="icon" src="icons/icon-128.png" alt="Daily Mail Reader icon">
+      <img class="icon" src="icons/icon-128.png" alt="Local Reader icon">
       <div>
         <p class="eyebrow">Local Chrome extension</p>
-        <h1>Daily Mail Reader</h1>
+        <h1>Local Reader</h1>
       </div>
     </header>
 
-    <p class="intro">A small, local Chrome extension that turns an article already loaded in the browser into a clean reader view. It does not contact another service, download article copies, or collect browsing data.</p>
+    <p class="intro">A private Chrome extension that turns articles already loaded in the browser into a clean reader view. Its generic readability engine works across publishers without relying on site-specific selectors.</p>
 
     <section aria-labelledby="install-heading">
       <h2 id="install-heading">Install once</h2>
@@ -183,16 +183,17 @@
         <li>Open <code>chrome://extensions</code> in Chrome.</li>
         <li>Turn on <strong>Developer mode</strong> in the top-right corner.</li>
         <li>Click <strong>Load unpacked</strong>.</li>
-        <li>Select the <code>dailymail-reader-extension</code> folder containing this guide.</li>
-        <li>Open Chrome’s Extensions menu—the puzzle-piece icon—and pin <strong>Daily Mail Reader</strong>.</li>
+        <li>Select the <code>dailymail-reader-extension</code> folder containing this guide. The original folder name is retained so version 1 installations can be reloaded in place.</li>
+        <li>Open Chrome’s Extensions menu—the puzzle-piece icon—and pin <strong>Local Reader</strong>.</li>
       </ol>
+      <p>If version 1 was already loaded, click its reload button on <code>chrome://extensions</code>. Chrome will update it to <strong>Local Reader 2.0.0</strong>.</p>
     </section>
 
     <section aria-labelledby="use-heading">
       <h2 id="use-heading">Use</h2>
       <ol>
-        <li>Open a Daily Mail article and wait for the page to load.</li>
-        <li>Click the <strong>Daily Mail Reader</strong> toolbar icon, or press <kbd>Option</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd> on macOS—<kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd> elsewhere.</li>
+        <li>Open an article on any ordinary web page and wait for it to load.</li>
+        <li>Click the <strong>Local Reader</strong> toolbar icon, or press <kbd>Option</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd> on macOS—<kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd> elsewhere.</li>
         <li>Use the reader controls to change text size, switch between light and dark themes, or print.</li>
         <li>Click <strong>Original page</strong> to return to the normal site.</li>
       </ol>
@@ -202,16 +203,22 @@
       <strong>Private by design.</strong> The extension only requests <code>activeTab</code> and <code>scripting</code>. Chrome grants temporary access to the current tab when you click the extension; it has no persistent access to browsing history or other sites.
     </aside>
 
+    <section aria-labelledby="how-heading">
+      <h2 id="how-heading">How it works</h2>
+      <p>Local Reader clones the fully rendered page, uses Mozilla Readability to identify the headline, author and core article content, then sanitizes the result with DOMPurify before displaying it locally. Both libraries are bundled with the extension; no remote code is loaded.</p>
+    </section>
+
     <section aria-labelledby="troubleshooting-heading">
       <h2 id="troubleshooting-heading">Troubleshooting</h2>
       <ul>
-        <li>If Chrome shows <code>DM</code> on the extension icon, the current tab is not a <code>dailymail.com</code> page.</li>
-        <li>If the reader says the article has not loaded, wait a moment and click the icon again.</li>
+        <li>If Chrome shows <code>WEB</code> on the extension icon, the current tab is not an ordinary web page—for example, it may be a <code>chrome://</code> settings page.</li>
+        <li>If Local Reader cannot identify a complete article, wait for the page to finish loading and click the icon again.</li>
+        <li>A reader can only process text delivered to the browser. Content absent from the rendered page cannot be extracted.</li>
         <li>After changing the extension files, open <code>chrome://extensions</code> and click the extension’s reload button.</li>
       </ul>
     </section>
 
-    <footer>Daily Mail Reader for Chrome · Local installation guide</footer>
+    <footer>Local Reader 2.0.0 for Chrome · Generic, private and entirely local</footer>
   </main>
 </body>
 </html>
