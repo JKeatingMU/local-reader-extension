@@ -10,7 +10,7 @@ A private Chrome extension that turns articles already loaded in the browser int
 4. Select this `dailymail-reader-extension` folder. The original folder name has been retained so existing installations can be reloaded in place.
 5. Open Chrome's Extensions menu (the puzzle-piece icon) and pin **Local Reader**.
 
-If an earlier version is already loaded, open `chrome://extensions` and click its reload button. Chrome will update it to **Local Reader 2.3.0**.
+If an earlier version is already loaded, open `chrome://extensions` and click its reload button. Chrome will update it to **Local Reader 2.3.1**.
 
 ## Use
 
@@ -47,6 +47,7 @@ Readability 0.6.0 and DOMPurify 3.4.13 are included in the `vendor` folder; no r
 - `v2.1.0` adds a same-page HTML fallback for articles shortened by client-side code.
 - `v2.2.0` adds private, native read-aloud controls with pause, resume and stop.
 - `v2.3.0` adds selectors for the available Chrome voices and playback speed.
+- `v2.3.1` widens the desktop reader and keeps its full toolbar on one line in a standard desktop window.
 
 The project is a Git repository. To inspect the preserved version without changing the working tree, run `git show v1.0.0:reader.js` from this folder.
 

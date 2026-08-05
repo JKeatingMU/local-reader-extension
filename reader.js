@@ -611,7 +611,7 @@
       html { background: var(--lr-bg); scroll-behavior: smooth; }
       body { margin: 0; background: var(--lr-bg); color: var(--lr-text); font-family: Georgia, 'Times New Roman', serif; }
       body.lr-dark { color-scheme: dark; --lr-bg: #16191d; --lr-paper: #20242a; --lr-text: #e9e4dc; --lr-muted: #aaa39a; --lr-line: #3b4047; --lr-accent: #8ec5ff; }
-      .lr-toolbar { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; gap: 12px; padding: 10px max(16px, calc((100vw - 840px) / 2)); border-bottom: 1px solid var(--lr-line); background: color-mix(in srgb, var(--lr-paper) 94%, transparent); backdrop-filter: blur(10px); font: 14px/1.2 system-ui, sans-serif; }
+      .lr-toolbar { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; gap: 12px; padding: 10px max(16px, calc((100vw - 1240px) / 2)); border-bottom: 1px solid var(--lr-line); background: color-mix(in srgb, var(--lr-paper) 94%, transparent); backdrop-filter: blur(10px); font: 14px/1.2 system-ui, sans-serif; }
       .lr-toolbar button { min-height: 36px; padding: 7px 11px; border: 1px solid var(--lr-line); border-radius: 7px; background: var(--lr-paper); color: var(--lr-text); cursor: pointer; }
       .lr-toolbar button:hover:not(:disabled) { border-color: var(--lr-accent); color: var(--lr-accent); }
       .lr-toolbar button:disabled { cursor: default; opacity: .45; }
@@ -622,7 +622,7 @@
       .lr-speech-setting { display: flex; align-items: center; gap: 5px; color: var(--lr-muted); font-size: 12px; }
       #lr-speech-voice { width: min(210px, 28vw); }
       #lr-speech-rate { width: 76px; }
-      .lr-page { width: min(100%, 920px); margin: 0 auto; padding: 36px 24px 80px; }
+      .lr-page { width: min(100%, 1040px); margin: 0 auto; padding: 36px 24px 80px; }
       .lr-page > article { padding: clamp(26px, 6vw, 68px); border: 1px solid var(--lr-line); border-radius: 3px; background: var(--lr-paper); box-shadow: 0 18px 50px rgba(53, 43, 32, .08); }
       .lr-kicker { margin: 0 0 14px; color: var(--lr-accent); font: 700 12px/1.2 system-ui, sans-serif; letter-spacing: .12em; text-transform: uppercase; }
       h1 { margin: 0; font-size: clamp(34px, 6vw, 56px); font-weight: 700; line-height: 1.04; letter-spacing: -.035em; text-wrap: balance; }

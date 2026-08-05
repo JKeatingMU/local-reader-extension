@@ -39,6 +39,12 @@ function call(method, params = {}) {
 
 await call("Page.enable");
 await call("Runtime.enable");
+await call("Emulation.setDeviceMetricsOverride", {
+  width: 1440,
+  height: 900,
+  deviceScaleFactor: 1,
+  mobile: false
+});
 await call("Page.navigate", { url: fixtureUrl });
 await new Promise((resolveWait) => setTimeout(resolveWait, fixtureName.endsWith("live") ? 7000 : 1200));
 
@@ -95,6 +101,7 @@ await new Promise((resolveWait) => setTimeout(resolveWait, 50));
 const inspection = await call("Runtime.evaluate", {
   expression: `(() => {
     const paragraphs = [...document.querySelectorAll('#lr-content p')];
+    const toolbarItems = [...document.querySelectorAll('.lr-toolbar > button, .lr-tools > button, .lr-tools > label')];
     return JSON.stringify({
       reader: Boolean(document.querySelector('#local-reader-view')),
       title: document.querySelector('h1')?.textContent?.trim(),
@@ -107,6 +114,8 @@ const inspection = await call("Runtime.evaluate", {
       voiceOptions: document.querySelector('#lr-speech-voice')?.options.length,
       voiceSelectDisabled: document.querySelector('#lr-speech-voice')?.disabled,
       rateOptions: document.querySelector('#lr-speech-rate')?.options.length,
+      toolbarRows: new Set(toolbarItems.map((item) => Math.round(item.getBoundingClientRect().top))).size,
+      readerWidth: Math.round(document.querySelector('.lr-page')?.getBoundingClientRect().width || 0),
       extractionSummary: document.querySelector('footer span')?.textContent?.trim(),
       textLength: document.querySelector('#lr-content')?.textContent?.replace(/\\s+/g, ' ').trim().length,
       firstParagraph: paragraphs.at(0)?.textContent?.replace(/\\s+/g, ' ').trim(),
@@ -210,6 +219,8 @@ if (
   result.voiceOptions !== 3 ||
   result.voiceSelectDisabled ||
   result.rateOptions !== 5 ||
+  result.toolbarRows !== 1 ||
+  result.readerWidth < 1000 ||
   result.images < 1 ||
   result.textLength < expected.minTextLength ||
   result.containsProductCta ||
