@@ -4,7 +4,7 @@ Safari 26 on macOS can load the extension folder temporarily, without creating a
 
 1. Open **Safari > Settings**.
 2. Open **Advanced** and enable **Show features for web developers**.
-3. Open the newly available **Developer** settings tab.
+3. Stay in the **Settings** window and open its newly available **Developer** tab. This is separate from the **Develop** menu in Safari's menu bar.
 4. Click **Add Temporary Extension**.
 5. Select the `local-reader-extension` folder containing `manifest.json`.
 6. Approve Safari's unsigned-extension authentication prompt if it appears.
