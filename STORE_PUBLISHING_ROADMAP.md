@@ -99,6 +99,23 @@ Safari extensions are distributed in the Extensions category of Apple's App Stor
 6. Develop version 2.5 while the first submissions are being reviewed.
 7. Treat later storage features carefully: saved articles, offline snapshots and persistent typography settings must be reflected in permissions, privacy disclosures and store descriptions.
 
+## Current publishing progress
+
+Completed on 6 August 2026:
+
+- public privacy policy and support guide
+- draft Chrome Web Store listing, single-purpose statement and permission explanations
+- store icon, light and dark 1280 x 800 screenshots, and 440 x 280 promotional tile
+- allowlisted Chrome release staging and ZIP generation
+- automated package, store-asset and cross-browser namespace checks
+- macOS Chrome smoke validation using the packaged 2.4.0 runtime files
+
+Still required before Chrome submission:
+
+- choose a distinctive final store name because another product currently begins its title with “Local Reader”
+- complete the Windows Chrome validation
+- complete the developer account, dashboard, upload and review steps in [`store/chrome/SUBMISSION_CHECKLIST.md`](store/chrome/SUBMISSION_CHECKLIST.md)
+
 ## Product roadmap after publication
 
 ### Version 2.5: reading experience

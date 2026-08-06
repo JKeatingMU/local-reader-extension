@@ -4,8 +4,13 @@ import { resolve } from "node:path";
 const port = Number(process.argv[2] || 9333);
 const fixtureUrl = process.argv[3];
 const fixtureName = process.argv[4] || "article";
+const sourceRoot = process.argv[5] || ".";
+const requestedScreenshotPath = process.argv[6];
+const viewportWidth = Number(process.argv[7] || 1440);
+const viewportHeight = Number(process.argv[8] || 900);
+const screenshotTheme = process.argv[9] || "light";
 if (!fixtureUrl) {
-  throw new Error("Usage: node tests/chrome-smoke-test.mjs <debug-port> <fixture-url> [fixture-name]");
+  throw new Error("Usage: node tests/chrome-smoke-test.mjs <debug-port> <fixture-url> [fixture-name] [source-root] [screenshot-path] [width] [height] [light|dark]");
 }
 
 const targets = await fetch(`http://127.0.0.1:${port}/json/list`).then((response) => response.json());
@@ -40,8 +45,8 @@ function call(method, params = {}) {
 await call("Page.enable");
 await call("Runtime.enable");
 await call("Emulation.setDeviceMetricsOverride", {
-  width: 1440,
-  height: 900,
+  width: viewportWidth,
+  height: viewportHeight,
   deviceScaleFactor: 1,
   mobile: false
 });
@@ -81,7 +86,7 @@ const speechMock = await call("Runtime.evaluate", {
 if (speechMock.exceptionDetails) throw new Error("Speech synthesis mock could not be installed");
 
 for (const file of ["vendor/Readability.js", "vendor/purify.min.js", "reader.js"]) {
-  const source = await readFile(resolve(file), "utf8");
+  const source = await readFile(resolve(sourceRoot, file), "utf8");
   const injection = await call("Runtime.evaluate", {
     expression: source,
     awaitPromise: true,
@@ -163,8 +168,21 @@ const speechInspection = await call("Runtime.evaluate", {
 });
 const speech = JSON.parse(speechInspection.result.value);
 
+await call("Runtime.evaluate", {
+  expression: `(() => {
+    const voice = document.querySelector('#lr-speech-voice');
+    const rate = document.querySelector('#lr-speech-rate');
+    if (voice) voice.value = '';
+    if (rate) rate.value = '1';
+    if (${JSON.stringify(screenshotTheme)} === 'dark' && !document.body.classList.contains('lr-dark')) {
+      document.querySelector('#lr-theme')?.click();
+    }
+  })()`,
+  returnByValue: true
+});
+
 const screenshot = await call("Page.captureScreenshot", { format: "png" });
-const screenshotPath = `/private/tmp/local-reader-${fixtureName}.png`;
+const screenshotPath = requestedScreenshotPath || `/private/tmp/local-reader-${fixtureName}.png`;
 await writeFile(screenshotPath, Buffer.from(screenshot.data, "base64"));
 
 console.log(JSON.stringify({ fixtureName, ...result, speech, screenshotPath }, null, 2));

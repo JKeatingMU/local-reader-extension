@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">Local Reader store icon</title>
+  <g transform="translate(16 16) scale(.75)">
+    <rect width="128" height="128" rx="24" fill="#0d4a86"/>
+    <path d="M34 22h42l18 18v66H34z" fill="#fff"/>
+    <path d="M76 22v20h18" fill="#c7def5"/>
+    <path d="M48 55h32M48 68h32M48 81h25" fill="none" stroke="#0d4a86" stroke-width="7" stroke-linecap="round"/>
+  </g>
+</svg>

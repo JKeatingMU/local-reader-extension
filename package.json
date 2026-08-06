@@ -5,7 +5,9 @@
   "description": "Build-time dependencies for the Local Reader Chrome extension.",
   "scripts": {
     "vendor": "node scripts/vendor-dependencies.mjs",
-    "check": "node --check background.js && node --check reader.js && node --check tests/chrome-smoke-test.mjs && node tests/background-compatibility-test.mjs"
+    "check": "node --check background.js && node --check reader.js && node --check tests/chrome-smoke-test.mjs && node --check tests/fixture-server.mjs && node --check scripts/package-extension.mjs && node scripts/validate-store-assets.mjs && node tests/background-compatibility-test.mjs",
+    "package:chrome": "node scripts/package-extension.mjs",
+    "release:chrome": "npm run check && npm run package:chrome"
   },
   "devDependencies": {
     "@mozilla/readability": "0.6.0",

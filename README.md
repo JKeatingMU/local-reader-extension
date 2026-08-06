@@ -36,6 +36,10 @@ Read aloud uses the browser's built-in Web Speech support and the voices it expo
 
 Readability 0.6.0 and DOMPurify 3.4.13 are included in the `vendor` folder; no remote code is loaded. Their licences are included alongside them.
 
+See the [privacy policy](PRIVACY.md) and [support guide](SUPPORT.md) for the public store disclosures and help information.
+
+Chrome Web Store preparation materials are under [`store/chrome`](store/chrome), including the draft listing, approved-size artwork and submission checklist.
+
 ## Troubleshooting
 
 - If the extension shows `WEB` on its icon, the current tab is not an ordinary web page—for example, it may be a browser settings page.
@@ -64,4 +68,7 @@ Development dependencies are only needed to refresh the vendored libraries:
 npm install
 npm run vendor
 npm run check
+npm run release:chrome
 ```
+
+`npm run release:chrome` validates the project and creates an allowlisted Chrome Web Store package under `dist/chrome`.

@@ -1,0 +1,47 @@
+# Local Reader Privacy Policy
+
+Effective date: 6 August 2026
+
+Local Reader turns the article in the browser's current tab into a clean reading view. Its privacy model is deliberately simple: article processing happens locally in the browser, and the developer does not collect, receive or sell browsing data or article content.
+
+## Information the extension processes
+
+When the user activates Local Reader, the extension temporarily processes the contents and URL of the active browser tab. It uses that information only to identify, sanitise and display the article selected by the user.
+
+Local Reader may request the original HTML of that same active page so it can compare the rendered document with the page response and select the more complete article representation. The request is made by the user's browser to the page the user already opened.
+
+Read aloud uses the speech-synthesis service and voices supplied by the browser and operating system. Local Reader does not add an external speech service.
+
+## Collection, transmission and sharing
+
+Local Reader does not:
+
+- transmit article text, page URLs or browsing activity to the developer
+- use analytics, advertising, tracking pixels or telemetry
+- create a developer-operated user account
+- sell or share user data
+- load executable code from a remote server
+
+Version 2.4.0 does not save articles, browsing history or reading activity. Extracted content exists only in the active tab and is discarded when that page is closed, reloaded or returned to its original view.
+
+## Browser permissions
+
+Local Reader requests only these extension permissions:
+
+- `activeTab` provides temporary access to the current page after the user clicks the extension or invokes its shortcut.
+- `scripting` allows the packaged article extraction, sanitisation and reader code to run in that active tab.
+
+The extension does not request persistent access to every website or access to browser history.
+
+## Included software
+
+Mozilla Readability and DOMPurify are packaged with the extension. They run locally and are not loaded from a remote content-delivery service.
+
+## Future changes
+
+If a future release adds optional local preferences, saved articles or offline reading, this policy and the relevant store disclosures will be updated before that version is published. Local storage will not be represented as cloud collection or transmission.
+
+## Contact
+
+Questions or concerns can be submitted through the public [Local Reader issue tracker](https://github.com/JKeatingMU/local-reader-extension/issues).
+
