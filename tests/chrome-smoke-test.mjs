@@ -9,6 +9,7 @@ const requestedScreenshotPath = process.argv[6];
 const viewportWidth = Number(process.argv[7] || 1440);
 const viewportHeight = Number(process.argv[8] || 900);
 const screenshotTheme = process.argv[9] || "light";
+const screenshotState = process.argv[10] || "reader";
 if (!fixtureUrl) {
   throw new Error("Usage: node tests/chrome-smoke-test.mjs <debug-port> <fixture-url> [fixture-name] [source-root] [screenshot-path] [width] [height] [light|dark]");
 }
@@ -78,7 +79,15 @@ const speechMock = await call("Runtime.evaluate", {
     }
     Object.defineProperty(globalThis, 'speechSynthesis', { configurable: true, value: synth });
     Object.defineProperty(globalThis, 'SpeechSynthesisUtterance', { configurable: true, value: MockUtterance });
+    const storedPreferences = {};
+    const storage = { local: {
+        async get(key) { return { [key]: storedPreferences[key] }; },
+        async set(values) { Object.assign(storedPreferences, values); }
+      } };
+    if (globalThis.chrome) Object.defineProperty(globalThis.chrome, 'storage', { configurable: true, value: storage });
+    else Object.defineProperty(globalThis, 'chrome', { configurable: true, value: { storage } });
     globalThis.__localReaderSpeechTest = calls;
+    globalThis.__textuaryStoredPreferences = storedPreferences;
     return true;
   })()`,
   returnByValue: true
@@ -106,7 +115,6 @@ await new Promise((resolveWait) => setTimeout(resolveWait, 50));
 const inspection = await call("Runtime.evaluate", {
   expression: `(() => {
     const paragraphs = [...document.querySelectorAll('#lr-content p')];
-    const toolbarItems = [...document.querySelectorAll('.lr-toolbar > button, .lr-tools > button, .lr-tools > label')];
     return JSON.stringify({
       reader: Boolean(document.querySelector('#local-reader-view')),
       title: document.querySelector('h1')?.textContent?.trim(),
@@ -115,11 +123,15 @@ const inspection = await call("Runtime.evaluate", {
       figures: document.querySelectorAll('#lr-content figure').length,
       images: document.querySelectorAll('#lr-content img').length,
       controls: document.querySelectorAll('.lr-toolbar button').length,
+      settingsSelects: document.querySelectorAll('.lr-settings-panel select').length,
+      settingsRanges: document.querySelectorAll('.lr-settings-panel input[type="range"]').length,
+      progressBars: document.querySelectorAll('[role="progressbar"]').length,
+      readingMeta: document.querySelector('.lr-reading-meta')?.textContent?.trim(),
       speechSelects: document.querySelectorAll('.lr-speech-setting select').length,
       voiceOptions: document.querySelector('#lr-speech-voice')?.options.length,
       voiceSelectDisabled: document.querySelector('#lr-speech-voice')?.disabled,
       rateOptions: document.querySelector('#lr-speech-rate')?.options.length,
-      toolbarRows: new Set(toolbarItems.map((item) => Math.round(item.getBoundingClientRect().top))).size,
+      toolbarHeight: Math.round(document.querySelector('.lr-toolbar')?.getBoundingClientRect().height || 0),
       readerWidth: Math.round(document.querySelector('.lr-page')?.getBoundingClientRect().width || 0),
       extractionSummary: document.querySelector('footer span')?.textContent?.trim(),
       textLength: document.querySelector('#lr-content')?.textContent?.replace(/\\s+/g, ' ').trim().length,
@@ -140,10 +152,12 @@ const speechInspection = await call("Runtime.evaluate", {
     const voice = document.querySelector('#lr-speech-voice');
     const rate = document.querySelector('#lr-speech-rate');
     voice.value = 'test-alternate';
+    voice.dispatchEvent(new Event('change'));
     rate.value = '1.5';
+    rate.dispatchEvent(new Event('change'));
     toggle?.click();
     await new Promise((resolveWait) => setTimeout(resolveWait, 20));
-    const afterPlay = { label: toggle?.textContent, stopDisabled: stop?.disabled };
+    const afterPlay = { label: toggle?.textContent, stopDisabled: stop?.disabled, highlighted: document.querySelectorAll('.lr-speaking').length };
     speechSynthesis.current?.onend?.();
     const advancedToNextChunk = globalThis.__localReaderSpeechTest.filter(({ type }) => type === 'speak').length >= 2;
     toggle?.click();
@@ -156,7 +170,7 @@ const speechInspection = await call("Runtime.evaluate", {
       advancedToNextChunk,
       afterPause,
       afterResume,
-      afterStop: { label: toggle?.textContent, stopDisabled: stop?.disabled },
+      afterStop: { label: toggle?.textContent, stopDisabled: stop?.disabled, highlighted: document.querySelectorAll('.lr-speaking').length },
       calls: globalThis.__localReaderSpeechTest,
       firstSpokenText: globalThis.__localReaderSpeechTest.find(({ type }) => type === 'speak')?.text,
       firstSpokenRate: globalThis.__localReaderSpeechTest.find(({ type }) => type === 'speak')?.rate,
@@ -168,24 +182,86 @@ const speechInspection = await call("Runtime.evaluate", {
 });
 const speech = JSON.parse(speechInspection.result.value);
 
+const styleInspection = await call("Runtime.evaluate", {
+  expression: `(async () => {
+    const change = (selector, value, eventType = 'change') => {
+      const control = document.querySelector(selector);
+      control.value = value;
+      control.dispatchEvent(new Event(eventType));
+    };
+    change('#lr-theme', 'ambient');
+    change('#lr-font-family', 'modern');
+    change('#lr-font-size', '23', 'input');
+    change('#lr-line-height', '1.9');
+    change('#lr-column-width', '900');
+    await new Promise((resolveWait) => setTimeout(resolveWait, 20));
+    return JSON.stringify({
+      theme: document.body.dataset.lrTheme,
+      fontSize: document.documentElement.style.getPropertyValue('--lr-font-size'),
+      lineHeight: document.documentElement.style.getPropertyValue('--lr-line-height'),
+      columnWidth: document.documentElement.style.getPropertyValue('--lr-page-width'),
+      fontFamily: document.documentElement.style.getPropertyValue('--lr-reading-font'),
+      saved: globalThis.__textuaryStoredPreferences.textuaryReadingPreferences
+    });
+  })()`,
+  awaitPromise: true,
+  returnByValue: true
+});
+const style = JSON.parse(styleInspection.result.value);
+
+const progressInspection = await call("Runtime.evaluate", {
+  expression: `(async () => {
+    document.documentElement.style.scrollBehavior = 'auto';
+    scrollTo(0, document.documentElement.scrollHeight);
+    await new Promise((resolveWait) => setTimeout(resolveWait, 180));
+    const result = {
+      value: Number(document.querySelector('[role="progressbar"]')?.getAttribute('aria-valuenow')),
+      label: document.querySelector('#lr-progress-label')?.textContent
+    };
+    scrollTo(0, 0);
+    await new Promise((resolveWait) => setTimeout(resolveWait, 50));
+    return JSON.stringify(result);
+  })()`,
+  awaitPromise: true,
+  returnByValue: true
+});
+const progress = JSON.parse(progressInspection.result.value);
+
 await call("Runtime.evaluate", {
   expression: `(() => {
     const voice = document.querySelector('#lr-speech-voice');
     const rate = document.querySelector('#lr-speech-rate');
     if (voice) voice.value = '';
     if (rate) rate.value = '1';
-    if (${JSON.stringify(screenshotTheme)} === 'dark' && !document.body.classList.contains('lr-dark')) {
-      document.querySelector('#lr-theme')?.click();
+    const theme = document.querySelector('#lr-theme');
+    if (theme) {
+      theme.value = ${JSON.stringify(screenshotTheme)} === 'dark' ? 'evening' : 'paper';
+      theme.dispatchEvent(new Event('change'));
     }
+    const settings = document.querySelector('.lr-settings');
+    if (settings) settings.open = ${JSON.stringify(screenshotState)} === 'settings';
   })()`,
   returnByValue: true
 });
+await new Promise((resolveWait) => setTimeout(resolveWait, 250));
+const themeInspection = await call("Runtime.evaluate", {
+  expression: `JSON.stringify({
+    theme: document.body.dataset.lrTheme,
+    scrollY,
+    body: getComputedStyle(document.body).color,
+    kicker: getComputedStyle(document.querySelector('.lr-kicker')).color,
+    standfirst: getComputedStyle(document.querySelector('.lr-standfirst')).color,
+    rule: getComputedStyle(document.querySelector('.lr-rule')).backgroundColor
+  })`,
+  returnByValue: true
+});
+const themeState = JSON.parse(themeInspection.result.value);
 
 const screenshot = await call("Page.captureScreenshot", { format: "png" });
 const screenshotPath = requestedScreenshotPath || `/private/tmp/local-reader-${fixtureName}.png`;
 await writeFile(screenshotPath, Buffer.from(screenshot.data, "base64"));
 
-console.log(JSON.stringify({ fixtureName, ...result, speech, screenshotPath }, null, 2));
+console.log(JSON.stringify({ fixtureName, ...result, speech, style, progress, themeState, screenshotPath }, null, 2));
 
 const expectations = {
   dailymail: {
@@ -234,12 +310,16 @@ const expected = expectations[fixtureName] || expectations.article;
 if (
   !result.reader ||
   result.paragraphs < expected.minParagraphs ||
-  result.controls !== 7 ||
+  result.controls !== 5 ||
+  result.settingsSelects !== 4 ||
+  result.settingsRanges !== 1 ||
+  result.progressBars !== 1 ||
+  !result.readingMeta?.includes("min read") ||
   result.speechSelects !== 2 ||
   result.voiceOptions !== 3 ||
   result.voiceSelectDisabled ||
   result.rateOptions !== 5 ||
-  result.toolbarRows !== 1 ||
+  result.toolbarHeight > 60 ||
   result.readerWidth < 1000 ||
   result.images < 1 ||
   result.textLength < expected.minTextLength ||
@@ -250,6 +330,7 @@ if (
   !result.extractionSummary?.includes(expected.method) ||
   speech.afterPlay.label !== "Pause" ||
   speech.afterPlay.stopDisabled ||
+  speech.afterPlay.highlighted !== 1 ||
   !speech.advancedToNextChunk ||
   speech.afterPause.label !== "Resume" ||
   !speech.afterPause.paused ||
@@ -257,10 +338,20 @@ if (
   speech.afterResume.paused ||
   speech.afterStop.label !== "Read aloud" ||
   !speech.afterStop.stopDisabled ||
+  speech.afterStop.highlighted !== 0 ||
   !speech.calls.some(({ type }) => type === "speak") ||
   !speech.firstSpokenText?.startsWith(result.title) ||
   speech.firstSpokenRate !== 1.5 ||
-  speech.firstSpokenVoice !== "test-alternate"
+  speech.firstSpokenVoice !== "test-alternate" ||
+  style.theme !== "ambient" ||
+  style.fontSize !== "23px" ||
+  style.lineHeight !== "1.9" ||
+  style.columnWidth !== "900px" ||
+  !style.fontFamily.includes("ui-sans-serif") ||
+  style.saved?.fontSize !== 23 ||
+  style.saved?.speechRate !== "1.5" ||
+  progress.value < 99 ||
+  progress.label !== "Finished"
 ) {
   process.exitCode = 1;
 }

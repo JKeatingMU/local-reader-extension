@@ -12,8 +12,8 @@ if (!/^\d+\.\d+\.\d+(?:\.\d+)?$/.test(version)) {
 }
 
 const outputRoot = join(projectRoot, "dist", "chrome");
-const stageRoot = join(outputRoot, `local-reader-${version}`);
-const archivePath = join(outputRoot, `local-reader-${version}.zip`);
+const stageRoot = join(outputRoot, `textuary-${version}`);
+const archivePath = join(outputRoot, `textuary-${version}.zip`);
 
 if (!stageRoot.startsWith(`${outputRoot}${sep}`)) {
   throw new Error("Refusing to stage outside the Chrome distribution directory");

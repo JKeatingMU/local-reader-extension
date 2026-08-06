@@ -1,20 +1,20 @@
-# Local Reader Privacy Policy
+# Textuary Privacy Policy
 
 Effective date: 6 August 2026
 
-Local Reader turns the article in the browser's current tab into a clean reading view. Its privacy model is deliberately simple: article processing happens locally in the browser, and the developer does not collect, receive or sell browsing data or article content.
+Textuary turns the article in the browser's current tab into a calm reading view. Its privacy model is deliberately simple: article processing happens locally in the browser, and the developer does not collect, receive or sell browsing data or article content.
 
 ## Information the extension processes
 
-When the user activates Local Reader, the extension temporarily processes the contents and URL of the active browser tab. It uses that information only to identify, sanitise and display the article selected by the user.
+When the user activates Textuary, the extension temporarily processes the contents and URL of the active browser tab. It uses that information only to identify, sanitise and display the article selected by the user.
 
-Local Reader may request the original HTML of that same active page so it can compare the rendered document with the page response and select the more complete article representation. The request is made by the user's browser to the page the user already opened.
+Textuary may request the original HTML of that same active page so it can compare the rendered document with the page response and select the more complete article representation. The request is made by the user's browser to the page the user already opened.
 
-Read aloud uses the speech-synthesis service and voices supplied by the browser and operating system. Local Reader does not add an external speech service.
+Read aloud uses the speech-synthesis service and voices supplied by the browser and operating system. Textuary does not add an external speech service.
 
 ## Collection, transmission and sharing
 
-Local Reader does not:
+Textuary does not:
 
 - transmit article text, page URLs or browsing activity to the developer
 - use analytics, advertising, tracking pixels or telemetry
@@ -22,14 +22,15 @@ Local Reader does not:
 - sell or share user data
 - load executable code from a remote server
 
-Version 2.4.0 does not save articles, browsing history or reading activity. Extracted content exists only in the active tab and is discarded when that page is closed, reloaded or returned to its original view.
+Version 2.5.0 stores reading preferences locally through the browser's extension storage. These preferences can include the selected theme, typeface, text size, line spacing, column width, voice and speech speed. Textuary does not save article content, URLs, browsing history, reading progress or reading activity. Extracted content exists only in the active tab and is discarded when that page is closed, reloaded or returned to its original view.
 
 ## Browser permissions
 
-Local Reader requests only these extension permissions:
+Textuary requests only these extension permissions:
 
 - `activeTab` provides temporary access to the current page after the user clicks the extension or invokes its shortcut.
 - `scripting` allows the packaged article extraction, sanitisation and reader code to run in that active tab.
+- `storage` remembers reading and speech preferences locally in the browser.
 
 The extension does not request persistent access to every website or access to browser history.
 
@@ -39,9 +40,8 @@ Mozilla Readability and DOMPurify are packaged with the extension. They run loca
 
 ## Future changes
 
-If a future release adds optional local preferences, saved articles or offline reading, this policy and the relevant store disclosures will be updated before that version is published. Local storage will not be represented as cloud collection or transmission.
+If a future release adds saved articles or offline reading, this policy and the relevant store disclosures will be updated before that version is published. Local storage will not be represented as cloud collection or transmission.
 
 ## Contact
 
-Questions or concerns can be submitted through the public [Local Reader issue tracker](https://github.com/JKeatingMU/local-reader-extension/issues).
-
+Questions or concerns can be submitted through the public [Textuary issue tracker](https://github.com/JKeatingMU/local-reader-extension/issues).

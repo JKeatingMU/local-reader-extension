@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="440" height="280" viewBox="0 0 440 280" role="img" aria-labelledby="title desc">
-  <title id="title">Local Reader promotional tile</title>
+  <title id="title">Textuary promotional tile</title>
   <desc id="desc">A document icon beside a clean article card on a deep blue background.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
@@ -19,6 +19,8 @@
     <path d="M68 18v18h16" fill="#c7def5"/>
     <path d="M43 50h28M43 62h28M43 74h21" fill="none" stroke="#0d4a86" stroke-width="6" stroke-linecap="round"/>
   </g>
+  <text x="102" y="214" fill="#fff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="20" font-weight="700" text-anchor="middle">Textuary</text>
+  <text x="102" y="234" fill="#c7def5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="8" font-weight="600" letter-spacing="1.4" text-anchor="middle">TEXT SANCTUARY</text>
   <g transform="translate(184 42)" filter="url(#shadow)">
     <rect width="210" height="196" rx="8" fill="#fffdf9"/>
     <rect x="24" y="25" width="48" height="6" rx="3" fill="#2b73ad"/>
@@ -34,4 +36,3 @@
     <rect x="66" y="170" width="56" height="4" rx="2" fill="#cbd2d8"/>
   </g>
 </svg>
-

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <title>Local Reader for Chrome — Installation Guide</title>
+  <title>Textuary for Chrome and Safari — Installation Guide</title>
   <style>
     :root {
       color-scheme: light;
@@ -168,14 +168,14 @@
 <body>
   <main>
     <header>
-      <img class="icon" src="icons/icon-128.png" alt="Local Reader icon">
+      <img class="icon" src="icons/icon-128.png" alt="Textuary icon">
       <div>
         <p class="eyebrow">Local Chrome extension</p>
-        <h1>Local Reader</h1>
+        <h1>Textuary</h1>
       </div>
     </header>
 
-    <p class="intro">A browser extension for Chrome and Safari that turns articles into a clean, focused reading view, inspired by the reader experience built into Microsoft Edge.</p>
+    <p class="intro">A browser extension for Chrome and Safari that turns articles into a calm, focused text sanctuary with reading progress, typography controls and private read-aloud.</p>
 
     <section aria-labelledby="install-heading">
       <h2 id="install-heading">Install in Chrome</h2>
@@ -184,9 +184,9 @@
         <li>Turn on <strong>Developer mode</strong> in the top-right corner.</li>
         <li>Click <strong>Load unpacked</strong>.</li>
         <li>Select the <code>local-reader-extension</code> folder containing this guide.</li>
-        <li>Open Chrome’s Extensions menu—the puzzle-piece icon—and pin <strong>Local Reader</strong>.</li>
+        <li>Open Chrome’s Extensions menu—the puzzle-piece icon—and pin <strong>Textuary</strong>.</li>
       </ol>
-      <p>If an earlier version is already loaded, click its reload button on <code>chrome://extensions</code>. Chrome will update it to <strong>Local Reader 2.4.0</strong>.</p>
+      <p>If an earlier version is already loaded, click its reload button on <code>chrome://extensions</code>. Chrome will update it to <strong>Textuary 2.5.0</strong>.</p>
     </section>
 
     <section aria-labelledby="safari-heading">
@@ -198,36 +198,36 @@
       <h2 id="use-heading">Use</h2>
       <ol>
         <li>Open an article on any ordinary web page and wait for it to load.</li>
-        <li>Click the <strong>Local Reader</strong> toolbar icon, or press <kbd>Option</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd> on macOS—<kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd> elsewhere.</li>
+        <li>Click the <strong>Textuary</strong> toolbar icon, or press <kbd>Option</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd> on macOS—<kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd> elsewhere.</li>
         <li>Choose a <strong>Voice</strong> and <strong>Speed</strong>, then click <strong>Read aloud</strong>. The same button pauses or resumes, and <strong>Stop</strong> returns to the beginning. Changes made during playback apply from the next short passage.</li>
-        <li>Use the other controls to change text size, switch between light and dark themes, or print.</li>
-        <li>Click <strong>Original page</strong> to return to the normal site.</li>
+        <li>Open <strong>Reading style</strong> to select a theme and typeface or adjust text size, spacing and column width. Textuary remembers these choices locally.</li>
+        <li>Follow the slim progress bar and estimated time remaining, or click <strong>Original page</strong> to return to the normal site.</li>
       </ol>
     </section>
 
     <aside class="privacy">
-      <strong>Private by design.</strong> The extension only requests <code>activeTab</code> and <code>scripting</code>. The browser grants temporary access to the current tab when you click the extension; it has no persistent access to browsing history or other sites.
+      <strong>Private by design.</strong> The extension requests <code>activeTab</code> and <code>scripting</code> for the article you choose, plus <code>storage</code> to remember reader settings locally. It has no persistent access to browsing history or other sites.
     </aside>
 
     <section aria-labelledby="how-heading">
       <h2 id="how-heading">How it works</h2>
-      <p>Local Reader compares the rendered page with an inertly parsed copy of the page’s original HTML, then uses the stronger article candidate. This makes extraction more reliable on dynamic sites without publisher-specific rules.</p>
+      <p>Textuary compares the rendered page with an inertly parsed copy of the page’s original HTML, then uses the stronger article candidate. This makes extraction more reliable on dynamic sites without publisher-specific rules.</p>
       <p>Mozilla Readability identifies the headline, author and core content; DOMPurify sanitizes the result before displaying it locally. Extracted article text is never sent to an external reading or analytics service.</p>
-      <p>Read aloud uses the browser’s built-in speech support and the voices it exposes from the computer. Local Reader divides the article into short passages for reliable playback and adds no external speech service.</p>
+      <p>Read aloud uses the browser’s built-in speech support and the voices it exposes from the computer. Textuary divides the article into short passages for reliable playback, highlights the current passage and adds no external speech service.</p>
     </section>
 
     <section aria-labelledby="troubleshooting-heading">
       <h2 id="troubleshooting-heading">Troubleshooting</h2>
       <ul>
         <li>If the extension shows <code>WEB</code> on its icon, the current tab is not an ordinary web page—for example, it may be a browser settings page.</li>
-        <li>If Local Reader cannot identify a complete article, wait for the page to finish loading and click the icon again.</li>
+        <li>If Textuary cannot identify a complete article, wait for the page to finish loading and click the icon again.</li>
         <li>The voice menu is supplied by the browser and operating system; Chrome and Safari may expose different voice lists.</li>
         <li>A reader can only process text delivered to the browser. Content absent from the rendered page cannot be extracted.</li>
         <li>After changing the extension files, open <code>chrome://extensions</code> and click the extension’s reload button.</li>
       </ul>
     </section>
 
-    <footer>Local Reader 2.4.0 for Chrome and Safari · Generic and private</footer>
+    <footer>Textuary 2.5.0 for Chrome and Safari · Your private text sanctuary</footer>
   </main>
 </body>
 </html>

@@ -1,12 +1,12 @@
-# Local Reader Store Publishing Roadmap
+# Textuary Store Publishing and Product Roadmap
 
 Last reviewed: 6 August 2026
 
-Local Reader can be distributed through both the Chrome Web Store and Apple's App Store. Chrome accepts a packaged browser extension directly. Safari distribution uses a signed macOS or iOS application containing the Safari Web Extension.
+Textuary can be distributed through both the Chrome Web Store and Apple's App Store. Chrome accepts a packaged browser extension directly. Safari distribution uses a signed macOS or iOS application containing the Safari Web Extension.
 
 ## Current position
 
-Version 2.4.0 is a good release candidate:
+Version 2.5.0 is the current release candidate:
 
 - Manifest V3 extension
 - compatible with Chrome and Safari
@@ -15,13 +15,16 @@ Version 2.4.0 is a good release candidate:
 - article content is processed locally
 - Readability and DOMPurify are included locally rather than loaded remotely
 - tested on ordinary articles across multiple publishers
+- estimated read time, live reading progress and time remaining
+- remembered typography, paper, evening and automatic ambient themes
+- read-aloud passage highlighting
 
 ## Shared preparation
 
 Before either submission:
 
 1. Add a public privacy policy explaining that page content is processed locally and is not transmitted to the developer or third parties.
-2. Prepare a store-safe name, summary and longer description. Describe Local Reader as a clean, distraction-free reader; avoid comparisons with another browser in store metadata.
+2. Use the store-safe **Textuary — Article Reader & Text Sanctuary** identity, summary and longer description. Avoid comparisons with another browser in store metadata.
 3. Create current screenshots showing the reader, themes and read-aloud controls.
 4. Confirm icon and promotional artwork at every store-required size.
 5. Provide a support URL, most likely the GitHub repository and its Issues page.
@@ -39,7 +42,7 @@ Before submitting to the Chrome Web Store, confirm on a Windows computer that:
 - light, dark and other available themes render correctly
 - text-size and read-aloud controls work with Windows-provided voices
 - pause, resume, stop, voice selection and playback speed behave correctly
-- the documented `Alt+Shift+R` shortcut opens Local Reader
+- the documented `Alt+Shift+R` shortcut opens Textuary
 - printing and PDF output have a clean layout
 - returning to the original page works correctly
 - no macOS-only assumptions appear in paths, fonts, shortcuts or instructions
@@ -96,7 +99,7 @@ Safari extensions are distributed in the Extensions category of Apple's App Stor
 3. Submit the proven desktop version to the Chrome Web Store.
 4. Create and test the permanent macOS Safari package.
 5. Submit the Safari version to the App Store.
-6. Develop version 2.5 while the first submissions are being reviewed.
+6. Continue developing the personal reading library while the first submissions are being reviewed.
 7. Treat later storage features carefully: saved articles, offline snapshots and persistent typography settings must be reflected in permissions, privacy disclosures and store descriptions.
 
 ## Current publishing progress
@@ -108,25 +111,28 @@ Completed on 6 August 2026:
 - store icon, light and dark 1280 x 800 screenshots, and 440 x 280 promotional tile
 - allowlisted Chrome release staging and ZIP generation
 - automated package, store-asset and cross-browser namespace checks
-- macOS Chrome smoke validation using the packaged 2.4.0 runtime files
+- distinctive store identity: **Textuary — Article Reader & Text Sanctuary**
+- macOS Chrome smoke validation of the 2.5.0 reading-experience runtime at 1280 x 800
+- estimated reading time, progress indicator and dynamic time remaining
+- remembered typography controls plus paper, evening and automatic ambient themes
+- read-aloud follow highlighting
 
 Still required before Chrome submission:
 
-- choose a distinctive final store name because another product currently begins its title with “Local Reader”
 - complete the Windows Chrome validation
 - complete the developer account, dashboard, upload and review steps in [`store/chrome/SUBMISSION_CHECKLIST.md`](store/chrome/SUBMISSION_CHECKLIST.md)
 
 ## Product roadmap after publication
 
-### Version 2.5: reading experience
+### Version 2.5: reading experience — completed 6 August 2026
 
-- estimated reading time
-- slim reading-progress indicator
-- dynamic estimated time remaining
-- typography controls for font, line spacing and column width
-- paper, evening and ambient themes
-- locally remembered preferences
-- read-aloud follow highlighting
+- [x] estimated reading time
+- [x] slim reading-progress indicator
+- [x] dynamic estimated time remaining
+- [x] typography controls for font, line spacing and column width
+- [x] paper, evening and ambient themes
+- [x] locally remembered preferences
+- [x] read-aloud follow highlighting
 
 ### Later release: personal reading library
 

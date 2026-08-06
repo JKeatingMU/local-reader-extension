@@ -2,6 +2,17 @@
   "use strict";
 
   const READER_ID = "local-reader-view";
+  const PRODUCT_NAME = "Textuary";
+  const PREFERENCES_KEY = "textuaryReadingPreferences";
+  const DEFAULT_PREFERENCES = Object.freeze({
+    theme: "paper",
+    fontFamily: "editorial",
+    fontSize: 20,
+    lineHeight: 1.72,
+    columnWidth: 1040,
+    speechVoice: "",
+    speechRate: "1"
+  });
   if (document.getElementById(READER_ID)) {
     globalThis.speechSynthesis?.cancel();
     location.reload();
@@ -9,7 +20,7 @@
   }
 
   if (typeof globalThis.Readability !== "function" || typeof globalThis.DOMPurify?.sanitize !== "function") {
-    showNotice("Local Reader could not load its article engine. Reload the extension and try again.");
+    showNotice(`${PRODUCT_NAME} could not load its article engine. Reload the extension and try again.`);
     return;
   }
 
@@ -33,7 +44,7 @@
     const selection = chooseBestArticle(renderedArticle, sourceArticle);
     const article = selection.article;
     if (!isUsable(article)) {
-      showNotice("Local Reader could not identify a complete article on this page.");
+      showNotice(`${PRODUCT_NAME} could not identify a complete article on this page.`);
       return;
     }
 
@@ -43,7 +54,7 @@
     const paragraphCount = content.querySelectorAll("p").length;
     const textLength = content.textContent.replace(/\s+/g, " ").trim().length;
     if (paragraphCount < 2 || textLength < 400) {
-      showNotice("Local Reader found some text, but not enough for a complete article.");
+      showNotice(`${PRODUCT_NAME} found some text, but not enough for a complete article.`);
       return;
     }
 
@@ -59,6 +70,10 @@
     const published = article.publishedTime || firstText(["time"]);
     const siteName = article.siteName || firstText(['meta[property="og:site_name"]'], true) || hostnameLabel(sourceUrl);
 
+    const wordCount = countWords(content.textContent, article.lang || document.documentElement.lang);
+    const readingMinutes = Math.max(1, Math.ceil(wordCount / 225));
+    const preferences = await loadPreferences();
+
     renderReader({
       sourceUrl,
       title,
@@ -69,8 +84,11 @@
       content,
       paragraphCount,
       textLength,
+      wordCount,
+      readingMinutes,
       language: article.lang || document.documentElement.lang || navigator.language,
-      extractionMethod: selection.method
+      extractionMethod: selection.method,
+      preferences
     });
   }
 
@@ -97,7 +115,7 @@
         nbTopCandidates: 8
       }).parse();
     } catch (error) {
-      console.warn("Local Reader could not distil this document", error);
+      console.warn(`${PRODUCT_NAME} could not distil this document`, error);
       return null;
     }
   }
@@ -128,7 +146,7 @@
       sourceDocument.head.prepend(base);
       return parseDocument(sourceDocument);
     } catch (error) {
-      if (error?.name !== "AbortError") console.info("Local Reader source fallback was unavailable", error);
+      if (error?.name !== "AbortError") console.info(`${PRODUCT_NAME} source fallback was unavailable`, error);
       return null;
     } finally {
       clearTimeout(timeout);
@@ -271,7 +289,7 @@
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>${safeTitle} — Local Reader</title>
+        <title>${safeTitle} — ${PRODUCT_NAME}</title>
         <style>${readerCss()}</style>
       </head>
       <body>
@@ -279,9 +297,51 @@
           <header class="lr-toolbar" aria-label="Reader controls">
             <button id="lr-original" type="button" title="Reload the original article">← Original page</button>
             <div class="lr-tools">
-              <button id="lr-smaller" type="button" aria-label="Decrease text size">A−</button>
-              <button id="lr-larger" type="button" aria-label="Increase text size">A+</button>
-              <button id="lr-theme" type="button" aria-label="Switch colour theme">Dark</button>
+              <details class="lr-settings">
+                <summary>Reading style</summary>
+                <div class="lr-settings-panel" aria-label="Typography and theme settings">
+                  <label>
+                    <span>Theme</span>
+                    <select id="lr-theme" aria-label="Reading theme">
+                      <option value="paper">Paper</option>
+                      <option value="evening">Evening</option>
+                      <option value="ambient">Ambient (automatic)</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>Typeface</span>
+                    <select id="lr-font-family" aria-label="Article typeface">
+                      <option value="editorial">Editorial</option>
+                      <option value="book">Book</option>
+                      <option value="modern">Modern</option>
+                      <option value="accessible">Accessible</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>Text size <output id="lr-font-size-value">20px</output></span>
+                    <input id="lr-font-size" type="range" min="16" max="28" step="1" value="20" aria-label="Article text size">
+                  </label>
+                  <label>
+                    <span>Line spacing</span>
+                    <select id="lr-line-height" aria-label="Article line spacing">
+                      <option value="1.5">Compact</option>
+                      <option value="1.72">Comfortable</option>
+                      <option value="1.9">Relaxed</option>
+                      <option value="2.1">Airy</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>Column width</span>
+                    <select id="lr-column-width" aria-label="Article column width">
+                      <option value="760">Narrow</option>
+                      <option value="900">Balanced</option>
+                      <option value="1040">Wide</option>
+                    </select>
+                  </label>
+                  <button id="lr-style-reset" type="button">Reset style</button>
+                </div>
+              </details>
+              <span id="lr-progress-label" class="lr-progress-label" aria-live="polite">${data.readingMinutes} min left</span>
               <label class="lr-speech-setting">
                 <span>Voice</span>
                 <select id="lr-speech-voice" aria-label="Read-aloud voice" title="Voice changes apply from the next passage">
@@ -302,13 +362,17 @@
               <button id="lr-speech-stop" type="button" disabled>Stop</button>
               <button id="lr-print" type="button">Print</button>
             </div>
+            <div class="lr-progress-track" role="progressbar" aria-label="Reading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <div id="lr-progress-bar"></div>
+            </div>
           </header>
           <main class="lr-page">
             <article>
-              <p class="lr-kicker">${safeSiteName} · Local Reader</p>
+              <p class="lr-kicker">${safeSiteName} · ${PRODUCT_NAME}</p>
               <h1>${safeTitle}</h1>
               ${safeDescription}
               <p class="lr-byline">${metadata}</p>
+              <p class="lr-reading-meta">${data.wordCount.toLocaleString()} words · ${data.readingMinutes} min read</p>
               <div class="lr-rule"></div>
               <div id="lr-content">${data.content.innerHTML}</div>
               <footer>
@@ -322,24 +386,99 @@
 
     document.getElementById("lr-original").addEventListener("click", () => location.reload());
     document.getElementById("lr-print").addEventListener("click", () => window.print());
-    setupReadAloud(data.language);
-
-    let fontSize = 20;
-    document.getElementById("lr-smaller").addEventListener("click", () => {
-      fontSize = Math.max(16, fontSize - 1);
-      document.documentElement.style.setProperty("--lr-font-size", `${fontSize}px`);
-    });
-    document.getElementById("lr-larger").addEventListener("click", () => {
-      fontSize = Math.min(28, fontSize + 1);
-      document.documentElement.style.setProperty("--lr-font-size", `${fontSize}px`);
-    });
-    document.getElementById("lr-theme").addEventListener("click", (event) => {
-      const isDark = document.body.classList.toggle("lr-dark");
-      event.currentTarget.textContent = isDark ? "Light" : "Dark";
-    });
+    setupReadingExperience(data);
+    setupReadAloud(data.language, data.preferences);
   }
 
-  function setupReadAloud(language) {
+  function setupReadingExperience(data) {
+    const settings = document.querySelector(".lr-settings");
+    const theme = document.getElementById("lr-theme");
+    const fontFamily = document.getElementById("lr-font-family");
+    const fontSize = document.getElementById("lr-font-size");
+    const fontSizeValue = document.getElementById("lr-font-size-value");
+    const lineHeight = document.getElementById("lr-line-height");
+    const columnWidth = document.getElementById("lr-column-width");
+    const reset = document.getElementById("lr-style-reset");
+    const progress = document.querySelector(".lr-progress-track");
+    const progressBar = document.getElementById("lr-progress-bar");
+    const progressLabel = document.getElementById("lr-progress-label");
+    const preferences = data.preferences;
+    let progressFrame = 0;
+
+    applyPreferences(preferences);
+
+    theme.addEventListener("change", updatePreferences);
+    fontFamily.addEventListener("change", updatePreferences);
+    fontSize.addEventListener("input", updatePreferences);
+    lineHeight.addEventListener("change", updatePreferences);
+    columnWidth.addEventListener("change", updatePreferences);
+    reset.addEventListener("click", () => {
+      const speechVoice = preferences.speechVoice;
+      const speechRate = preferences.speechRate;
+      Object.assign(preferences, DEFAULT_PREFERENCES, { speechVoice, speechRate });
+      applyPreferences(preferences);
+      void savePreferences(preferences);
+      requestProgressUpdate();
+    });
+
+    document.addEventListener("click", (event) => {
+      if (settings.open && !settings.contains(event.target)) settings.open = false;
+    });
+    settings.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        settings.open = false;
+        settings.querySelector("summary").focus();
+      }
+    });
+
+    const requestProgressUpdate = () => {
+      if (progressFrame) return;
+      progressFrame = requestAnimationFrame(() => {
+        progressFrame = 0;
+        const available = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+        const rawRatio = Math.min(1, Math.max(0, scrollY / available));
+        const ratio = rawRatio >= .975 ? 1 : rawRatio;
+        const percentage = Math.round(ratio * 100);
+        const minutesLeft = Math.max(0, Math.ceil(data.readingMinutes * (1 - ratio)));
+        progressBar.style.width = `${percentage}%`;
+        progress.setAttribute("aria-valuenow", String(percentage));
+        progressLabel.textContent = percentage >= 100 ? "Finished" : `${minutesLeft} min left`;
+      });
+    };
+    addEventListener("scroll", requestProgressUpdate, { passive: true });
+    addEventListener("resize", requestProgressUpdate, { passive: true });
+    requestProgressUpdate();
+
+    function updatePreferences() {
+      Object.assign(preferences, {
+        theme: theme.value,
+        fontFamily: fontFamily.value,
+        fontSize: Number(fontSize.value),
+        lineHeight: Number(lineHeight.value),
+        columnWidth: Number(columnWidth.value)
+      });
+      applyPreferences(preferences);
+      void savePreferences(preferences);
+      requestProgressUpdate();
+    }
+
+    function applyPreferences(next) {
+      theme.value = next.theme;
+      fontFamily.value = next.fontFamily;
+      fontSize.value = String(next.fontSize);
+      fontSizeValue.value = `${next.fontSize}px`;
+      lineHeight.value = String(next.lineHeight);
+      columnWidth.value = String(next.columnWidth);
+      document.body.dataset.lrTheme = next.theme;
+      document.body.dataset.lrAmbient = ambientPeriod();
+      document.documentElement.style.setProperty("--lr-font-size", `${next.fontSize}px`);
+      document.documentElement.style.setProperty("--lr-line-height", String(next.lineHeight));
+      document.documentElement.style.setProperty("--lr-page-width", `${next.columnWidth}px`);
+      document.documentElement.style.setProperty("--lr-reading-font", fontStack(next.fontFamily));
+    }
+  }
+
+  function setupReadAloud(language, preferences) {
     const toggle = document.getElementById("lr-speech-toggle");
     const stop = document.getElementById("lr-speech-stop");
     const voiceSelect = document.getElementById("lr-speech-voice");
@@ -360,6 +499,17 @@
     let state = "idle";
     let chunkIndex = 0;
     let session = 0;
+    let highlightedElement = null;
+
+    rateSelect.value = preferences.speechRate;
+    voiceSelect.addEventListener("change", () => {
+      preferences.speechVoice = voiceSelect.value;
+      void savePreferences(preferences);
+    });
+    rateSelect.addEventListener("change", () => {
+      preferences.speechRate = rateSelect.value;
+      void savePreferences(preferences);
+    });
 
     toggle.addEventListener("click", () => {
       if (state === "playing") {
@@ -377,7 +527,7 @@
       }
 
       if (!chunks.length) {
-        showNotice("Local Reader could not find any text to read aloud.");
+        showNotice(`${PRODUCT_NAME} could not find any text to read aloud.`);
         return;
       }
 
@@ -401,7 +551,9 @@
         return;
       }
 
-      const utterance = new Utterance(chunks[chunkIndex]);
+      const chunk = chunks[chunkIndex];
+      highlightSpokenElement(chunk.element);
+      const utterance = new Utterance(chunk.text);
       const selectedVoice = voices.find((candidate) => voiceKey(candidate) === voiceSelect.value);
       const languagePrefix = String(language || navigator.language || "").split("-")[0].toLowerCase();
       const voice = selectedVoice || voices.find((candidate) => candidate.default) ||
@@ -417,7 +569,7 @@
       utterance.onerror = (event) => {
         if (activeSession !== session || /canceled|interrupted/.test(event.error || "")) return;
         finishSpeaking();
-        showNotice("Chrome could not read this article aloud with the selected system voice.");
+        showNotice(`The browser could not read this article aloud with the selected system voice.`);
       };
       synth.speak(utterance);
     }
@@ -428,12 +580,14 @@
       if (synth.paused) synth.resume();
       chunkIndex = 0;
       state = "idle";
+      highlightSpokenElement(null);
       updateSpeechControls();
     }
 
     function finishSpeaking() {
       chunkIndex = 0;
       state = "idle";
+      highlightSpokenElement(null);
       updateSpeechControls();
     }
 
@@ -459,8 +613,9 @@
         const suffix = [voice.lang, voice.default ? "default" : ""].filter(Boolean).join(", ");
         voiceSelect.append(new Option(`${voice.name}${suffix ? ` (${suffix})` : ""}`, voiceKey(voice)));
       }
-      if ([...voiceSelect.options].some((option) => option.value === selectedVoice)) {
-        voiceSelect.value = selectedVoice;
+      const preferredVoice = selectedVoice || preferences.speechVoice;
+      if ([...voiceSelect.options].some((option) => option.value === preferredVoice)) {
+        voiceSelect.value = preferredVoice;
       }
       voiceSelect.disabled = voices.length === 0;
     }
@@ -469,6 +624,20 @@
     if (typeof synth.addEventListener === "function") synth.addEventListener("voiceschanged", populateVoices);
     else synth.onvoiceschanged = populateVoices;
     updateSpeechControls();
+
+    function highlightSpokenElement(element) {
+      if (highlightedElement === element) return;
+      highlightedElement?.classList.remove("lr-speaking");
+      highlightedElement?.removeAttribute("aria-current");
+      highlightedElement = element;
+      if (!element) return;
+      element.classList.add("lr-speaking");
+      element.setAttribute("aria-current", "true");
+      const bounds = element.getBoundingClientRect();
+      if (bounds.top < 80 || bounds.bottom > innerHeight - 40) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
   }
 
   function voiceKey(voice) {
@@ -492,7 +661,7 @@
       .filter((element) => !element.querySelector("p, li, h2, h3, h4, h5, h6"));
     return readableElements.flatMap((element) => splitForSpeech(
       element.textContent.replace(/\s+/g, " ").trim()
-    ));
+    ).map((text) => ({ text, element })));
   }
 
   function splitForSpeech(text, maxLength = 320) {
@@ -529,6 +698,70 @@
     }
     if (remaining) pieces.push(remaining);
     return pieces;
+  }
+
+  function countWords(text, language) {
+    const normalized = String(text || "").replace(/\s+/g, " ").trim();
+    if (!normalized) return 0;
+    if (typeof Intl.Segmenter === "function") {
+      return [...new Intl.Segmenter(language || undefined, { granularity: "word" }).segment(normalized)]
+        .filter(({ isWordLike }) => isWordLike).length;
+    }
+    return normalized.match(/\p{L}[\p{L}\p{M}\p{N}’'-]*/gu)?.length || normalized.split(" ").length;
+  }
+
+  async function loadPreferences() {
+    const storage = extensionStorage();
+    if (!storage) return { ...DEFAULT_PREFERENCES };
+    try {
+      const result = await storage.get(PREFERENCES_KEY);
+      return normalizePreferences(result?.[PREFERENCES_KEY]);
+    } catch (error) {
+      console.info(`${PRODUCT_NAME} could not load reading preferences`, error);
+      return { ...DEFAULT_PREFERENCES };
+    }
+  }
+
+  async function savePreferences(preferences) {
+    const storage = extensionStorage();
+    if (!storage) return;
+    try {
+      await storage.set({ [PREFERENCES_KEY]: normalizePreferences(preferences) });
+    } catch (error) {
+      console.info(`${PRODUCT_NAME} could not save reading preferences`, error);
+    }
+  }
+
+  function extensionStorage() {
+    return globalThis.browser?.storage?.local || globalThis.chrome?.storage?.local || null;
+  }
+
+  function normalizePreferences(value = {}) {
+    const enumValue = (candidate, allowed, fallback) => allowed.includes(candidate) ? candidate : fallback;
+    const numberValue = (candidate, allowed, fallback) => allowed.includes(Number(candidate)) ? Number(candidate) : fallback;
+    return {
+      theme: enumValue(value.theme, ["paper", "evening", "ambient"], DEFAULT_PREFERENCES.theme),
+      fontFamily: enumValue(value.fontFamily, ["editorial", "book", "modern", "accessible"], DEFAULT_PREFERENCES.fontFamily),
+      fontSize: Math.min(28, Math.max(16, Number(value.fontSize) || DEFAULT_PREFERENCES.fontSize)),
+      lineHeight: numberValue(value.lineHeight, [1.5, 1.72, 1.9, 2.1], DEFAULT_PREFERENCES.lineHeight),
+      columnWidth: numberValue(value.columnWidth, [760, 900, 1040], DEFAULT_PREFERENCES.columnWidth),
+      speechVoice: typeof value.speechVoice === "string" ? value.speechVoice : DEFAULT_PREFERENCES.speechVoice,
+      speechRate: enumValue(String(value.speechRate || ""), ["0.75", "1", "1.25", "1.5", "2"], DEFAULT_PREFERENCES.speechRate)
+    };
+  }
+
+  function fontStack(family) {
+    return ({
+      editorial: "Georgia, 'Times New Roman', serif",
+      book: "Iowan Old Style, Palatino Linotype, Book Antiqua, Palatino, serif",
+      modern: "ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+      accessible: "Atkinson Hyperlegible, Arial, Verdana, sans-serif"
+    })[family] || "Georgia, 'Times New Roman', serif";
+  }
+
+  function ambientPeriod() {
+    const hour = new Date().getHours();
+    return hour >= 19 || hour < 7 ? "evening" : "day";
   }
 
   function firstText(selectors, metadata = false) {
@@ -610,11 +843,13 @@
 
   function readerCss() {
     return `
-      :root { color-scheme: light; --lr-font-size: 20px; --lr-bg: #f7f4ee; --lr-paper: #fff; --lr-text: #24211e; --lr-muted: #6b625b; --lr-line: #ded7cf; --lr-accent: #0d4a86; }
+      :root { color-scheme: light; --lr-font-size: 20px; --lr-line-height: 1.72; --lr-page-width: 1040px; --lr-reading-font: Georgia, 'Times New Roman', serif; --lr-bg: #f4efe5; --lr-paper: #fffdf8; --lr-text: #24211e; --lr-muted: #6b625b; --lr-line: #ded7cf; --lr-accent: #0d4a86; }
       * { box-sizing: border-box; }
       html { background: var(--lr-bg); scroll-behavior: smooth; }
-      body { margin: 0; background: var(--lr-bg); color: var(--lr-text); font-family: Georgia, 'Times New Roman', serif; }
-      body.lr-dark { color-scheme: dark; --lr-bg: #16191d; --lr-paper: #20242a; --lr-text: #e9e4dc; --lr-muted: #aaa39a; --lr-line: #3b4047; --lr-accent: #8ec5ff; }
+      body { margin: 0; background: var(--lr-bg); color: var(--lr-text); font-family: var(--lr-reading-font); transition: background-color .2s ease, color .2s ease; }
+      body[data-lr-theme="evening"], body[data-lr-theme="ambient"][data-lr-ambient="evening"] { color-scheme: dark; --lr-bg: #171817; --lr-paper: #222320; --lr-text: #eee6d8; --lr-muted: #b4aa9b; --lr-line: #41413b; --lr-accent: #e9b872; }
+      body[data-lr-theme="ambient"][data-lr-ambient="day"] { --lr-bg: #e8efea; --lr-paper: #fcfdf9; --lr-text: #1f2924; --lr-muted: #68746d; --lr-line: #d0dbd3; --lr-accent: #2d6e55; }
+      body[data-lr-theme="ambient"] { background-image: radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--lr-accent) 9%, transparent), transparent 32rem); background-attachment: fixed; }
       .lr-toolbar { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; gap: 12px; padding: 10px max(16px, calc((100vw - 1240px) / 2)); border-bottom: 1px solid var(--lr-line); background: var(--lr-paper); background: color-mix(in srgb, var(--lr-paper) 94%, transparent); backdrop-filter: blur(10px); font: 14px/1.2 system-ui, sans-serif; }
       .lr-toolbar button { min-height: 36px; padding: 7px 11px; border: 1px solid var(--lr-line); border-radius: 7px; background: var(--lr-paper); color: var(--lr-text); cursor: pointer; }
       .lr-toolbar button:hover:not(:disabled) { border-color: var(--lr-accent); color: var(--lr-accent); }
@@ -622,19 +857,34 @@
       .lr-toolbar select { min-height: 36px; padding: 6px 28px 6px 8px; border: 1px solid var(--lr-line); border-radius: 7px; background: var(--lr-paper); color: var(--lr-text); font: inherit; }
       .lr-toolbar select:focus { border-color: var(--lr-accent); outline: 2px solid color-mix(in srgb, var(--lr-accent) 30%, transparent); outline-offset: 1px; }
       #lr-speech-toggle[aria-pressed="true"] { border-color: var(--lr-accent); color: var(--lr-accent); }
-      .lr-tools { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+      .lr-tools { display: flex; flex-wrap: nowrap; align-items: center; justify-content: flex-end; gap: 6px; }
       .lr-speech-setting { display: flex; align-items: center; gap: 5px; color: var(--lr-muted); font-size: 12px; }
       #lr-speech-voice { width: min(210px, 28vw); }
       #lr-speech-rate { width: 76px; }
-      .lr-page { width: min(100%, 1040px); margin: 0 auto; padding: 36px 24px 80px; }
+      .lr-settings { position: relative; }
+      .lr-settings > summary { min-height: 36px; padding: 9px 11px 7px; border: 1px solid var(--lr-line); border-radius: 7px; background: var(--lr-paper); color: var(--lr-text); cursor: pointer; list-style: none; white-space: nowrap; }
+      .lr-settings > summary::-webkit-details-marker { display: none; }
+      .lr-settings > summary::after { content: " ▾"; color: var(--lr-muted); }
+      .lr-settings[open] > summary { border-color: var(--lr-accent); color: var(--lr-accent); }
+      .lr-settings-panel { position: absolute; top: calc(100% + 10px); right: 0; display: grid; width: 300px; gap: 13px; padding: 18px; border: 1px solid var(--lr-line); border-radius: 10px; background: var(--lr-paper); box-shadow: 0 18px 50px rgba(0, 0, 0, .18); }
+      .lr-settings-panel label { display: grid; gap: 6px; color: var(--lr-muted); font-size: 12px; }
+      .lr-settings-panel label > span { display: flex; justify-content: space-between; }
+      .lr-settings-panel select, .lr-settings-panel input { width: 100%; }
+      .lr-settings-panel output { color: var(--lr-text); }
+      .lr-settings-panel button { justify-self: start; }
+      .lr-progress-label { min-width: 64px; color: var(--lr-muted); font-size: 12px; text-align: center; white-space: nowrap; }
+      .lr-progress-track { position: absolute; right: 0; bottom: -1px; left: 0; height: 3px; overflow: hidden; background: transparent; }
+      #lr-progress-bar { width: 0; height: 100%; background: var(--lr-accent); transition: width .12s linear; }
+      .lr-page { width: min(100%, var(--lr-page-width)); margin: 0 auto; padding: 36px 24px 80px; transition: width .2s ease; }
       .lr-page > article { padding: clamp(26px, 6vw, 68px); border: 1px solid var(--lr-line); border-radius: 3px; background: var(--lr-paper); box-shadow: 0 18px 50px rgba(53, 43, 32, .08); }
       .lr-kicker { margin: 0 0 14px; color: var(--lr-accent); font: 700 12px/1.2 system-ui, sans-serif; letter-spacing: .12em; text-transform: uppercase; }
       h1 { margin: 0; font-size: clamp(34px, 6vw, 56px); font-weight: 700; line-height: 1.04; letter-spacing: -.035em; text-wrap: balance; }
       .lr-standfirst { margin: 24px 0 0; color: var(--lr-muted); font-size: clamp(20px, 3vw, 25px); line-height: 1.42; }
       .lr-byline { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 24px 0 0; color: var(--lr-muted); font: 13px/1.5 system-ui, sans-serif; }
+      .lr-reading-meta { margin: 7px 0 0; color: var(--lr-muted); font: 12px/1.5 system-ui, sans-serif; }
       .lr-rule { width: 72px; height: 3px; margin: 28px 0 34px; background: var(--lr-accent); }
       #lr-content { overflow-wrap: anywhere; }
-      #lr-content p, #lr-content li { font-size: var(--lr-font-size); line-height: 1.72; }
+      #lr-content p, #lr-content li { font-size: var(--lr-font-size); line-height: var(--lr-line-height); }
       #lr-content p { margin: 0 0 1.05em; }
       #lr-content > *:first-child:is(p, div) > p:first-child::first-letter, #lr-content > p:first-child::first-letter { float: left; margin: .05em .1em 0 0; color: var(--lr-accent); font-size: 3.5em; font-weight: 700; line-height: .8; }
       #lr-content h2, #lr-content h3, #lr-content h4 { margin: 2.1em 0 .7em; font-family: system-ui, sans-serif; line-height: 1.18; letter-spacing: -.025em; }
@@ -650,8 +900,10 @@
       #lr-content figure { margin: 2.2em 0; }
       #lr-content img { display: block; width: auto; height: auto; max-width: 100%; max-height: 760px; margin: 2em auto; border-radius: 2px; object-fit: contain; background: var(--lr-bg); }
       #lr-content figcaption { margin-top: -1.5em; color: var(--lr-muted); font: 12px/1.45 system-ui, sans-serif; }
+      #lr-content .lr-speaking, h1.lr-speaking, .lr-standfirst.lr-speaking { border-radius: 4px; background: color-mix(in srgb, var(--lr-accent) 14%, transparent); box-shadow: 0 0 0 5px color-mix(in srgb, var(--lr-accent) 14%, transparent); transition: background .18s ease, box-shadow .18s ease; }
       footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--lr-line); color: var(--lr-muted); font: 12px/1.5 system-ui, sans-serif; }
-      @media (max-width: 600px) { .lr-toolbar { align-items: flex-start; } .lr-page { padding: 0; } .lr-page > article { border: 0; padding: 34px 20px 60px; } .lr-tools button:nth-child(1), .lr-tools button:nth-child(2), .lr-speech-setting > span { display: none; } #lr-speech-voice { width: min(150px, 42vw); } }
+      @media (max-width: 900px) { .lr-progress-label, .lr-speech-setting > span { display: none; } #lr-speech-voice { width: min(170px, 25vw); } }
+      @media (max-width: 600px) { .lr-toolbar { align-items: flex-start; } .lr-tools { flex-wrap: wrap; } .lr-page { padding: 0; } .lr-page > article { border: 0; padding: 34px 20px 60px; } #lr-speech-voice { width: min(150px, 42vw); } .lr-settings-panel { position: fixed; top: 60px; right: 12px; left: 12px; width: auto; } }
       @media print { .lr-toolbar { display: none; } html, body, .lr-page, .lr-page > article { background: white; color: black; } .lr-page { width: 100%; padding: 0; } .lr-page > article { border: 0; box-shadow: none; padding: 0; } }
     `;
   }

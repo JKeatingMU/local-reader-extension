@@ -1,6 +1,6 @@
 const extensionApi = globalThis.browser ?? globalThis.chrome;
 
-if (!extensionApi) throw new Error("Local Reader could not find a Web Extensions API");
+if (!extensionApi) throw new Error("Textuary could not find a Web Extensions API");
 
 extensionApi.action.onClicked.addListener(async (tab) => {
   if (!tab.id || !/^https?:\/\//i.test(tab.url || "")) {
@@ -19,7 +19,7 @@ extensionApi.action.onClicked.addListener(async (tab) => {
     });
     await setBadge(tab.id, "", "#2563eb");
   } catch (error) {
-    console.error("Local Reader could not run", error);
+    console.error("Textuary could not run", error);
     await setBadge(tab.id, "ERR", "#b91c1c");
   }
 });
