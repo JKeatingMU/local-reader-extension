@@ -26,7 +26,23 @@ Before either submission:
 4. Confirm icon and promotional artwork at every store-required size.
 5. Provide a support URL, most likely the GitHub repository and its Issues page.
 6. Run automated tests and manual Chrome and Safari checks against the exact release package.
-7. Keep all privacy declarations consistent with the extension's permissions and actual behaviour.
+7. Test the exact release package in Chrome on Windows; development and testing to date have been on macOS only.
+8. Keep all privacy declarations consistent with the extension's permissions and actual behaviour.
+
+### Required Windows Chrome validation
+
+Before submitting to the Chrome Web Store, confirm on a Windows computer that:
+
+- the unpacked extension installs and opens correctly
+- article extraction works across several ordinary publishers
+- the complete toolbar remains on one line at common desktop window sizes
+- light, dark and other available themes render correctly
+- text-size and read-aloud controls work with Windows-provided voices
+- pause, resume, stop, voice selection and playback speed behave correctly
+- the documented `Alt+Shift+R` shortcut opens Local Reader
+- printing and PDF output have a clean layout
+- returning to the original page works correctly
+- no macOS-only assumptions appear in paths, fonts, shortcuts or instructions
 
 ## Chrome Web Store
 
@@ -76,11 +92,12 @@ Safari extensions are distributed in the Extensions category of Apple's App Stor
 ## Suggested sequence
 
 1. Prepare the shared privacy policy, copy, artwork and release packaging.
-2. Submit the proven desktop version to the Chrome Web Store.
-3. Create and test the permanent macOS Safari package.
-4. Submit the Safari version to the App Store.
-5. Develop version 2.5 while the first submissions are being reviewed.
-6. Treat later storage features carefully: saved articles, offline snapshots and persistent typography settings must be reflected in permissions, privacy disclosures and store descriptions.
+2. Complete and record the Windows Chrome validation.
+3. Submit the proven desktop version to the Chrome Web Store.
+4. Create and test the permanent macOS Safari package.
+5. Submit the Safari version to the App Store.
+6. Develop version 2.5 while the first submissions are being reviewed.
+7. Treat later storage features carefully: saved articles, offline snapshots and persistent typography settings must be reflected in permissions, privacy disclosures and store descriptions.
 
 ## Product roadmap after publication
 
