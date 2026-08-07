@@ -10,8 +10,9 @@ const viewportWidth = Number(process.argv[7] || 1440);
 const viewportHeight = Number(process.argv[8] || 900);
 const screenshotTheme = process.argv[9] || "light";
 const screenshotState = process.argv[10] || "reader";
+const speechPlatform = process.argv[11] || "chrome";
 if (!fixtureUrl) {
-  throw new Error("Usage: node tests/chrome-smoke-test.mjs <debug-port> <fixture-url> [fixture-name] [source-root] [screenshot-path] [width] [height] [light|dark]");
+  throw new Error("Usage: node tests/chrome-smoke-test.mjs <debug-port> <fixture-url> [fixture-name] [source-root] [screenshot-path] [width] [height] [light|dark] [reader|settings] [chrome|safari]");
 }
 
 const targets = await fetch(`http://127.0.0.1:${port}/json/list`).then((response) => response.json());
@@ -122,14 +123,37 @@ const speechMock = await call("Runtime.evaluate", {
     Object.defineProperty(globalThis, 'SpeechSynthesisUtterance', { configurable: true, value: MockUtterance });
     Object.defineProperty(globalThis, 'AudioContext', { configurable: true, value: MockAudioContext });
     Object.defineProperty(navigator, 'gpu', { configurable: true, value: { async requestAdapter() { return {}; } } });
+    if (${JSON.stringify(speechPlatform)} === 'safari') {
+      Object.defineProperty(navigator, 'userAgent', { configurable: true, value: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Version/26.0 Safari/605.1.15' });
+    }
     const storedPreferences = {};
     const storage = { local: {
         async get(key) { return { [key]: storedPreferences[key] }; },
         async set(values) { Object.assign(storedPreferences, values); }
       } };
+    let nativeState = 'idle';
+    let nativeRequestId = '';
     const runtime = {
       getURL(path) {
         return path === 'vendor/kokoro.web.js' ? kokoroModule : 'chrome-extension://textuary-test/' + path;
+      },
+      async sendMessage(message) {
+        const payload = message?.payload || {};
+        naturalCalls.push({ type: 'native-command', command: payload.command, ...payload });
+        if (payload.command === 'voices') return { ok: true, voices: [
+          { identifier: 'com.apple.voice.premium.selena', name: 'Selena', language: 'en-GB', quality: 'Premium' },
+          { identifier: 'com.apple.voice.enhanced.ava', name: 'Ava', language: 'en-US', quality: 'Enhanced' }
+        ] };
+        if (payload.command === 'speak') {
+          nativeState = 'speaking';
+          nativeRequestId = payload.requestId;
+        } else if (payload.command === 'pause') nativeState = 'paused';
+        else if (payload.command === 'resume') nativeState = 'speaking';
+        else if (payload.command === 'stop') {
+          nativeState = 'idle';
+          nativeRequestId = '';
+        }
+        return { ok: true, state: nativeState, requestId: nativeRequestId };
       }
     };
     if (globalThis.chrome) {
@@ -180,7 +204,7 @@ const inspection = await call("Runtime.evaluate", {
       readingMeta: document.querySelector('.lr-reading-meta')?.textContent?.trim(),
       speechSelects: document.querySelectorAll('.lr-speech-setting select').length,
       speechEngineOptions: document.querySelector('#lr-speech-engine')?.options.length,
-      naturalEngineDisabled: document.querySelector('#lr-speech-engine option[value="kokoro"]')?.disabled,
+      naturalEngineDisabled: document.querySelector('#lr-speech-engine option[value="${speechPlatform === "safari" ? "apple" : "kokoro"}"]')?.disabled,
       voiceOptions: document.querySelector('#lr-speech-voice')?.options.length,
       voiceSelectDisabled: document.querySelector('#lr-speech-voice')?.disabled,
       rateOptions: document.querySelector('#lr-speech-rate')?.options.length,
@@ -238,18 +262,20 @@ const speech = JSON.parse(speechInspection.result.value);
 
 const naturalSpeechInspection = await call("Runtime.evaluate", {
   expression: `(async () => {
+    const safari = ${JSON.stringify(speechPlatform)} === 'safari';
     const engine = document.querySelector('#lr-speech-engine');
     const voice = document.querySelector('#lr-speech-voice');
     const toggle = document.querySelector('#lr-speech-toggle');
     const stop = document.querySelector('#lr-speech-stop');
-    engine.value = 'kokoro';
+    engine.value = safari ? 'apple' : 'kokoro';
     engine.dispatchEvent(new Event('change'));
-    voice.value = 'bf_emma';
+    await new Promise((resolveWait) => setTimeout(resolveWait, 30));
+    voice.value = safari ? 'com.apple.voice.premium.selena' : 'bf_emma';
     voice.dispatchEvent(new Event('change'));
     toggle.click();
     await new Promise((resolveWait) => setTimeout(resolveWait, 20));
     const consentOpen = document.querySelector('#lr-kokoro-consent')?.open;
-    document.querySelector('#lr-kokoro-consent button[value="enable"]')?.click();
+    if (!safari) document.querySelector('#lr-kokoro-consent button[value="enable"]')?.click();
     await new Promise((resolveWait) => setTimeout(resolveWait, 120));
     const afterPlay = { label: toggle.textContent, highlighted: document.querySelectorAll('.lr-speaking').length };
     toggle.click();
@@ -404,6 +430,32 @@ const expectations = {
   }
 };
 const expected = expectations[fixtureName] || expectations.article;
+const safariNativeSpeechOkay = speechPlatform !== "safari" || (
+  !naturalSpeech.consentOpen &&
+  naturalSpeech.voiceOptions === 2 &&
+  naturalSpeech.calls.some(({ type, command }) => type === "native-command" && command === "voices") &&
+  naturalSpeech.calls.some(({ type, command, voiceIdentifier, rate, text }) =>
+    type === "native-command" &&
+    command === "speak" &&
+    voiceIdentifier === "com.apple.voice.premium.selena" &&
+    rate === 1.5 &&
+    text?.startsWith(result.title)
+  ) &&
+  naturalSpeech.calls.some(({ type, command }) => type === "native-command" && command === "pause") &&
+  naturalSpeech.calls.some(({ type, command }) => type === "native-command" && command === "resume") &&
+  naturalSpeech.calls.some(({ type, command }) => type === "native-command" && command === "stop") &&
+  naturalSpeech.saved?.speechEngine === "apple" &&
+  naturalSpeech.saved?.appleVoice === "com.apple.voice.premium.selena"
+);
+const chromeNaturalSpeechOkay = speechPlatform === "safari" || (
+  naturalSpeech.consentOpen &&
+  naturalSpeech.voiceOptions === 28 &&
+  naturalSpeech.calls.some(({ type, dtype, device }) => type === "model" && dtype === "fp32" && device === "webgpu") &&
+  naturalSpeech.calls.some(({ type, value }) => type === "wasm-path" && value === "chrome-extension://textuary-test/vendor/") &&
+  naturalSpeech.calls.some(({ type, voice, speed }) => type === "generate" && voice === "bf_emma" && speed === 1.5) &&
+  naturalSpeech.saved?.speechEngine === "kokoro" &&
+  naturalSpeech.saved?.kokoroConsent === true
+);
 
 if (
   !result.reader ||
@@ -444,19 +496,14 @@ if (
   !speech.secondSpokenText?.startsWith("By ") ||
   speech.firstSpokenRate !== 1.5 ||
   speech.firstSpokenVoice !== "test-alternate" ||
-  !naturalSpeech.consentOpen ||
-  naturalSpeech.voiceOptions !== 28 ||
+  !safariNativeSpeechOkay ||
+  !chromeNaturalSpeechOkay ||
   naturalSpeech.afterPlay.label !== "Pause" ||
   naturalSpeech.afterPlay.highlighted !== 1 ||
   naturalSpeech.afterPause.label !== "Resume" ||
   naturalSpeech.afterResume.label !== "Pause" ||
   naturalSpeech.afterStop.label !== "Read aloud" ||
   naturalSpeech.afterStop.highlighted !== 0 ||
-  !naturalSpeech.calls.some(({ type, dtype, device }) => type === "model" && dtype === "fp32" && device === "webgpu") ||
-  !naturalSpeech.calls.some(({ type, value }) => type === "wasm-path" && value === "chrome-extension://textuary-test/vendor/") ||
-  !naturalSpeech.calls.some(({ type, voice, speed }) => type === "generate" && voice === "bf_emma" && speed === 1.5) ||
-  naturalSpeech.saved?.speechEngine !== "kokoro" ||
-  naturalSpeech.saved?.kokoroConsent !== true ||
   style.theme !== "ambient" ||
   style.fontSize !== "23px" ||
   style.lineHeight !== "1.9" ||

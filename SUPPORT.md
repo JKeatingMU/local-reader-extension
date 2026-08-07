@@ -8,12 +8,15 @@
 4. In Chrome, reload the extension from `chrome://extensions` after installing an updated unpacked version.
 5. Remember that a reader can process only content delivered to the browser.
 
-## Natural voice troubleshooting
+## Natural and Premium voice troubleshooting
 
-- Natural (Kokoro) speech currently requires a WebGPU-capable Chrome browser and graphics adapter. Safari uses System speech because the current ONNX WebGPU runtime can hang in WebKit.
+- Natural (Kokoro) speech requires a WebGPU-capable Chrome browser and graphics adapter.
 - The first activation downloads and caches approximately 330 MB of model data. Check the internet connection and allow time for the progress message to complete.
 - The first passage is slower than later passages. Performance varies by GPU; Textuary prepares one passage ahead to reduce pauses.
 - If Natural speech fails, switch **Speech** to **System**. Article reading and system read-aloud do not depend on the Kokoro model.
+- **Premium (Apple)** requires the packaged Safari extension from `safari/Textuary/Textuary.xcodeproj`; it is unavailable in a temporary folder-loaded extension.
+- Install an Enhanced or Premium voice in the device's Accessibility speech settings before opening Textuary. If it does not appear, close and reopen the reader after the download completes.
+- If the native bridge is unavailable, disable any duplicate temporary Textuary entry, enable the packaged extension in Safari Settings, and try again. **System** remains available as a fallback.
 
 ## Report an issue
 

@@ -1,12 +1,12 @@
 # Textuary Store Publishing and Product Roadmap
 
-Last reviewed: 6 August 2026
+Last reviewed: 7 August 2026
 
 Textuary can be distributed through both the Chrome Web Store and Apple's App Store. Chrome accepts a packaged browser extension directly. Safari distribution uses a signed macOS or iOS application containing the Safari Web Extension.
 
 ## Current position
 
-Version 2.5.0 remains the preserved release candidate on `main`. Version 2.6.0 is being validated on the `feature/kokoro-natural-voices` branch and adds:
+Version 2.5.0 remains the preserved release candidate on `main`. Chrome's Kokoro work is preserved on `feature/kokoro-natural-voices`. Version 2.7.0 is being validated on `feature/safari-native-premium-voices` and adds a native Apple voice path for Safari while retaining:
 
 - Manifest V3 extension
 - compatible with Chrome and Safari
@@ -21,6 +21,8 @@ Version 2.5.0 remains the preserved release candidate on `main`. Version 2.6.0 i
 - optional Kokoro natural voices generated locally with WebGPU
 - an explicit approximately 330 MB first-use model download and browser cache
 - system-voice fallback and spoken author/publication metadata
+- a containing macOS/iOS application and Safari Web Extension
+- installed Apple Enhanced and Premium voices through on-device `AVSpeechSynthesizer`
 
 ## Shared preparation
 
@@ -148,6 +150,19 @@ Still required before Chrome submission:
 - [ ] manual listening test in ordinary macOS Chrome
 - [ ] Windows Chrome WebGPU, performance and fallback test
 - [x] keep Safari System-only for 2.6 after ONNX WebGPU testing hung during first inference
+
+### Version 2.7: native Apple Premium voices — in validation 7 August 2026
+
+- [x] preserve the failed Safari Kokoro experiment on `feature/safari-kokoro-wasm`
+- [x] create a multiplatform macOS/iOS containing application and Safari Web Extension
+- [x] enumerate installed Enhanced and Premium Apple voices without transmitting article text
+- [x] connect voice, speed, play, pause, resume, stop and passage highlighting to `AVSpeechSynthesizer`
+- [x] retain Chrome's Kokoro implementation and Chrome manifest independently
+- [x] automated mocked Safari control-flow test
+- [x] unsigned and locally signed macOS builds
+- [ ] manual packaged-Safari listening test with Selena Premium
+- [ ] install Xcode's matching iOS platform component and complete a generic device build
+- [ ] physical iPad/iPhone Safari test
 
 ### Later release: personal reading library
 

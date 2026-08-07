@@ -7,6 +7,7 @@ const source = await readFile(new URL("../background.js", import.meta.url), "utf
 for (const namespace of ["browser", "chrome"]) {
   const calls = [];
   let onClicked;
+  let onMessage;
   const api = {
     action: {
       onClicked: { addListener(listener) { onClicked = listener; } },
@@ -15,6 +16,13 @@ for (const namespace of ["browser", "chrome"]) {
     },
     scripting: {
       async executeScript(options) { calls.push(["executeScript", options]); }
+    },
+    runtime: {
+      onMessage: { addListener(listener) { onMessage = listener; } },
+      async sendNativeMessage(application, payload) {
+        calls.push(["nativeMessage", { application, payload }]);
+        return { ok: true, engine: "AVSpeechSynthesizer" };
+      }
     }
   };
   const context = {
@@ -39,6 +47,20 @@ for (const namespace of ["browser", "chrome"]) {
   assert.ok(
     calls.some(([type, options]) => type === "badgeText" && options.text === "WEB"),
     `${namespace} unsupported-page badge`
+  );
+
+  const nativeResponse = await onMessage({
+    type: "textuary-native-speech",
+    payload: { command: "ping" }
+  });
+  assert.equal(nativeResponse.engine, "AVSpeechSynthesizer", `${namespace} native speech response`);
+  assert.ok(
+    calls.some(([type, options]) =>
+      type === "nativeMessage" &&
+      options.application === "com.jgkeating.textuary.Extension" &&
+      options.payload.command === "ping"
+    ),
+    `${namespace} native speech forwarding`
   );
 }
 

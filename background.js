@@ -2,6 +2,21 @@ const extensionApi = globalThis.browser ?? globalThis.chrome;
 
 if (!extensionApi) throw new Error("Textuary could not find a Web Extensions API");
 
+const NATIVE_SPEECH_MESSAGE = "textuary-native-speech";
+
+if (extensionApi.runtime?.onMessage?.addListener) {
+  extensionApi.runtime.onMessage.addListener((message) => {
+    if (message?.type !== NATIVE_SPEECH_MESSAGE) return undefined;
+    if (typeof extensionApi.runtime.sendNativeMessage !== "function") {
+      return Promise.resolve({ ok: false, error: "Safari's native speech bridge is unavailable" });
+    }
+    return Promise.resolve(extensionApi.runtime.sendNativeMessage(
+      "com.jgkeating.textuary.Extension",
+      message.payload || {}
+    )).catch((error) => ({ ok: false, error: String(error?.message || error) }));
+  });
+}
+
 extensionApi.action.onClicked.addListener(async (tab) => {
   if (!tab.id || !/^https?:\/\//i.test(tab.url || "")) {
     await setBadge(tab.id, "WEB", "#6b7280");

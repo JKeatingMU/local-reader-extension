@@ -1,17 +1,41 @@
-# Try Textuary in Safari
+# Install and test Textuary in Safari
 
-Safari 26 on macOS can load the extension folder temporarily, without creating an Xcode project first.
+Textuary 2.7 includes a containing Apple application and Safari Web Extension for macOS, iPhone and iPad. This packaged version can use installed Apple Enhanced and Premium voices through the on-device `AVSpeechSynthesizer` API. The older temporary-extension method still works for article-reader testing, but it cannot use this native voice bridge.
 
-1. Open **Safari > Settings**.
-2. Open **Advanced** and enable **Show features for web developers**.
-3. Stay in the **Settings** window and open its newly available **Developer** tab. This is separate from the **Develop** menu in Safari's menu bar.
-4. Click **Add Temporary Extension**.
-5. Select the `local-reader-extension` folder containing `manifest.json`.
-6. Approve Safari's unsigned-extension authentication prompt if it appears.
-7. In Safari's **Extensions** settings, make sure **Textuary** is enabled.
-8. Open an ordinary article page and click the Textuary toolbar button.
-9. When Safari asks for website access, allow it for that use or for the website.
+## macOS: packaged extension with Premium voices
 
-Test article extraction, reading time and progress, the Reading style controls, printing and read aloud. Safari supplies its own broad system voice list, so the available names may differ from Chrome. Textuary currently disables Natural (Kokoro) speech in Safari because testing found that the upstream ONNX WebGPU runtime can hang in WebKit; use **System** speech in Safari.
+1. Download an Apple Premium or Enhanced voice in **System Settings > Accessibility > Read & Speak**. Selena Premium is one tested example.
+2. Open `safari/Textuary/Textuary.xcodeproj` in Xcode.
+3. Select the **Textuary (macOS)** scheme and **My Mac**, then click **Run**.
+4. In the Textuary application, click **Quit and Open Safari Settings…**, or open **Safari > Settings > Extensions** yourself.
+5. Enable **Textuary** and approve website access when Safari asks.
+6. If the temporary development version is also listed, disable it so there is only one active Textuary extension.
+7. Open an ordinary article and click the Textuary toolbar button.
+8. In the reader, choose **Premium (Apple)** under Speech, then select the installed voice and speed.
 
-Temporary extensions are removed after 24 hours or when Safari quits. Once the Safari behaviour is confirmed, Apple's Safari Web Extension packager can create the macOS app wrapper needed for permanent installation or distribution.
+The Premium voice menu deliberately shows only Apple's Enhanced and Premium voices. Choose **System** if you want the broader voice list exposed through browser speech synthesis.
+
+## iPhone and iPad development test
+
+1. Install an Enhanced or Premium voice under **Settings > Accessibility > Spoken Content > Voices**.
+2. Open the Xcode project and select the **Textuary (iOS)** scheme.
+3. Choose a connected iPhone or iPad and click **Run**. Xcode may first require the matching iOS platform component under **Xcode > Settings > Components**.
+4. On the device, enable Textuary under **Settings > Apps > Safari > Extensions** and grant website access.
+5. Open an article in Safari, activate Textuary, and choose **Premium (Apple)** in its reading view.
+
+The iOS extension source compiles, but a physical iPad/iPhone runtime test remains required before distribution.
+
+## Temporary Safari extension
+
+For a quick reader-only test on macOS, Safari 26 can still load the repository folder temporarily:
+
+1. Open **Safari > Settings > Advanced** and enable **Show features for web developers**.
+2. Open the newly available **Developer** settings tab. This is separate from Safari's **Develop** menu.
+3. Click **Add Temporary Extension** and select the repository folder containing `manifest.json`.
+4. Enable Textuary under **Safari > Settings > Extensions** and approve website access.
+
+Temporary extensions are removed after 24 hours or when Safari quits. Because this path does not load the containing application, use **System** speech with the temporary version. Use the Xcode-packaged extension for **Premium (Apple)** voices.
+
+## Why Safari does not use Kokoro
+
+Chrome's optional Natural mode uses Kokoro locally with WebGPU. Safari testing exposed an upstream ONNX/WebKit hang and, in one experiment, a WebKit content-process crash. Textuary therefore uses Apple's own on-device premium voices in Safari. This avoids the model download, works with voices the user has explicitly installed, and retains the same Textuary play, pause, resume, stop, speed and passage-highlighting controls.

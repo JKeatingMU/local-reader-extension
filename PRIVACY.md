@@ -14,6 +14,8 @@ System read aloud uses the speech-synthesis service and voices supplied by the b
 
 If the user explicitly enables Natural voices, Textuary downloads the Kokoro FP32 model and selected voice data from Hugging Face and caches those files in the browser. The packaged Kokoro runtime generates speech locally with WebGPU. Article text, article URLs and the generated audio are not sent to Hugging Face or another speech service. As with any file download, Hugging Face and its delivery infrastructure receive ordinary network request information such as the user's IP address and browser request metadata.
 
+In the packaged Safari version, Premium (Apple) speech passes short article passages from the Safari extension to Textuary's containing application extension, which speaks them through Apple's `AVSpeechSynthesizer` using an Enhanced or Premium voice installed by the user. Synthesis occurs on the Apple device; Textuary does not send the text to the developer, Hugging Face or another remote speech service.
+
 ## Collection, transmission and sharing
 
 Textuary does not:
@@ -24,7 +26,7 @@ Textuary does not:
 - sell or share user data
 - load executable code from a remote server; the optional remotely downloaded Kokoro files are model and voice data interpreted by the packaged local runtime
 
-Version 2.6.0 stores reading preferences locally through the browser's extension storage. These preferences can include the selected theme, typeface, text size, line spacing, column width, speech engine, voice, speech speed and whether the user accepted the Natural-voice model download. The browser may separately cache downloaded Kokoro model and voice data. Textuary does not save article content, URLs, browsing history, reading progress or reading activity. Extracted content exists only in the active tab and is discarded when that page is closed, reloaded or returned to its original view.
+Textuary stores reading preferences locally through the browser's extension storage. These preferences can include the selected theme, typeface, text size, line spacing, column width, speech engine, voice, speech speed and whether the user accepted the Natural-voice model download. The browser may separately cache downloaded Kokoro model and voice data. Textuary does not save article content, URLs, browsing history, reading progress or reading activity. Extracted content exists only in the active tab and is discarded when that page is closed, reloaded or returned to its original view.
 
 ## Browser permissions
 
@@ -33,6 +35,7 @@ Textuary requests only these extension permissions:
 - `activeTab` provides temporary access to the current page after the user clicks the extension or invokes its shortcut.
 - `scripting` allows the packaged article extraction, sanitisation and reader code to run in that active tab.
 - `storage` remembers reading and speech preferences locally in the browser.
+- `nativeMessaging` appears only in the packaged Safari manifest and carries speech commands and the current short passage between Textuary's Safari extension and its own Apple application extension.
 
 The extension does not request persistent access to every website or access to browser history.
 

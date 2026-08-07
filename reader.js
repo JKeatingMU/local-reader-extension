@@ -44,6 +44,7 @@
     speechEngine: "system",
     speechVoice: "",
     speechRate: "1",
+    appleVoice: "",
     kokoroVoice: "bf_emma",
     kokoroConsent: false
   });
@@ -473,6 +474,7 @@
         speechEngine: preferences.speechEngine,
         speechVoice: preferences.speechVoice,
         speechRate: preferences.speechRate,
+        appleVoice: preferences.appleVoice,
         kokoroVoice: preferences.kokoroVoice,
         kokoroConsent: preferences.kokoroConsent
       };
@@ -555,6 +557,7 @@
     const NaturalAudioContext = globalThis.AudioContext || globalThis.webkitAudioContext;
     const isSafari = /\bSafari\//.test(navigator.userAgent) &&
       !/\b(?:Chrome|HeadlessChrome|Chromium|CriOS|Edg|OPR)\//.test(navigator.userAgent);
+    const hasAppleSpeech = Boolean(isSafari && extensionApi?.runtime?.sendMessage);
     const hasNaturalSpeech = Boolean(!isSafari && navigator.gpu && extensionApi?.runtime?.getURL && NaturalAudioContext);
     const chunks = buildSpeechChunks(data);
     const naturalOption = engineSelect.querySelector('option[value="kokoro"]');
@@ -566,17 +569,30 @@
     let naturalContext = null;
     let naturalSource = null;
     let kokoroPromise = null;
+    let appleVoices = [];
+    let appleVoicesLoaded = false;
+    let appleVoicesPromise = null;
+    let applePollTimer = null;
     let generationTail = Promise.resolve();
     const naturalCache = new Map();
 
-    naturalOption.disabled = !hasNaturalSpeech;
-    naturalOption.title = hasNaturalSpeech
-      ? "Runs locally using WebGPU"
-      : isSafari
-        ? "Natural voices are temporarily unavailable in Safari; use System speech"
+    if (isSafari) {
+      naturalOption.value = "apple";
+      naturalOption.textContent = "Premium (Apple)";
+      naturalOption.disabled = !hasAppleSpeech;
+      naturalOption.title = hasAppleSpeech
+        ? "Uses enhanced and premium voices installed on this Apple device"
+        : "The Textuary Safari app is required for premium Apple voices";
+    } else {
+      naturalOption.disabled = !hasNaturalSpeech;
+      naturalOption.title = hasNaturalSpeech
+        ? "Runs locally using WebGPU"
         : "WebGPU is unavailable in this browser";
+    }
     if (preferences.speechEngine === "kokoro" && !hasNaturalSpeech) preferences.speechEngine = "system";
+    if (preferences.speechEngine === "apple" && !hasAppleSpeech) preferences.speechEngine = "system";
     if (!hasSystemSpeech && hasNaturalSpeech) preferences.speechEngine = "kokoro";
+    if (!hasSystemSpeech && hasAppleSpeech) preferences.speechEngine = "apple";
     engineSelect.value = preferences.speechEngine;
     rateSelect.value = preferences.speechRate;
 
@@ -588,6 +604,7 @@
     });
     voiceSelect.addEventListener("change", () => {
       if (engineSelect.value === "kokoro") preferences.kokoroVoice = voiceSelect.value;
+      else if (engineSelect.value === "apple") preferences.appleVoice = voiceSelect.value;
       else preferences.speechVoice = voiceSelect.value;
       clearNaturalCache(chunkIndex + 1);
       void savePreferences(preferences);
@@ -598,7 +615,10 @@
       void savePreferences(preferences);
     });
 
-    toggle.addEventListener("click", () => void handleToggle());
+    toggle.addEventListener("click", () => void handleToggle().catch((error) => {
+      stopSpeaking();
+      showNotice(`Read-aloud control failed: ${naturalSpeechError(error)}.`);
+    }));
     stop.addEventListener("click", stopSpeaking);
     window.addEventListener("pagehide", () => {
       stopSpeaking();
@@ -607,7 +627,8 @@
 
     async function handleToggle() {
       if (state === "playing") {
-        if (engineSelect.value === "kokoro") await naturalContext?.suspend();
+        if (engineSelect.value === "apple") await sendAppleSpeech("pause");
+        else if (engineSelect.value === "kokoro") await naturalContext?.suspend();
         else synth.pause();
         state = "paused";
         updateSpeechControls();
@@ -615,7 +636,8 @@
       }
 
       if (state === "paused") {
-        if (engineSelect.value === "kokoro") await naturalContext?.resume();
+        if (engineSelect.value === "apple") await sendAppleSpeech("resume");
+        else if (engineSelect.value === "kokoro") await naturalContext?.resume();
         else synth.resume();
         state = "playing";
         updateSpeechControls();
@@ -631,7 +653,9 @@
       session += 1;
       chunkIndex = 0;
       const activeSession = session;
-      if (engineSelect.value === "kokoro") {
+      if (engineSelect.value === "apple") {
+        await beginAppleSpeech(activeSession);
+      } else if (engineSelect.value === "kokoro") {
         await beginNaturalSpeech(activeSession);
       } else {
         beginSystemSpeech(activeSession);
@@ -648,6 +672,117 @@
       if (synth.paused) synth.resume();
       updateSpeechControls();
       setTimeout(() => speakSystemNext(activeSession), 0);
+    }
+
+    async function beginAppleSpeech(activeSession) {
+      if (!hasAppleSpeech) {
+        fallBackToSystem("Premium Apple voices require the packaged Textuary Safari app. System voices remain available.");
+        return;
+      }
+
+      state = "loading";
+      setSpeechStatus("Finding installed Apple premium voices…");
+      updateSpeechControls();
+      try {
+        await loadAppleVoices();
+        if (activeSession !== session) return;
+        if (!appleVoices.length) {
+          throw new Error("No enhanced or premium Apple voices are installed");
+        }
+        await speakAppleNext(activeSession);
+      } catch (error) {
+        if (activeSession !== session) return;
+        void sendAppleSpeech("stop").catch(() => {});
+        finishSpeaking();
+        fallBackToSystem(`Premium Apple speech could not start: ${naturalSpeechError(error)}. System voices remain available.`);
+      }
+    }
+
+    async function speakAppleNext(activeSession) {
+      if (activeSession !== session || state === "idle") return;
+      if (chunkIndex >= chunks.length) {
+        finishSpeaking();
+        return;
+      }
+
+      const chunk = chunks[chunkIndex];
+      const requestId = `${activeSession}-${chunkIndex}-${Date.now()}`;
+      const selectedVoice = selectedAppleVoice();
+      state = "loading";
+      setSpeechStatus(`Starting ${selectedVoice?.name || "Apple premium voice"}…`);
+      highlightSpokenElement(chunk.element);
+      updateSpeechControls();
+
+      const response = await sendAppleSpeech("speak", {
+        requestId,
+        text: chunk.text,
+        voiceIdentifier: selectedVoice?.identifier || preferences.appleVoice,
+        language: selectedVoice?.language || language || navigator.language || "en",
+        rate: Number(rateSelect.value) || 1
+      });
+      if (activeSession !== session) return;
+      if (response.requestId && response.requestId !== requestId) {
+        throw new Error("The native speech bridge returned an unexpected passage identifier");
+      }
+      state = "playing";
+      setSpeechStatus("");
+      updateSpeechControls();
+      scheduleAppleStatusPoll(activeSession, requestId);
+    }
+
+    function scheduleAppleStatusPoll(activeSession, requestId) {
+      clearTimeout(applePollTimer);
+      applePollTimer = setTimeout(async () => {
+        if (activeSession !== session || state === "idle") return;
+        try {
+          const response = await sendAppleSpeech("status");
+          if (activeSession !== session) return;
+          if (response.requestId && response.requestId !== requestId) {
+            throw new Error("The native speech bridge lost the current passage");
+          }
+          if (response.state === "finished") {
+            chunkIndex += 1;
+            await speakAppleNext(activeSession);
+            return;
+          }
+          if (response.state === "idle" && state !== "paused") {
+            throw new Error("The native speech process stopped unexpectedly");
+          }
+          scheduleAppleStatusPoll(activeSession, requestId);
+        } catch (error) {
+          if (activeSession !== session) return;
+          void sendAppleSpeech("stop").catch(() => {});
+          finishSpeaking();
+          showNotice(`Premium Apple speech stopped: ${naturalSpeechError(error)}.`);
+        }
+      }, 180);
+    }
+
+    async function loadAppleVoices() {
+      if (!appleVoicesPromise) {
+        appleVoicesPromise = sendAppleSpeech("voices").then((response) => {
+          const available = Array.isArray(response.voices) ? response.voices : [];
+          const languagePrefix = String(language || navigator.language || "en").split("-")[0].toLowerCase();
+          const matching = available.filter((voice) => String(voice.language || "").toLowerCase().startsWith(languagePrefix));
+          appleVoices = (matching.length ? matching : available).filter((voice) => voice?.identifier && voice?.name);
+          appleVoicesLoaded = true;
+          if (engineSelect.value === "apple") configureVoiceMenu();
+          return appleVoices;
+        }).catch((error) => {
+          appleVoicesPromise = null;
+          throw error;
+        });
+      }
+      return appleVoicesPromise;
+    }
+
+    async function sendAppleSpeech(command, payload = {}) {
+      const response = await extensionApi.runtime.sendMessage({
+        type: "textuary-native-speech",
+        payload: { command, ...payload }
+      });
+      if (!response?.ok) throw new Error(response?.error || "The Textuary native speech bridge did not respond");
+      return response;
     }
 
     async function beginNaturalSpeech(activeSession) {
@@ -848,6 +983,9 @@
 
     function stopSpeaking() {
       session += 1;
+      clearTimeout(applePollTimer);
+      applePollTimer = null;
+      if (hasAppleSpeech) void sendAppleSpeech("stop").catch(() => {});
       synth?.cancel();
       if (synth?.paused) synth.resume();
       if (naturalSource) {
@@ -865,6 +1003,8 @@
     }
 
     function finishSpeaking() {
+      clearTimeout(applePollTimer);
+      applePollTimer = null;
       naturalSource = null;
       void naturalContext?.suspend();
       chunkIndex = 0;
@@ -891,7 +1031,7 @@
         loading: "Loading voice…",
         generating: "Preparing…"
       })[state] || "Read aloud";
-      toggle.disabled = state === "loading" || state === "generating" || (!hasSystemSpeech && !hasNaturalSpeech);
+      toggle.disabled = state === "loading" || state === "generating" || (!hasSystemSpeech && !hasNaturalSpeech && !hasAppleSpeech);
       toggle.setAttribute("aria-pressed", String(state !== "idle"));
       stop.disabled = state === "idle";
       engineSelect.disabled = state !== "idle";
@@ -910,6 +1050,36 @@
     }
 
     function configureVoiceMenu() {
+      if (engineSelect.value === "apple") {
+        if (!appleVoicesLoaded) {
+          voiceSelect.replaceChildren(new Option("Loading premium voices…", ""));
+          voiceSelect.disabled = true;
+          voiceSelect.title = "Textuary is asking the native Apple speech engine for installed premium voices";
+          void loadAppleVoices().catch((error) => {
+            voiceSelect.replaceChildren(new Option("Premium voices unavailable", ""));
+            voiceSelect.disabled = true;
+            showNotice(`Textuary could not list Apple premium voices: ${naturalSpeechError(error)}.`);
+          });
+          return;
+        }
+        if (!appleVoices.length) {
+          voiceSelect.replaceChildren(new Option("No premium voices installed", ""));
+          voiceSelect.disabled = true;
+          voiceSelect.title = "Install an enhanced or premium voice in Accessibility > Read & Speak";
+          return;
+        }
+        voiceSelect.replaceChildren(...appleVoices.map((voice) =>
+          new Option(`${voice.name} (${voice.quality}, ${voice.language})`, voice.identifier)
+        ));
+        const selected = appleVoices.some(({ identifier }) => identifier === preferences.appleVoice)
+          ? preferences.appleVoice
+          : appleVoices[0].identifier;
+        voiceSelect.value = selected;
+        preferences.appleVoice = selected;
+        voiceSelect.disabled = false;
+        voiceSelect.title = "Enhanced and premium voices installed on this Apple device";
+        return;
+      }
       if (engineSelect.value === "kokoro") {
         voiceSelect.replaceChildren(...KOKORO_VOICES.map(([id, name, accent, gender]) =>
           new Option(`${name} (${accent}, ${gender})`, id)
@@ -936,6 +1106,10 @@
 
     function naturalVoiceName() {
       return KOKORO_VOICES.find(([id]) => id === preferences.kokoroVoice)?.[1] || "natural voice";
+    }
+
+    function selectedAppleVoice() {
+      return appleVoices.find(({ identifier }) => identifier === voiceSelect.value) || appleVoices[0] || null;
     }
 
     function setSpeechStatus(message) {
@@ -1091,9 +1265,10 @@
       fontSize: Math.min(28, Math.max(16, Number(value.fontSize) || DEFAULT_PREFERENCES.fontSize)),
       lineHeight: numberValue(value.lineHeight, [1.5, 1.72, 1.9, 2.1], DEFAULT_PREFERENCES.lineHeight),
       columnWidth: numberValue(value.columnWidth, [760, 900, 1040], DEFAULT_PREFERENCES.columnWidth),
-      speechEngine: enumValue(value.speechEngine, ["system", "kokoro"], DEFAULT_PREFERENCES.speechEngine),
+      speechEngine: enumValue(value.speechEngine, ["system", "kokoro", "apple"], DEFAULT_PREFERENCES.speechEngine),
       speechVoice: typeof value.speechVoice === "string" ? value.speechVoice : DEFAULT_PREFERENCES.speechVoice,
       speechRate: enumValue(String(value.speechRate || ""), ["0.75", "1", "1.25", "1.5", "2"], DEFAULT_PREFERENCES.speechRate),
+      appleVoice: typeof value.appleVoice === "string" ? value.appleVoice : DEFAULT_PREFERENCES.appleVoice,
       kokoroVoice: KOKORO_VOICES.some(([id]) => id === value.kokoroVoice)
         ? value.kokoroVoice
         : DEFAULT_PREFERENCES.kokoroVoice,
