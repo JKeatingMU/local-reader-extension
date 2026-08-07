@@ -672,7 +672,7 @@
         console.error(`${PRODUCT_NAME} could not start Kokoro`, error);
         if (activeSession === session) {
           finishSpeaking();
-          fallBackToSystem("Natural voices could not start on this device. System voices are still available.");
+          fallBackToSystem(`Natural voices could not start: ${naturalSpeechError(error)}. System voices are still available.`);
         }
       }
     }
@@ -932,6 +932,15 @@
     function setSpeechStatus(message) {
       status.textContent = message;
       status.hidden = !message;
+    }
+
+    function naturalSpeechError(error) {
+      const message = String(error?.message || error || "unknown error")
+        .replace(/chrome-extension:\/\/[a-z]+\//gi, "the packaged extension/")
+        .replace(/https?:\/\/[^\s)]+/gi, "the model server")
+        .replace(/\s+/g, " ")
+        .trim();
+      return (message || "unknown error").slice(0, 180);
     }
 
     populateSystemVoices();
