@@ -751,7 +751,8 @@
           const adapter = await navigator.gpu.requestAdapter();
           if (!adapter) throw new Error("No WebGPU adapter is available");
           const moduleUrl = extensionApi.runtime.getURL("vendor/kokoro.web.js");
-          const { KokoroTTS } = await import(moduleUrl);
+          const { KokoroTTS, env } = await import(moduleUrl);
+          env.wasmPaths = extensionApi.runtime.getURL("vendor/");
           return KokoroTTS.from_pretrained(KOKORO_MODEL_ID, {
             dtype: "fp32",
             device: "webgpu",

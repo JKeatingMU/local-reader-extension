@@ -38,7 +38,8 @@ const evaluation = await call("Runtime.evaluate", {
     const adapter = await navigator.gpu.requestAdapter();
     if (!adapter) throw new Error('Chrome did not provide a WebGPU adapter');
     const started = performance.now();
-    const { KokoroTTS } = await import(${JSON.stringify(moduleUrl)});
+    const { KokoroTTS, env } = await import(${JSON.stringify(moduleUrl)});
+    env.wasmPaths = new URL('.', ${JSON.stringify(moduleUrl)}).href;
     let lastProgress = -1;
     const tts = await KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX', {
       dtype: ${JSON.stringify(dtype)},

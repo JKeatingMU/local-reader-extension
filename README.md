@@ -38,7 +38,7 @@ System read-aloud uses the browser's built-in Web Speech support and the voices 
 
 Read-aloud starts with the title, author and publication date when available, followed by the standfirst and article. Text is divided into short passages; Natural speech prepares the next passage while the current one plays.
 
-Readability 0.6.0, DOMPurify 3.4.13 and the Kokoro.js 1.2.1 browser runtime are included in the `vendor` folder; no remote executable code is loaded. Their licences and the licences of the packaged Kokoro browser dependencies are included alongside them.
+Readability 0.6.0, DOMPurify 3.4.13, the Kokoro.js 1.2.1 browser runtime and its matching ONNX WebAssembly helper are included in the `vendor` folder; no remote executable code is loaded. Their licences and the licences of the packaged Kokoro browser dependencies are included alongside them.
 
 See the [privacy policy](PRIVACY.md) and [support guide](SUPPORT.md) for the public store disclosures and help information.
 

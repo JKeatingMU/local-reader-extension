@@ -8,6 +8,7 @@ await mkdir(vendor, { recursive: true });
 const readabilitySource = resolve(root, "node_modules/@mozilla/readability/Readability.js");
 const purifySource = resolve(root, "node_modules/dompurify/dist/purify.min.js");
 const kokoroSource = resolve(root, "node_modules/kokoro-js/dist/kokoro.web.js");
+const onnxRuntimeSource = resolve(root, "node_modules/@huggingface/transformers/dist");
 
 const readability = await readFile(readabilitySource, "utf8");
 const purify = await readFile(purifySource, "utf8");
@@ -30,6 +31,14 @@ await copyFile(
   resolve(vendor, "LICENSE-dompurify.txt")
 );
 await copyFile(kokoroSource, resolve(vendor, "kokoro.web.js"));
+await copyFile(
+  resolve(onnxRuntimeSource, "ort-wasm-simd-threaded.jsep.mjs"),
+  resolve(vendor, "ort-wasm-simd-threaded.jsep.mjs")
+);
+await copyFile(
+  resolve(onnxRuntimeSource, "ort-wasm-simd-threaded.jsep.wasm"),
+  resolve(vendor, "ort-wasm-simd-threaded.jsep.wasm")
+);
 await copyFile(
   resolve(root, "node_modules/kokoro-js/LICENSE"),
   resolve(vendor, "LICENSE-kokoro-js.txt")
@@ -68,4 +77,4 @@ SOFTWARE.
 `
 );
 
-console.log("Vendored Readability 0.6.0, DOMPurify 3.4.13 and Kokoro.js 1.2.1");
+console.log("Vendored Readability 0.6.0, DOMPurify 3.4.13, Kokoro.js 1.2.1 and its ONNX runtime");

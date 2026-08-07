@@ -29,6 +29,8 @@ const packageFiles = [
   "vendor/Readability.js",
   "vendor/purify.min.js",
   "vendor/kokoro.web.js",
+  "vendor/ort-wasm-simd-threaded.jsep.mjs",
+  "vendor/ort-wasm-simd-threaded.jsep.wasm",
   "vendor/LICENSE-readability.md",
   "vendor/LICENSE-dompurify.txt",
   "vendor/LICENSE-kokoro-js.txt",

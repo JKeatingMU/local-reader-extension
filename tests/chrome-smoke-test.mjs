@@ -100,6 +100,11 @@ const speechMock = await call("Runtime.evaluate", {
       }
     }
     const kokoroModule = 'data:text/javascript,' + encodeURIComponent(\`
+      export const env = {
+        set wasmPaths(value) {
+          globalThis.__localReaderNaturalTest.push({ type: 'wasm-path', value });
+        }
+      };
       export const KokoroTTS = {
         async from_pretrained(model, options) {
           globalThis.__localReaderNaturalTest.push({ type: 'model', model, dtype: options.dtype, device: options.device });
@@ -122,7 +127,11 @@ const speechMock = await call("Runtime.evaluate", {
         async get(key) { return { [key]: storedPreferences[key] }; },
         async set(values) { Object.assign(storedPreferences, values); }
       } };
-    const runtime = { getURL() { return kokoroModule; } };
+    const runtime = {
+      getURL(path) {
+        return path === 'vendor/kokoro.web.js' ? kokoroModule : 'chrome-extension://textuary-test/' + path;
+      }
+    };
     if (globalThis.chrome) {
       Object.defineProperty(globalThis.chrome, 'storage', { configurable: true, value: storage });
       Object.defineProperty(globalThis.chrome, 'runtime', { configurable: true, value: runtime });
@@ -444,6 +453,7 @@ if (
   naturalSpeech.afterStop.label !== "Read aloud" ||
   naturalSpeech.afterStop.highlighted !== 0 ||
   !naturalSpeech.calls.some(({ type, dtype, device }) => type === "model" && dtype === "fp32" && device === "webgpu") ||
+  !naturalSpeech.calls.some(({ type, value }) => type === "wasm-path" && value === "chrome-extension://textuary-test/vendor/") ||
   !naturalSpeech.calls.some(({ type, voice, speed }) => type === "generate" && voice === "bf_emma" && speed === 1.5) ||
   naturalSpeech.saved?.speechEngine !== "kokoro" ||
   naturalSpeech.saved?.kokoroConsent !== true ||
