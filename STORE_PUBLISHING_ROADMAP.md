@@ -147,7 +147,7 @@ Still required before Chrome submission:
 - [x] automated Chrome control-flow test and real FP32/WebGPU generation test on macOS
 - [ ] manual listening test in ordinary macOS Chrome
 - [ ] Windows Chrome WebGPU, performance and fallback test
-- [ ] decide whether Safari should expose Kokoro or remain System-only for 2.6
+- [x] keep Safari System-only for 2.6 after ONNX WebGPU testing hung during first inference
 
 ### Later release: personal reading library
 

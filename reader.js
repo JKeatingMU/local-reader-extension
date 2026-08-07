@@ -553,7 +553,9 @@
     const extensionApi = globalThis.browser ?? globalThis.chrome;
     const hasSystemSpeech = Boolean(synth && typeof Utterance === "function");
     const NaturalAudioContext = globalThis.AudioContext || globalThis.webkitAudioContext;
-    const hasNaturalSpeech = Boolean(navigator.gpu && extensionApi?.runtime?.getURL && NaturalAudioContext);
+    const isSafari = /\bSafari\//.test(navigator.userAgent) &&
+      !/\b(?:Chrome|HeadlessChrome|Chromium|CriOS|Edg|OPR)\//.test(navigator.userAgent);
+    const hasNaturalSpeech = Boolean(!isSafari && navigator.gpu && extensionApi?.runtime?.getURL && NaturalAudioContext);
     const chunks = buildSpeechChunks(data);
     const naturalOption = engineSelect.querySelector('option[value="kokoro"]');
     let voices = [];
@@ -568,7 +570,11 @@
     const naturalCache = new Map();
 
     naturalOption.disabled = !hasNaturalSpeech;
-    naturalOption.title = hasNaturalSpeech ? "Runs locally using WebGPU" : "WebGPU is unavailable in this browser";
+    naturalOption.title = hasNaturalSpeech
+      ? "Runs locally using WebGPU"
+      : isSafari
+        ? "Natural voices are temporarily unavailable in Safari; use System speech"
+        : "WebGPU is unavailable in this browser";
     if (preferences.speechEngine === "kokoro" && !hasNaturalSpeech) preferences.speechEngine = "system";
     if (!hasSystemSpeech && hasNaturalSpeech) preferences.speechEngine = "kokoro";
     engineSelect.value = preferences.speechEngine;
@@ -646,7 +652,9 @@
 
     async function beginNaturalSpeech(activeSession) {
       if (!hasNaturalSpeech) {
-        fallBackToSystem("Natural voices need WebGPU, which is unavailable here.");
+        fallBackToSystem(isSafari
+          ? "Natural voices are temporarily unavailable in Safari because its current ONNX WebGPU runtime can hang. System voices remain available."
+          : "Natural voices need WebGPU, which is unavailable here.");
         return;
       }
 
