@@ -68,6 +68,7 @@ See [the store-publishing and product roadmap](STORE_PUBLISHING_ROADMAP.md) for 
 - `v2.6.0` adds optional on-device Kokoro natural voices, consented model caching, WebGPU playback with passage prefetch, system fallback, and spoken author/date metadata.
 - `v2.6.1` packages Kokoro's matching ONNX runtime locally for Chrome Manifest V3 compatibility.
 - `v2.6.2` makes Kokoro's pronunciation-dictionary stream compatible with Safari 26.
+- `v2.6.3` normalises Safari's decompressed pronunciation dictionary to an `ArrayBuffer`.
 
 The project is a Git repository. To inspect the preserved version without changing the working tree, run `git show v1.0.0:reader.js` from this folder.
 

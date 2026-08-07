@@ -9,8 +9,8 @@ if (bundle.includes("for await(const e of A)t.push(e)")) {
   throw new Error("Kokoro still uses ReadableStream async iteration, which Safari 26 does not expose");
 }
 
-if (!bundle.includes("A.getReader();for(;;)")) {
-  throw new Error("Kokoro is missing the Safari-compatible pronunciation-dictionary reader");
+if (!bundle.includes("new Response(A).arrayBuffer()")) {
+  throw new Error("Kokoro is missing Safari-compatible pronunciation-dictionary stream consumption");
 }
 
 for (const resource of [

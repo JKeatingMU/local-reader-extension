@@ -1,11 +1,11 @@
 {
   "name": "textuary-extension",
-  "version": "2.6.2",
+  "version": "2.6.3",
   "private": true,
   "description": "Build-time dependencies for the Textuary browser extension.",
   "scripts": {
     "vendor": "node scripts/vendor-dependencies.mjs",
-    "check": "node --check background.js && node --check reader.js && node --check tests/chrome-smoke-test.mjs && node --check tests/kokoro-webgpu-test.mjs && node --check tests/fixture-server.mjs && node --check tests/vendor-runtime-compatibility-test.mjs && node --check scripts/package-extension.mjs && node scripts/validate-store-assets.mjs && node tests/background-compatibility-test.mjs && node tests/vendor-runtime-compatibility-test.mjs",
+    "check": "node --check background.js && node --check reader.js && node --check vendor/kokoro.web.js && node --check tests/chrome-smoke-test.mjs && node --check tests/kokoro-webgpu-test.mjs && node --check tests/fixture-server.mjs && node --check tests/vendor-runtime-compatibility-test.mjs && node --check scripts/package-extension.mjs && node scripts/validate-store-assets.mjs && node tests/background-compatibility-test.mjs && node tests/vendor-runtime-compatibility-test.mjs",
     "package:chrome": "node scripts/package-extension.mjs",
     "release:chrome": "npm run check && npm run package:chrome"
   },

@@ -14,8 +14,8 @@ const readability = await readFile(readabilitySource, "utf8");
 const purify = await readFile(purifySource, "utf8");
 const kokoro = await readFile(kokoroSource, "utf8");
 const asyncStreamIteration = "t=[];for await(const e of A)t.push(e);const r=await new Blob(t).arrayBuffer();";
-const readerStreamIteration = "t=[];{const e=A.getReader();for(;;){const{done:A,value:r}=await e.read();if(A)break;t.push(r)}}const r=await new Blob(t).arrayBuffer();";
-const safariCompatibleKokoro = kokoro.replace(asyncStreamIteration, readerStreamIteration);
+const responseStreamConsumption = "r=await new Response(A).arrayBuffer();";
+const safariCompatibleKokoro = kokoro.replace(asyncStreamIteration, responseStreamConsumption);
 
 if (safariCompatibleKokoro === kokoro) {
   throw new Error("Could not apply the Safari ReadableStream compatibility patch to Kokoro.js");
