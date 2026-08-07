@@ -1,6 +1,6 @@
 # Textuary Privacy Policy
 
-Effective date: 6 August 2026
+Effective date: 7 August 2026
 
 Textuary turns the article in the browser's current tab into a calm reading view. Its privacy model is deliberately simple: article processing happens locally in the browser, and the developer does not collect, receive or sell browsing data or article content.
 
@@ -10,7 +10,9 @@ When the user activates Textuary, the extension temporarily processes the conten
 
 Textuary may request the original HTML of that same active page so it can compare the rendered document with the page response and select the more complete article representation. The request is made by the user's browser to the page the user already opened.
 
-Read aloud uses the speech-synthesis service and voices supplied by the browser and operating system. Textuary does not add an external speech service.
+System read aloud uses the speech-synthesis service and voices supplied by the browser and operating system.
+
+If the user explicitly enables Natural voices, Textuary downloads the Kokoro FP32 model and selected voice data from Hugging Face and caches those files in the browser. The packaged Kokoro runtime generates speech locally with WebGPU. Article text, article URLs and the generated audio are not sent to Hugging Face or another speech service. As with any file download, Hugging Face and its delivery infrastructure receive ordinary network request information such as the user's IP address and browser request metadata.
 
 ## Collection, transmission and sharing
 
@@ -20,9 +22,9 @@ Textuary does not:
 - use analytics, advertising, tracking pixels or telemetry
 - create a developer-operated user account
 - sell or share user data
-- load executable code from a remote server
+- load executable code from a remote server; the optional remotely downloaded Kokoro files are model and voice data interpreted by the packaged local runtime
 
-Version 2.5.0 stores reading preferences locally through the browser's extension storage. These preferences can include the selected theme, typeface, text size, line spacing, column width, voice and speech speed. Textuary does not save article content, URLs, browsing history, reading progress or reading activity. Extracted content exists only in the active tab and is discarded when that page is closed, reloaded or returned to its original view.
+Version 2.6.0 stores reading preferences locally through the browser's extension storage. These preferences can include the selected theme, typeface, text size, line spacing, column width, speech engine, voice, speech speed and whether the user accepted the Natural-voice model download. The browser may separately cache downloaded Kokoro model and voice data. Textuary does not save article content, URLs, browsing history, reading progress or reading activity. Extracted content exists only in the active tab and is discarded when that page is closed, reloaded or returned to its original view.
 
 ## Browser permissions
 
@@ -36,7 +38,7 @@ The extension does not request persistent access to every website or access to b
 
 ## Included software
 
-Mozilla Readability and DOMPurify are packaged with the extension. They run locally and are not loaded from a remote content-delivery service.
+Mozilla Readability, DOMPurify, Kokoro.js, Transformers.js and the phonemizer runtime are packaged with the extension. They run locally and are not loaded from a remote content-delivery service. Optional Kokoro model and voice data are downloaded from Hugging Face only after Natural voices are enabled.
 
 ## Future changes
 

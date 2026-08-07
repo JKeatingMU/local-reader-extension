@@ -1,6 +1,6 @@
 # Chrome Web Store Listing
 
-Prepared for Textuary 2.5.0.
+Prepared for Textuary 2.6.0 experimental validation; refresh screenshots and final wording before submission.
 
 ## Product details
 
@@ -23,14 +23,14 @@ Features:
 - four typefaces plus adjustable text size, spacing and column width
 - paper, evening and automatic ambient themes
 - locally remembered reading preferences
-- read aloud using voices already available through Chrome and your computer
+- choose system voices or optional natural Kokoro voices generated locally with WebGPU
 - selectable voice and playback speed
 - pause, resume and stop controls
 - automatic highlighting of the passage being read aloud
 - clean printing and PDF output
 - a keyboard shortcut for quick access
 
-Textuary runs only when you activate it. Article extraction and sanitisation happen locally in the browser. Reading and speech preferences are saved only in browser extension storage. Textuary contains no advertising, analytics or external reading service, and it does not transmit article text or browsing activity to the developer.
+Textuary runs only when you activate it. Article extraction and sanitisation happen locally in the browser. Reading and speech preferences are saved only in browser extension storage. If the user enables Natural voices, the browser downloads and caches approximately 330 MB of model data from Hugging Face; the packaged runtime still generates speech locally and never transmits article text. Textuary contains no advertising or analytics and does not transmit article text or browsing activity to the developer.
 
 Some pages do not deliver their complete article to the browser. Textuary can reorganise content that is available in the page, but it cannot retrieve text that was never delivered.
 
@@ -50,15 +50,15 @@ Runs the packaged Readability, DOMPurify and Textuary code in the user-selected 
 
 ### `storage`
 
-Remembers the user's selected theme, typography, voice and speech speed locally. It does not store article content, URLs, browsing history or reading activity.
+Remembers the user's selected theme, typography, speech engine, voice, speech speed and Natural-voice consent locally. It does not store article content, URLs, browsing history or reading activity.
 
 ## Privacy declarations
 
 - Website content and the active page URL are processed locally solely to provide the reader feature requested by the user.
 - Theme, typography, voice and speech-speed preferences are stored locally through browser extension storage.
-- No article content, URLs or browsing activity are transmitted to the developer or a third party.
+- No article content, URLs or browsing activity are transmitted to the developer or a speech service. After opt-in, ordinary model-file requests are made to Hugging Face without article text.
 - No data is sold or used for advertising, creditworthiness or purposes unrelated to the extension's single purpose.
-- No remotely hosted executable code is used.
+- No remotely hosted executable code is used. Kokoro model and voice files are downloaded data interpreted by the packaged runtime.
 - Privacy policy: <https://github.com/JKeatingMU/local-reader-extension/blob/main/PRIVACY.md>
 
 The dashboard wording may change. Ensure its selected data categories describe local processing consistently with the privacy policy rather than implying that the developer receives the data.

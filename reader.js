@@ -4,14 +4,48 @@
   const READER_ID = "local-reader-view";
   const PRODUCT_NAME = "Textuary";
   const PREFERENCES_KEY = "textuaryReadingPreferences";
+  const KOKORO_MODEL_ID = "onnx-community/Kokoro-82M-v1.0-ONNX";
+  const KOKORO_VOICES = Object.freeze([
+    ["af_heart", "Heart", "US", "female"],
+    ["af_bella", "Bella", "US", "female"],
+    ["af_nicole", "Nicole", "US", "female"],
+    ["af_aoede", "Aoede", "US", "female"],
+    ["af_kore", "Kore", "US", "female"],
+    ["af_sarah", "Sarah", "US", "female"],
+    ["af_alloy", "Alloy", "US", "female"],
+    ["af_nova", "Nova", "US", "female"],
+    ["af_river", "River", "US", "female"],
+    ["af_sky", "Sky", "US", "female"],
+    ["af_jessica", "Jessica", "US", "female"],
+    ["am_fenrir", "Fenrir", "US", "male"],
+    ["am_michael", "Michael", "US", "male"],
+    ["am_puck", "Puck", "US", "male"],
+    ["am_liam", "Liam", "US", "male"],
+    ["am_onyx", "Onyx", "US", "male"],
+    ["am_eric", "Eric", "US", "male"],
+    ["am_echo", "Echo", "US", "male"],
+    ["am_adam", "Adam", "US", "male"],
+    ["am_santa", "Santa", "US", "male"],
+    ["bf_emma", "Emma", "British", "female"],
+    ["bf_isabella", "Isabella", "British", "female"],
+    ["bf_alice", "Alice", "British", "female"],
+    ["bf_lily", "Lily", "British", "female"],
+    ["bm_fable", "Fable", "British", "male"],
+    ["bm_george", "George", "British", "male"],
+    ["bm_lewis", "Lewis", "British", "male"],
+    ["bm_daniel", "Daniel", "British", "male"]
+  ]);
   const DEFAULT_PREFERENCES = Object.freeze({
     theme: "paper",
     fontFamily: "editorial",
     fontSize: 20,
     lineHeight: 1.72,
     columnWidth: 1040,
+    speechEngine: "system",
     speechVoice: "",
-    speechRate: "1"
+    speechRate: "1",
+    kokoroVoice: "bf_emma",
+    kokoroConsent: false
   });
   if (document.getElementById(READER_ID)) {
     globalThis.speechSynthesis?.cancel();
@@ -279,9 +313,12 @@
     const safeDescription = data.description && data.description !== data.title
       ? `<p class="lr-standfirst">${escapeHtml(data.description)}</p>`
       : "";
-    const metadata = [data.byline, formatDate(data.published)]
-      .filter(Boolean)
-      .map((value) => `<span>${escapeHtml(value)}</span>`)
+    const metadata = [
+      ["lr-author", data.byline],
+      ["lr-published", formatDate(data.published)]
+    ]
+      .filter(([, value]) => Boolean(value))
+      .map(([className, value]) => `<span class="${className}">${escapeHtml(value)}</span>`)
       .join("");
 
     window.stop();
@@ -343,6 +380,13 @@
               </details>
               <span id="lr-progress-label" class="lr-progress-label" aria-live="polite">${data.readingMinutes} min left</span>
               <label class="lr-speech-setting">
+                <span>Speech</span>
+                <select id="lr-speech-engine" aria-label="Read-aloud speech engine">
+                  <option value="system">System</option>
+                  <option value="kokoro">Natural (Kokoro)</option>
+                </select>
+              </label>
+              <label class="lr-speech-setting">
                 <span>Voice</span>
                 <select id="lr-speech-voice" aria-label="Read-aloud voice" title="Voice changes apply from the next passage">
                   <option value="">System default</option>
@@ -381,13 +425,25 @@
               </footer>
             </article>
           </main>
+          <p id="lr-speech-status" class="lr-speech-status" role="status" aria-live="polite" hidden></p>
+          <dialog id="lr-kokoro-consent" class="lr-consent-dialog" aria-labelledby="lr-kokoro-consent-title">
+            <form method="dialog">
+              <h2 id="lr-kokoro-consent-title">Enable natural voices?</h2>
+              <p>Textuary will download and cache an approximately 330 MB Kokoro voice model from Hugging Face. Speech is then generated on this device with WebGPU; article text is not uploaded.</p>
+              <p class="lr-consent-note">The first passage may take a little while. System voices remain available at any time.</p>
+              <div>
+                <button value="cancel">Not now</button>
+                <button value="enable" class="lr-primary">Enable natural voices</button>
+              </div>
+            </form>
+          </dialog>
         </div>
       </body>`;
 
     document.getElementById("lr-original").addEventListener("click", () => location.reload());
     document.getElementById("lr-print").addEventListener("click", () => window.print());
     setupReadingExperience(data);
-    setupReadAloud(data.language, data.preferences);
+    setupReadAloud(data);
   }
 
   function setupReadingExperience(data) {
@@ -413,9 +469,14 @@
     lineHeight.addEventListener("change", updatePreferences);
     columnWidth.addEventListener("change", updatePreferences);
     reset.addEventListener("click", () => {
-      const speechVoice = preferences.speechVoice;
-      const speechRate = preferences.speechRate;
-      Object.assign(preferences, DEFAULT_PREFERENCES, { speechVoice, speechRate });
+      const speechPreferences = {
+        speechEngine: preferences.speechEngine,
+        speechVoice: preferences.speechVoice,
+        speechRate: preferences.speechRate,
+        kokoroVoice: preferences.kokoroVoice,
+        kokoroConsent: preferences.kokoroConsent
+      };
+      Object.assign(preferences, DEFAULT_PREFERENCES, speechPreferences);
       applyPreferences(preferences);
       void savePreferences(preferences);
       requestProgressUpdate();
@@ -478,54 +539,84 @@
     }
   }
 
-  function setupReadAloud(language, preferences) {
+  function setupReadAloud(data) {
+    const { language, preferences } = data;
     const toggle = document.getElementById("lr-speech-toggle");
     const stop = document.getElementById("lr-speech-stop");
+    const engineSelect = document.getElementById("lr-speech-engine");
     const voiceSelect = document.getElementById("lr-speech-voice");
     const rateSelect = document.getElementById("lr-speech-rate");
+    const status = document.getElementById("lr-speech-status");
+    const consentDialog = document.getElementById("lr-kokoro-consent");
     const synth = globalThis.speechSynthesis;
     const Utterance = globalThis.SpeechSynthesisUtterance;
-
-    if (!synth || typeof Utterance !== "function") {
-      toggle.disabled = true;
-      toggle.textContent = "Read aloud unavailable";
-      voiceSelect.disabled = true;
-      rateSelect.disabled = true;
-      return;
-    }
-
-    const chunks = buildSpeechChunks();
+    const extensionApi = globalThis.browser ?? globalThis.chrome;
+    const hasSystemSpeech = Boolean(synth && typeof Utterance === "function");
+    const NaturalAudioContext = globalThis.AudioContext || globalThis.webkitAudioContext;
+    const hasNaturalSpeech = Boolean(navigator.gpu && extensionApi?.runtime?.getURL && NaturalAudioContext);
+    const chunks = buildSpeechChunks(data);
+    const naturalOption = engineSelect.querySelector('option[value="kokoro"]');
     let voices = [];
     let state = "idle";
     let chunkIndex = 0;
     let session = 0;
     let highlightedElement = null;
+    let naturalContext = null;
+    let naturalSource = null;
+    let kokoroPromise = null;
+    let generationTail = Promise.resolve();
+    const naturalCache = new Map();
 
+    naturalOption.disabled = !hasNaturalSpeech;
+    naturalOption.title = hasNaturalSpeech ? "Runs locally using WebGPU" : "WebGPU is unavailable in this browser";
+    if (preferences.speechEngine === "kokoro" && !hasNaturalSpeech) preferences.speechEngine = "system";
+    if (!hasSystemSpeech && hasNaturalSpeech) preferences.speechEngine = "kokoro";
+    engineSelect.value = preferences.speechEngine;
     rateSelect.value = preferences.speechRate;
+
+    engineSelect.addEventListener("change", () => {
+      stopSpeaking();
+      preferences.speechEngine = engineSelect.value;
+      configureVoiceMenu();
+      void savePreferences(preferences);
+    });
     voiceSelect.addEventListener("change", () => {
-      preferences.speechVoice = voiceSelect.value;
+      if (engineSelect.value === "kokoro") preferences.kokoroVoice = voiceSelect.value;
+      else preferences.speechVoice = voiceSelect.value;
+      clearNaturalCache(chunkIndex + 1);
       void savePreferences(preferences);
     });
     rateSelect.addEventListener("change", () => {
       preferences.speechRate = rateSelect.value;
+      clearNaturalCache(chunkIndex + 1);
       void savePreferences(preferences);
     });
 
-    toggle.addEventListener("click", () => {
+    toggle.addEventListener("click", () => void handleToggle());
+    stop.addEventListener("click", stopSpeaking);
+    window.addEventListener("pagehide", () => {
+      stopSpeaking();
+      void naturalContext?.close();
+    }, { once: true });
+
+    async function handleToggle() {
       if (state === "playing") {
-        synth.pause();
+        if (engineSelect.value === "kokoro") await naturalContext?.suspend();
+        else synth.pause();
         state = "paused";
         updateSpeechControls();
         return;
       }
 
       if (state === "paused") {
-        synth.resume();
+        if (engineSelect.value === "kokoro") await naturalContext?.resume();
+        else synth.resume();
         state = "playing";
         updateSpeechControls();
         return;
       }
 
+      if (state !== "idle") return;
       if (!chunks.length) {
         showNotice(`${PRODUCT_NAME} could not find any text to read aloud.`);
         return;
@@ -533,18 +624,60 @@
 
       session += 1;
       chunkIndex = 0;
+      const activeSession = session;
+      if (engineSelect.value === "kokoro") {
+        await beginNaturalSpeech(activeSession);
+      } else {
+        beginSystemSpeech(activeSession);
+      }
+    }
+
+    function beginSystemSpeech(activeSession) {
+      if (!hasSystemSpeech) {
+        showNotice("System read-aloud is unavailable in this browser. Try Natural (Kokoro) instead.");
+        return;
+      }
       state = "playing";
       synth.cancel();
       if (synth.paused) synth.resume();
       updateSpeechControls();
-      const activeSession = session;
-      setTimeout(() => speakNext(activeSession), 0);
-    });
+      setTimeout(() => speakSystemNext(activeSession), 0);
+    }
 
-    stop.addEventListener("click", stopSpeaking);
-    window.addEventListener("pagehide", stopSpeaking, { once: true });
+    async function beginNaturalSpeech(activeSession) {
+      if (!hasNaturalSpeech) {
+        fallBackToSystem("Natural voices need WebGPU, which is unavailable here.");
+        return;
+      }
 
-    function speakNext(activeSession) {
+      await ensureNaturalAudioContext();
+      if (!preferences.kokoroConsent && !await requestNaturalVoiceConsent()) {
+        engineSelect.value = "system";
+        preferences.speechEngine = "system";
+        configureVoiceMenu();
+        void savePreferences(preferences);
+        return;
+      }
+      if (activeSession !== session) return;
+
+      state = "loading";
+      setSpeechStatus("Loading natural voice model…");
+      updateSpeechControls();
+      try {
+        await loadKokoro();
+        if (activeSession !== session) return;
+        await naturalContext.resume();
+        speakNaturalNext(activeSession);
+      } catch (error) {
+        console.error(`${PRODUCT_NAME} could not start Kokoro`, error);
+        if (activeSession === session) {
+          finishSpeaking();
+          fallBackToSystem("Natural voices could not start on this device. System voices are still available.");
+        }
+      }
+    }
+
+    function speakSystemNext(activeSession) {
       if (activeSession !== session || state === "idle") return;
       if (chunkIndex >= chunks.length) {
         finishSpeaking();
@@ -564,42 +697,199 @@
       utterance.onend = () => {
         if (activeSession !== session) return;
         chunkIndex += 1;
-        speakNext(activeSession);
+        speakSystemNext(activeSession);
       };
       utterance.onerror = (event) => {
         if (activeSession !== session || /canceled|interrupted/.test(event.error || "")) return;
         finishSpeaking();
-        showNotice(`The browser could not read this article aloud with the selected system voice.`);
+        showNotice("The browser could not read this article aloud with the selected system voice.");
       };
       synth.speak(utterance);
     }
 
+    async function speakNaturalNext(activeSession) {
+      if (activeSession !== session || state === "idle") return;
+      if (chunkIndex >= chunks.length) {
+        finishSpeaking();
+        return;
+      }
+
+      state = "generating";
+      setSpeechStatus(`Preparing ${naturalVoiceName()}…`);
+      updateSpeechControls();
+      try {
+        const buffer = await generateNaturalBuffer(chunkIndex);
+        if (activeSession !== session) return;
+        highlightSpokenElement(chunks[chunkIndex].element);
+        naturalSource = naturalContext.createBufferSource();
+        naturalSource.buffer = buffer;
+        naturalSource.connect(naturalContext.destination);
+        naturalSource.addEventListener("ended", () => {
+          if (activeSession !== session || state === "idle") return;
+          naturalSource?.disconnect();
+          naturalSource = null;
+          chunkIndex += 1;
+          pruneNaturalCache();
+          void speakNaturalNext(activeSession);
+        }, { once: true });
+        naturalSource.start();
+        state = "playing";
+        setSpeechStatus("");
+        updateSpeechControls();
+        void generateNaturalBuffer(chunkIndex + 1).catch(() => {});
+      } catch (error) {
+        console.error(`${PRODUCT_NAME} could not generate natural speech`, error);
+        if (activeSession !== session) return;
+        finishSpeaking();
+        showNotice("The natural voice could not generate this passage. Try a system voice or another natural voice.");
+      }
+    }
+
+    async function loadKokoro() {
+      if (!kokoroPromise) {
+        kokoroPromise = (async () => {
+          const adapter = await navigator.gpu.requestAdapter();
+          if (!adapter) throw new Error("No WebGPU adapter is available");
+          const moduleUrl = extensionApi.runtime.getURL("vendor/kokoro.web.js");
+          const { KokoroTTS } = await import(moduleUrl);
+          return KokoroTTS.from_pretrained(KOKORO_MODEL_ID, {
+            dtype: "fp32",
+            device: "webgpu",
+            progress_callback: updateKokoroProgress
+          });
+        })().catch((error) => {
+          kokoroPromise = null;
+          throw error;
+        });
+      }
+      return kokoroPromise;
+    }
+
+    function updateKokoroProgress(progress) {
+      if (progress?.status !== "progress" || !Number.isFinite(progress.progress)) return;
+      const file = String(progress.file || "");
+      if (!/onnx|model/i.test(file)) return;
+      setSpeechStatus(`Downloading natural voice model… ${Math.round(progress.progress)}%`);
+    }
+
+    function generateNaturalBuffer(index) {
+      if (index >= chunks.length) return Promise.resolve(null);
+      const key = naturalCacheKey(index);
+      if (naturalCache.has(key)) return naturalCache.get(key);
+      const voice = preferences.kokoroVoice;
+      const speed = Number(rateSelect.value) || 1;
+
+      const task = generationTail.catch(() => {}).then(async () => {
+        const tts = await loadKokoro();
+        const result = await tts.generate(chunks[index].text, {
+          voice,
+          speed
+        });
+        const buffer = naturalContext.createBuffer(1, result.audio.length, result.sampling_rate);
+        buffer.copyToChannel(result.audio, 0);
+        return buffer;
+      });
+      generationTail = task;
+      naturalCache.set(key, task);
+      task.catch(() => naturalCache.delete(key));
+      return task;
+    }
+
+    function naturalCacheKey(index) {
+      return `${index}:${preferences.kokoroVoice}:${rateSelect.value}`;
+    }
+
+    function clearNaturalCache(fromIndex = 0) {
+      for (const key of naturalCache.keys()) {
+        if (Number(key.split(":", 1)[0]) >= fromIndex) naturalCache.delete(key);
+      }
+    }
+
+    function pruneNaturalCache() {
+      for (const key of naturalCache.keys()) {
+        const index = Number(key.split(":", 1)[0]);
+        if (index < chunkIndex - 1 || index > chunkIndex + 5) naturalCache.delete(key);
+      }
+    }
+
+    async function ensureNaturalAudioContext() {
+      if (!naturalContext || naturalContext.state === "closed") {
+        if (!NaturalAudioContext) throw new Error("Web Audio is unavailable");
+        naturalContext = new NaturalAudioContext({ sampleRate: 24000 });
+      }
+      if (naturalContext.state === "suspended") await naturalContext.resume();
+      return naturalContext;
+    }
+
+    function requestNaturalVoiceConsent() {
+      return new Promise((resolve) => {
+        const complete = () => {
+          const accepted = consentDialog.returnValue === "enable";
+          if (accepted) {
+            preferences.kokoroConsent = true;
+            void ensureNaturalAudioContext();
+            void savePreferences(preferences);
+          }
+          resolve(accepted);
+        };
+        consentDialog.addEventListener("close", complete, { once: true });
+        consentDialog.showModal();
+      });
+    }
+
     function stopSpeaking() {
       session += 1;
-      synth.cancel();
-      if (synth.paused) synth.resume();
+      synth?.cancel();
+      if (synth?.paused) synth.resume();
+      if (naturalSource) {
+        naturalSource.onended = null;
+        try { naturalSource.stop(); } catch {}
+        naturalSource.disconnect();
+        naturalSource = null;
+      }
+      void naturalContext?.suspend();
       chunkIndex = 0;
       state = "idle";
+      setSpeechStatus("");
       highlightSpokenElement(null);
       updateSpeechControls();
     }
 
     function finishSpeaking() {
+      naturalSource = null;
+      void naturalContext?.suspend();
       chunkIndex = 0;
       state = "idle";
+      setSpeechStatus("");
       highlightSpokenElement(null);
       updateSpeechControls();
     }
 
-    function updateSpeechControls() {
-      toggle.textContent = state === "playing" ? "Pause" : state === "paused" ? "Resume" : "Read aloud";
-      toggle.setAttribute("aria-pressed", String(state !== "idle"));
-      stop.disabled = state === "idle";
+    function fallBackToSystem(message) {
+      if (hasSystemSpeech) {
+        engineSelect.value = "system";
+        preferences.speechEngine = "system";
+        configureVoiceMenu();
+        void savePreferences(preferences);
+      }
+      showNotice(message);
     }
 
-    function populateVoices() {
-      const selectedVoice = voiceSelect.value;
-      voices = [...(synth.getVoices?.() || [])].sort((left, right) => {
+    function updateSpeechControls() {
+      toggle.textContent = ({
+        playing: "Pause",
+        paused: "Resume",
+        loading: "Loading voice…",
+        generating: "Preparing…"
+      })[state] || "Read aloud";
+      toggle.disabled = state === "loading" || state === "generating" || (!hasSystemSpeech && !hasNaturalSpeech);
+      toggle.setAttribute("aria-pressed", String(state !== "idle"));
+      stop.disabled = state === "idle";
+      engineSelect.disabled = state !== "idle";
+    }
+
+    function populateSystemVoices() {
+      voices = [...(synth?.getVoices?.() || [])].sort((left, right) => {
         if (left.default !== right.default) return left.default ? -1 : 1;
         const languagePrefix = String(language || "").split("-")[0].toLowerCase();
         const leftMatches = languagePrefix && left.lang?.toLowerCase().startsWith(languagePrefix);
@@ -607,22 +897,47 @@
         if (leftMatches !== rightMatches) return leftMatches ? -1 : 1;
         return left.name.localeCompare(right.name);
       });
+      if (engineSelect.value === "system") configureVoiceMenu();
+    }
+
+    function configureVoiceMenu() {
+      if (engineSelect.value === "kokoro") {
+        voiceSelect.replaceChildren(...KOKORO_VOICES.map(([id, name, accent, gender]) =>
+          new Option(`${name} (${accent}, ${gender})`, id)
+        ));
+        voiceSelect.value = KOKORO_VOICES.some(([id]) => id === preferences.kokoroVoice)
+          ? preferences.kokoroVoice
+          : DEFAULT_PREFERENCES.kokoroVoice;
+        voiceSelect.disabled = !hasNaturalSpeech;
+        voiceSelect.title = "Natural voices are generated locally; changes apply from the next passage";
+        return;
+      }
 
       voiceSelect.replaceChildren(new Option("System default", ""));
       for (const voice of voices) {
         const suffix = [voice.lang, voice.default ? "default" : ""].filter(Boolean).join(", ");
         voiceSelect.append(new Option(`${voice.name}${suffix ? ` (${suffix})` : ""}`, voiceKey(voice)));
       }
-      const preferredVoice = selectedVoice || preferences.speechVoice;
-      if ([...voiceSelect.options].some((option) => option.value === preferredVoice)) {
-        voiceSelect.value = preferredVoice;
+      if ([...voiceSelect.options].some((option) => option.value === preferences.speechVoice)) {
+        voiceSelect.value = preferences.speechVoice;
       }
-      voiceSelect.disabled = voices.length === 0;
+      voiceSelect.disabled = !hasSystemSpeech || voices.length === 0;
+      voiceSelect.title = "System voices are supplied by the browser and operating system";
     }
 
-    populateVoices();
-    if (typeof synth.addEventListener === "function") synth.addEventListener("voiceschanged", populateVoices);
-    else synth.onvoiceschanged = populateVoices;
+    function naturalVoiceName() {
+      return KOKORO_VOICES.find(([id]) => id === preferences.kokoroVoice)?.[1] || "natural voice";
+    }
+
+    function setSpeechStatus(message) {
+      status.textContent = message;
+      status.hidden = !message;
+    }
+
+    populateSystemVoices();
+    configureVoiceMenu();
+    if (typeof synth?.addEventListener === "function") synth.addEventListener("voiceschanged", populateSystemVoices);
+    else if (synth) synth.onvoiceschanged = populateSystemVoices;
     updateSpeechControls();
 
     function highlightSpokenElement(element) {
@@ -644,10 +959,14 @@
     return voice.voiceURI || `${voice.name}\u0000${voice.lang}`;
   }
 
-  function buildSpeechChunks() {
-    const selectors = [
-      "h1",
-      ".lr-standfirst",
+  function buildSpeechChunks(data = {}) {
+    const headerElements = [
+      document.querySelector("h1"),
+      document.querySelector(".lr-author"),
+      document.querySelector(".lr-published"),
+      document.querySelector(".lr-standfirst")
+    ].filter(Boolean);
+    const contentSelectors = [
       "#lr-content h2",
       "#lr-content h3",
       "#lr-content h4",
@@ -657,11 +976,20 @@
       "#lr-content li",
       "#lr-content figcaption"
     ].join(",");
-    const readableElements = [...document.querySelectorAll(selectors)]
+    const readableElements = [...headerElements, ...document.querySelectorAll(contentSelectors)]
       .filter((element) => !element.querySelector("p, li, h2, h3, h4, h5, h6"));
     return readableElements.flatMap((element) => splitForSpeech(
-      element.textContent.replace(/\s+/g, " ").trim()
+      speechTextForElement(element, data)
     ).map((text) => ({ text, element })));
+  }
+
+  function speechTextForElement(element, data) {
+    const text = element.textContent.replace(/\s+/g, " ").trim();
+    if (element.classList.contains("lr-author")) {
+      return /^by\b/i.test(text) ? text : `By ${text}`;
+    }
+    if (element.classList.contains("lr-published")) return `Published ${text}`;
+    return text || data.title || "";
   }
 
   function splitForSpeech(text, maxLength = 320) {
@@ -745,8 +1073,13 @@
       fontSize: Math.min(28, Math.max(16, Number(value.fontSize) || DEFAULT_PREFERENCES.fontSize)),
       lineHeight: numberValue(value.lineHeight, [1.5, 1.72, 1.9, 2.1], DEFAULT_PREFERENCES.lineHeight),
       columnWidth: numberValue(value.columnWidth, [760, 900, 1040], DEFAULT_PREFERENCES.columnWidth),
+      speechEngine: enumValue(value.speechEngine, ["system", "kokoro"], DEFAULT_PREFERENCES.speechEngine),
       speechVoice: typeof value.speechVoice === "string" ? value.speechVoice : DEFAULT_PREFERENCES.speechVoice,
-      speechRate: enumValue(String(value.speechRate || ""), ["0.75", "1", "1.25", "1.5", "2"], DEFAULT_PREFERENCES.speechRate)
+      speechRate: enumValue(String(value.speechRate || ""), ["0.75", "1", "1.25", "1.5", "2"], DEFAULT_PREFERENCES.speechRate),
+      kokoroVoice: KOKORO_VOICES.some(([id]) => id === value.kokoroVoice)
+        ? value.kokoroVoice
+        : DEFAULT_PREFERENCES.kokoroVoice,
+      kokoroConsent: value.kokoroConsent === true
     };
   }
 
@@ -859,7 +1192,8 @@
       #lr-speech-toggle[aria-pressed="true"] { border-color: var(--lr-accent); color: var(--lr-accent); }
       .lr-tools { display: flex; flex-wrap: nowrap; align-items: center; justify-content: flex-end; gap: 6px; }
       .lr-speech-setting { display: flex; align-items: center; gap: 5px; color: var(--lr-muted); font-size: 12px; }
-      #lr-speech-voice { width: min(210px, 28vw); }
+      #lr-speech-engine { width: 150px; }
+      #lr-speech-voice { width: min(190px, 24vw); }
       #lr-speech-rate { width: 76px; }
       .lr-settings { position: relative; }
       .lr-settings > summary { min-height: 36px; padding: 9px 11px 7px; border: 1px solid var(--lr-line); border-radius: 7px; background: var(--lr-paper); color: var(--lr-text); cursor: pointer; list-style: none; white-space: nowrap; }
@@ -875,6 +1209,16 @@
       .lr-progress-label { min-width: 64px; color: var(--lr-muted); font-size: 12px; text-align: center; white-space: nowrap; }
       .lr-progress-track { position: absolute; right: 0; bottom: -1px; left: 0; height: 3px; overflow: hidden; background: transparent; }
       #lr-progress-bar { width: 0; height: 100%; background: var(--lr-accent); transition: width .12s linear; }
+      .lr-speech-status { position: fixed; z-index: 11; top: 66px; right: max(18px, calc((100vw - 1240px) / 2)); max-width: min(430px, calc(100vw - 36px)); margin: 0; padding: 9px 13px; border: 1px solid var(--lr-line); border-radius: 8px; background: var(--lr-paper); color: var(--lr-muted); box-shadow: 0 8px 28px rgba(0, 0, 0, .15); font: 12px/1.4 system-ui, sans-serif; }
+      .lr-consent-dialog { width: min(520px, calc(100vw - 36px)); padding: 0; border: 1px solid var(--lr-line); border-radius: 12px; background: var(--lr-paper); color: var(--lr-text); box-shadow: 0 24px 80px rgba(0, 0, 0, .28); }
+      .lr-consent-dialog::backdrop { background: rgba(12, 16, 20, .55); backdrop-filter: blur(3px); }
+      .lr-consent-dialog form { padding: 26px; font: 15px/1.55 system-ui, sans-serif; }
+      .lr-consent-dialog h2 { margin: 0 0 12px; font: 700 24px/1.2 system-ui, sans-serif; }
+      .lr-consent-dialog p { margin: 0 0 13px; }
+      .lr-consent-dialog .lr-consent-note { color: var(--lr-muted); font-size: 13px; }
+      .lr-consent-dialog form > div { display: flex; justify-content: flex-end; gap: 9px; margin-top: 22px; }
+      .lr-consent-dialog button { min-height: 38px; padding: 8px 13px; border: 1px solid var(--lr-line); border-radius: 7px; background: var(--lr-paper); color: var(--lr-text); cursor: pointer; }
+      .lr-consent-dialog button.lr-primary { border-color: var(--lr-accent); background: var(--lr-accent); color: white; }
       .lr-page { width: min(100%, var(--lr-page-width)); margin: 0 auto; padding: 36px 24px 80px; transition: width .2s ease; }
       .lr-page > article { padding: clamp(26px, 6vw, 68px); border: 1px solid var(--lr-line); border-radius: 3px; background: var(--lr-paper); box-shadow: 0 18px 50px rgba(53, 43, 32, .08); }
       .lr-kicker { margin: 0 0 14px; color: var(--lr-accent); font: 700 12px/1.2 system-ui, sans-serif; letter-spacing: .12em; text-transform: uppercase; }
@@ -900,10 +1244,10 @@
       #lr-content figure { margin: 2.2em 0; }
       #lr-content img { display: block; width: auto; height: auto; max-width: 100%; max-height: 760px; margin: 2em auto; border-radius: 2px; object-fit: contain; background: var(--lr-bg); }
       #lr-content figcaption { margin-top: -1.5em; color: var(--lr-muted); font: 12px/1.45 system-ui, sans-serif; }
-      #lr-content .lr-speaking, h1.lr-speaking, .lr-standfirst.lr-speaking { border-radius: 4px; background: color-mix(in srgb, var(--lr-accent) 14%, transparent); box-shadow: 0 0 0 5px color-mix(in srgb, var(--lr-accent) 14%, transparent); transition: background .18s ease, box-shadow .18s ease; }
+      #lr-content .lr-speaking, h1.lr-speaking, .lr-standfirst.lr-speaking, .lr-byline .lr-speaking { border-radius: 4px; background: color-mix(in srgb, var(--lr-accent) 14%, transparent); box-shadow: 0 0 0 5px color-mix(in srgb, var(--lr-accent) 14%, transparent); transition: background .18s ease, box-shadow .18s ease; }
       footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--lr-line); color: var(--lr-muted); font: 12px/1.5 system-ui, sans-serif; }
-      @media (max-width: 900px) { .lr-progress-label, .lr-speech-setting > span { display: none; } #lr-speech-voice { width: min(170px, 25vw); } }
-      @media (max-width: 600px) { .lr-toolbar { align-items: flex-start; } .lr-tools { flex-wrap: wrap; } .lr-page { padding: 0; } .lr-page > article { border: 0; padding: 34px 20px 60px; } #lr-speech-voice { width: min(150px, 42vw); } .lr-settings-panel { position: fixed; top: 60px; right: 12px; left: 12px; width: auto; } }
+      @media (max-width: 1050px) { .lr-progress-label, .lr-speech-setting > span { display: none; } #lr-speech-engine { width: 116px; } #lr-speech-voice { width: min(160px, 22vw); } }
+      @media (max-width: 700px) { .lr-toolbar { align-items: flex-start; } .lr-tools { flex-wrap: wrap; } .lr-page { padding: 0; } .lr-page > article { border: 0; padding: 34px 20px 60px; } #lr-speech-engine { width: 116px; } #lr-speech-voice { width: min(150px, 38vw); } .lr-settings-panel { position: fixed; top: 60px; right: 12px; left: 12px; width: auto; } }
       @media print { .lr-toolbar { display: none; } html, body, .lr-page, .lr-page > article { background: white; color: black; } .lr-page { width: 100%; padding: 0; } .lr-page > article { border: 0; box-shadow: none; padding: 0; } }
     `;
   }

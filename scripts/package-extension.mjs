@@ -28,8 +28,13 @@ const packageFiles = [
   "icons/icon-128-store.png",
   "vendor/Readability.js",
   "vendor/purify.min.js",
+  "vendor/kokoro.web.js",
   "vendor/LICENSE-readability.md",
-  "vendor/LICENSE-dompurify.txt"
+  "vendor/LICENSE-dompurify.txt",
+  "vendor/LICENSE-kokoro-js.txt",
+  "vendor/LICENSE-transformers-js.txt",
+  "vendor/LICENSE-phonemizer.txt",
+  "vendor/LICENSE-onnxruntime.txt"
 ];
 
 await rm(stageRoot, { recursive: true, force: true });

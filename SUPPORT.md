@@ -8,6 +8,13 @@
 4. In Chrome, reload the extension from `chrome://extensions` after installing an updated unpacked version.
 5. Remember that a reader can process only content delivered to the browser.
 
+## Natural voice troubleshooting
+
+- Natural (Kokoro) speech requires a WebGPU-capable browser and graphics adapter. Use System speech if the Natural option is disabled.
+- The first activation downloads and caches approximately 330 MB of model data. Check the internet connection and allow time for the progress message to complete.
+- The first passage is slower than later passages. Performance varies by GPU; Textuary prepares one passage ahead to reduce pauses.
+- If Natural speech fails, switch **Speech** to **System**. Article reading and system read-aloud do not depend on the Kokoro model.
+
 ## Report an issue
 
 Use the [GitHub issue tracker](https://github.com/JKeatingMU/local-reader-extension/issues) and include:

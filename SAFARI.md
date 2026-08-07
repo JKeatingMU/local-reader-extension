@@ -12,6 +12,6 @@ Safari 26 on macOS can load the extension folder temporarily, without creating a
 8. Open an ordinary article page and click the Textuary toolbar button.
 9. When Safari asks for website access, allow it for that use or for the website.
 
-Test article extraction, reading time and progress, the Reading style controls, printing and read aloud. Safari supplies its own voice list, so the available names may differ from Chrome.
+Test article extraction, reading time and progress, the Reading style controls, printing and read aloud. Safari supplies its own system voice list, so the available names may differ from Chrome. Natural (Kokoro) voices are experimental and require WebGPU plus compatible Safari extension-module behaviour; if the option is disabled or fails to initialise, select **System** speech.
 
 Temporary extensions are removed after 24 hours or when Safari quits. Once the Safari behaviour is confirmed, Apple's Safari Web Extension packager can create the macOS app wrapper needed for permanent installation or distribution.

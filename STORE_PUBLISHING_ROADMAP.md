@@ -6,7 +6,7 @@ Textuary can be distributed through both the Chrome Web Store and Apple's App St
 
 ## Current position
 
-Version 2.5.0 is the current release candidate:
+Version 2.5.0 remains the preserved release candidate on `main`. Version 2.6.0 is being validated on the `feature/kokoro-natural-voices` branch and adds:
 
 - Manifest V3 extension
 - compatible with Chrome and Safari
@@ -18,6 +18,9 @@ Version 2.5.0 is the current release candidate:
 - estimated read time, live reading progress and time remaining
 - remembered typography, paper, evening and automatic ambient themes
 - read-aloud passage highlighting
+- optional Kokoro natural voices generated locally with WebGPU
+- an explicit approximately 330 MB first-use model download and browser cache
+- system-voice fallback and spoken author/publication metadata
 
 ## Shared preparation
 
@@ -133,6 +136,18 @@ Still required before Chrome submission:
 - [x] paper, evening and ambient themes
 - [x] locally remembered preferences
 - [x] read-aloud follow highlighting
+
+### Version 2.6: natural read-aloud — experimental 7 August 2026
+
+- [x] opt-in Kokoro FP32 model and 28 English voices
+- [x] local WebGPU speech generation with system fallback
+- [x] model-download consent and progress messaging
+- [x] passage prefetch, pause, resume and stop
+- [x] speak title, author, publication date and standfirst before the body
+- [x] automated Chrome control-flow test and real FP32/WebGPU generation test on macOS
+- [ ] manual listening test in ordinary macOS Chrome
+- [ ] Windows Chrome WebGPU, performance and fallback test
+- [ ] decide whether Safari should expose Kokoro or remain System-only for 2.6
 
 ### Later release: personal reading library
 

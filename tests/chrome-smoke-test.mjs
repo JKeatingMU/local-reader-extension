@@ -57,6 +57,7 @@ await new Promise((resolveWait) => setTimeout(resolveWait, fixtureName.endsWith(
 const speechMock = await call("Runtime.evaluate", {
   expression: `(() => {
     const calls = [];
+    const naturalCalls = [];
     const availableVoices = [
       { name: 'Test Default', lang: 'en-IE', voiceURI: 'test-default', default: true, localService: true },
       { name: 'Test Alternate', lang: 'en-GB', voiceURI: 'test-alternate', default: false, localService: true }
@@ -77,16 +78,57 @@ const speechMock = await call("Runtime.evaluate", {
     class MockUtterance {
       constructor(text) { this.text = text; }
     }
+    class MockAudioContext {
+      constructor() { this.state = 'running'; this.destination = {}; }
+      async resume() { this.state = 'running'; naturalCalls.push({ type: 'context-resume' }); }
+      async suspend() { this.state = 'suspended'; naturalCalls.push({ type: 'context-suspend' }); }
+      async close() { this.state = 'closed'; }
+      createBuffer(channels, length, sampleRate) {
+        return { channels, length, sampleRate, copyToChannel(data) { this.dataLength = data.length; } };
+      }
+      createBufferSource() {
+        const listeners = {};
+        const source = {
+          connect() {}, disconnect() {},
+          addEventListener(type, listener) { listeners[type] = listener; },
+          start() { naturalCalls.push({ type: 'natural-play', length: this.buffer?.length }); },
+          stop() { naturalCalls.push({ type: 'natural-stop' }); },
+          finish() { listeners.ended?.(); }
+        };
+        globalThis.__textuaryNaturalSource = source;
+        return source;
+      }
+    }
+    const kokoroModule = 'data:text/javascript,' + encodeURIComponent(\`
+      export const KokoroTTS = {
+        async from_pretrained(model, options) {
+          globalThis.__localReaderNaturalTest.push({ type: 'model', model, dtype: options.dtype, device: options.device });
+          options.progress_callback?.({ status: 'progress', file: 'model.onnx', progress: 50 });
+          return {
+            async generate(text, options) {
+              globalThis.__localReaderNaturalTest.push({ type: 'generate', text, voice: options.voice, speed: options.speed });
+              return { audio: new Float32Array([0, 0.1, -0.1, 0]), sampling_rate: 24000 };
+            }
+          };
+        }
+      };
+    \`);
     Object.defineProperty(globalThis, 'speechSynthesis', { configurable: true, value: synth });
     Object.defineProperty(globalThis, 'SpeechSynthesisUtterance', { configurable: true, value: MockUtterance });
+    Object.defineProperty(globalThis, 'AudioContext', { configurable: true, value: MockAudioContext });
+    Object.defineProperty(navigator, 'gpu', { configurable: true, value: { async requestAdapter() { return {}; } } });
     const storedPreferences = {};
     const storage = { local: {
         async get(key) { return { [key]: storedPreferences[key] }; },
         async set(values) { Object.assign(storedPreferences, values); }
       } };
-    if (globalThis.chrome) Object.defineProperty(globalThis.chrome, 'storage', { configurable: true, value: storage });
-    else Object.defineProperty(globalThis, 'chrome', { configurable: true, value: { storage } });
+    const runtime = { getURL() { return kokoroModule; } };
+    if (globalThis.chrome) {
+      Object.defineProperty(globalThis.chrome, 'storage', { configurable: true, value: storage });
+      Object.defineProperty(globalThis.chrome, 'runtime', { configurable: true, value: runtime });
+    } else Object.defineProperty(globalThis, 'chrome', { configurable: true, value: { storage, runtime } });
     globalThis.__localReaderSpeechTest = calls;
+    globalThis.__localReaderNaturalTest = naturalCalls;
     globalThis.__textuaryStoredPreferences = storedPreferences;
     return true;
   })()`,
@@ -128,6 +170,8 @@ const inspection = await call("Runtime.evaluate", {
       progressBars: document.querySelectorAll('[role="progressbar"]').length,
       readingMeta: document.querySelector('.lr-reading-meta')?.textContent?.trim(),
       speechSelects: document.querySelectorAll('.lr-speech-setting select').length,
+      speechEngineOptions: document.querySelector('#lr-speech-engine')?.options.length,
+      naturalEngineDisabled: document.querySelector('#lr-speech-engine option[value="kokoro"]')?.disabled,
       voiceOptions: document.querySelector('#lr-speech-voice')?.options.length,
       voiceSelectDisabled: document.querySelector('#lr-speech-voice')?.disabled,
       rateOptions: document.querySelector('#lr-speech-rate')?.options.length,
@@ -173,6 +217,7 @@ const speechInspection = await call("Runtime.evaluate", {
       afterStop: { label: toggle?.textContent, stopDisabled: stop?.disabled, highlighted: document.querySelectorAll('.lr-speaking').length },
       calls: globalThis.__localReaderSpeechTest,
       firstSpokenText: globalThis.__localReaderSpeechTest.find(({ type }) => type === 'speak')?.text,
+      secondSpokenText: globalThis.__localReaderSpeechTest.filter(({ type }) => type === 'speak')[1]?.text,
       firstSpokenRate: globalThis.__localReaderSpeechTest.find(({ type }) => type === 'speak')?.rate,
       firstSpokenVoice: globalThis.__localReaderSpeechTest.find(({ type }) => type === 'speak')?.voice
     });
@@ -181,6 +226,45 @@ const speechInspection = await call("Runtime.evaluate", {
   returnByValue: true
 });
 const speech = JSON.parse(speechInspection.result.value);
+
+const naturalSpeechInspection = await call("Runtime.evaluate", {
+  expression: `(async () => {
+    const engine = document.querySelector('#lr-speech-engine');
+    const voice = document.querySelector('#lr-speech-voice');
+    const toggle = document.querySelector('#lr-speech-toggle');
+    const stop = document.querySelector('#lr-speech-stop');
+    engine.value = 'kokoro';
+    engine.dispatchEvent(new Event('change'));
+    voice.value = 'bf_emma';
+    voice.dispatchEvent(new Event('change'));
+    toggle.click();
+    await new Promise((resolveWait) => setTimeout(resolveWait, 20));
+    const consentOpen = document.querySelector('#lr-kokoro-consent')?.open;
+    document.querySelector('#lr-kokoro-consent button[value="enable"]')?.click();
+    await new Promise((resolveWait) => setTimeout(resolveWait, 120));
+    const afterPlay = { label: toggle.textContent, highlighted: document.querySelectorAll('.lr-speaking').length };
+    toggle.click();
+    await new Promise((resolveWait) => setTimeout(resolveWait, 10));
+    const afterPause = { label: toggle.textContent };
+    toggle.click();
+    await new Promise((resolveWait) => setTimeout(resolveWait, 10));
+    const afterResume = { label: toggle.textContent };
+    stop.click();
+    return JSON.stringify({
+      consentOpen,
+      voiceOptions: voice.options.length,
+      afterPlay,
+      afterPause,
+      afterResume,
+      afterStop: { label: toggle.textContent, highlighted: document.querySelectorAll('.lr-speaking').length },
+      calls: globalThis.__localReaderNaturalTest,
+      saved: globalThis.__textuaryStoredPreferences.textuaryReadingPreferences
+    });
+  })()`,
+  awaitPromise: true,
+  returnByValue: true
+});
+const naturalSpeech = JSON.parse(naturalSpeechInspection.result.value);
 
 const styleInspection = await call("Runtime.evaluate", {
   expression: `(async () => {
@@ -229,6 +313,11 @@ const progress = JSON.parse(progressInspection.result.value);
 
 await call("Runtime.evaluate", {
   expression: `(() => {
+    const engine = document.querySelector('#lr-speech-engine');
+    if (engine) {
+      engine.value = 'system';
+      engine.dispatchEvent(new Event('change'));
+    }
     const voice = document.querySelector('#lr-speech-voice');
     const rate = document.querySelector('#lr-speech-rate');
     if (voice) voice.value = '';
@@ -261,7 +350,7 @@ const screenshot = await call("Page.captureScreenshot", { format: "png" });
 const screenshotPath = requestedScreenshotPath || `/private/tmp/local-reader-${fixtureName}.png`;
 await writeFile(screenshotPath, Buffer.from(screenshot.data, "base64"));
 
-console.log(JSON.stringify({ fixtureName, ...result, speech, style, progress, themeState, screenshotPath }, null, 2));
+console.log(JSON.stringify({ fixtureName, ...result, speech, naturalSpeech, style, progress, themeState, screenshotPath }, null, 2));
 
 const expectations = {
   dailymail: {
@@ -315,7 +404,9 @@ if (
   result.settingsRanges !== 1 ||
   result.progressBars !== 1 ||
   !result.readingMeta?.includes("min read") ||
-  result.speechSelects !== 2 ||
+  result.speechSelects !== 3 ||
+  result.speechEngineOptions !== 2 ||
+  result.naturalEngineDisabled ||
   result.voiceOptions !== 3 ||
   result.voiceSelectDisabled ||
   result.rateOptions !== 5 ||
@@ -341,8 +432,21 @@ if (
   speech.afterStop.highlighted !== 0 ||
   !speech.calls.some(({ type }) => type === "speak") ||
   !speech.firstSpokenText?.startsWith(result.title) ||
+  !speech.secondSpokenText?.startsWith("By ") ||
   speech.firstSpokenRate !== 1.5 ||
   speech.firstSpokenVoice !== "test-alternate" ||
+  !naturalSpeech.consentOpen ||
+  naturalSpeech.voiceOptions !== 28 ||
+  naturalSpeech.afterPlay.label !== "Pause" ||
+  naturalSpeech.afterPlay.highlighted !== 1 ||
+  naturalSpeech.afterPause.label !== "Resume" ||
+  naturalSpeech.afterResume.label !== "Pause" ||
+  naturalSpeech.afterStop.label !== "Read aloud" ||
+  naturalSpeech.afterStop.highlighted !== 0 ||
+  !naturalSpeech.calls.some(({ type, dtype, device }) => type === "model" && dtype === "fp32" && device === "webgpu") ||
+  !naturalSpeech.calls.some(({ type, voice, speed }) => type === "generate" && voice === "bf_emma" && speed === 1.5) ||
+  naturalSpeech.saved?.speechEngine !== "kokoro" ||
+  naturalSpeech.saved?.kokoroConsent !== true ||
   style.theme !== "ambient" ||
   style.fontSize !== "23px" ||
   style.lineHeight !== "1.9" ||
