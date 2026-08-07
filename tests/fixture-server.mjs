@@ -5,6 +5,7 @@ import { resolve } from "node:path";
 const port = Number(process.argv[2] || 8767);
 const fixtures = new Map([
   ["/client-paywall.html", ["tests/fixtures/client-paywall.html", "text/html; charset=utf-8"]],
+  ["/media-article.html", ["tests/fixtures/media-article.html", "text/html; charset=utf-8"]],
   ["/store-article.html", ["tests/fixtures/store-article.html", "text/html; charset=utf-8"]],
   ["/store-reading.svg", ["tests/fixtures/store-reading.svg", "image/svg+xml"]],
   ["/kokoro.web.js", ["vendor/kokoro.web.js", "text/javascript; charset=utf-8"]],

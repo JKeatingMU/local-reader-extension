@@ -10,7 +10,7 @@ A browser extension for Chrome and Safari that turns articles into a calm, focus
 4. Select this `local-reader-extension` folder.
 5. Open Chrome's Extensions menu (the puzzle-piece icon) and pin **Textuary**.
 
-If an earlier version is already loaded, open `chrome://extensions` and click its reload button. Chrome will update it to **Textuary 2.7.0**.
+If an earlier version is already loaded, open `chrome://extensions` and click its reload button. Chrome will update it to **Textuary 2.7.1**.
 
 ## Try in Safari on macOS
 
@@ -71,6 +71,7 @@ See [the store-publishing and product roadmap](STORE_PUBLISHING_ROADMAP.md) for 
 - `v2.6.3` normalises Safari's decompressed pronunciation dictionary to an `ArrayBuffer`.
 - `v2.6.4` keeps Safari on reliable System speech after testing exposed an upstream ONNX WebGPU hang.
 - `v2.7.0` adds the packaged macOS/iOS Safari extension and on-device Apple Enhanced/Premium voice support with Textuary's existing controls and passage highlighting.
+- `v2.7.1` improves complete-headline selection, promotes lazy-loaded article images, preserves safe native video, and removes player-interface text from the reading view.
 
 The project is a Git repository. To inspect the preserved version without changing the working tree, run `git show v1.0.0:reader.js` from this folder.
 

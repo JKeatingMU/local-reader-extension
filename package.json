@@ -1,6 +1,6 @@
 {
   "name": "textuary-extension",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "private": true,
   "description": "Build-time dependencies for the Textuary browser extension.",
   "scripts": {

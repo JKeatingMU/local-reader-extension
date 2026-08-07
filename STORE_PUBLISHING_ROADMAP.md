@@ -164,6 +164,15 @@ Still required before Chrome submission:
 - [ ] install Xcode's matching iOS platform component and complete a generic device build
 - [ ] physical iPad/iPhone Safari test
 
+### Version 2.7.1: reader media refinement — in validation 7 August 2026
+
+- [x] prefer a longer credible metadata headline when Readability selects a shortened visible heading
+- [x] promote common lazy-image and responsive-image sources before extraction
+- [x] preserve sanitised native video sources, posters and user-operated controls without autoplay
+- [x] remove clustered video-player status labels without removing editorial captions or prose
+- [x] automated Chrome and Safari-mode media regression tests
+- [ ] manual Safari test against the Daily Mail comparison article
+
 ### Later release: personal reading library
 
 - save clean articles locally without an account

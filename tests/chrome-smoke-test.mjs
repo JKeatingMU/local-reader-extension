@@ -197,6 +197,10 @@ const inspection = await call("Runtime.evaluate", {
       paragraphs: paragraphs.length,
       figures: document.querySelectorAll('#lr-content figure').length,
       images: document.querySelectorAll('#lr-content img').length,
+      imageSources: [...document.querySelectorAll('#lr-content img')].map((image) => ({ src: image.src, srcset: image.srcset, loading: image.loading })),
+      videos: document.querySelectorAll('#lr-content video').length,
+      videoSources: [...document.querySelectorAll('#lr-content video')].map((video) => ({ src: video.src, poster: video.poster, controls: video.controls, autoplay: video.autoplay })),
+      sourceSources: [...document.querySelectorAll('#lr-content video source')].map((source) => source.src),
       controls: document.querySelectorAll('.lr-toolbar button').length,
       settingsSelects: document.querySelectorAll('.lr-settings-panel select').length,
       settingsRanges: document.querySelectorAll('.lr-settings-panel input[type="range"]').length,
@@ -215,7 +219,8 @@ const inspection = await call("Runtime.evaluate", {
       firstParagraph: paragraphs.at(0)?.textContent?.replace(/\\s+/g, ' ').trim(),
       lastParagraph: paragraphs.at(-1)?.textContent?.replace(/\\s+/g, ' ').trim(),
       shortParagraphs: paragraphs.map((paragraph) => paragraph.textContent.replace(/\\s+/g, ' ').trim()).filter((text) => text.length < 80),
-      containsProductCta: document.querySelector('#lr-content')?.textContent?.includes('Shop')
+      containsProductCta: document.querySelector('#lr-content')?.textContent?.includes('Shop'),
+      containsPlayerControls: /Loaded:\s*0%|Progress:\s*0%|Current Time|Duration Time|Full Size/.test(document.querySelector('#lr-content')?.textContent || '')
     });
   })()`,
   returnByValue: true
@@ -258,6 +263,9 @@ const speechInspection = await call("Runtime.evaluate", {
   awaitPromise: true,
   returnByValue: true
 });
+if (speechInspection.exceptionDetails) {
+  throw new Error(speechInspection.exceptionDetails.exception?.description || "System speech inspection failed");
+}
 const speech = JSON.parse(speechInspection.result.value);
 
 const naturalSpeechInspection = await call("Runtime.evaluate", {
@@ -420,6 +428,19 @@ const expectations = {
     site: "Example Gazette",
     method: "Original page HTML"
   },
+  media: {
+    minParagraphs: 6,
+    minTextLength: 1700,
+    firstPrefix: "The opening paragraph establishes",
+    lastSuffix: "playback-status debris.",
+    site: "Example Gazette",
+    method: "Rendered page",
+    title: "A complete investigation with photographs and video evidence",
+    minVideos: 1,
+    videoSourceSuffix: "/sample-video.mp4",
+    requiresCleanPlayer: true,
+    imageSuffix: "/store-reading.svg"
+  },
   article: {
     minParagraphs: 2,
     minTextLength: 400,
@@ -459,6 +480,7 @@ const chromeNaturalSpeechOkay = speechPlatform === "safari" || (
 
 if (
   !result.reader ||
+  (expected.title && result.title !== expected.title) ||
   result.paragraphs < expected.minParagraphs ||
   result.controls !== 5 ||
   result.settingsSelects !== 4 ||
@@ -474,6 +496,15 @@ if (
   result.toolbarHeight > 60 ||
   result.readerWidth < 1000 ||
   result.images < 1 ||
+  (expected.minVideos && result.videos < expected.minVideos) ||
+  (expected.requiresCleanPlayer && result.containsPlayerControls) ||
+  (expected.imageSuffix && !result.imageSources.some(({ src, srcset, loading }) =>
+    (src.endsWith(expected.imageSuffix) || srcset.includes(expected.imageSuffix)) && loading === "eager"
+  )) ||
+  (expected.minVideos && !result.videoSources.some(({ poster, controls, autoplay }) =>
+    poster.endsWith("/store-reading.svg") && controls && !autoplay
+  )) ||
+  (expected.videoSourceSuffix && !result.sourceSources.some((src) => src.endsWith(expected.videoSourceSuffix))) ||
   result.textLength < expected.minTextLength ||
   result.containsProductCta ||
   !result.firstParagraph?.startsWith(expected.firstPrefix) ||

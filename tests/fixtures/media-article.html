@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>A complete investigation with photographs and video evidence — Example Gazette</title>
+  <meta property="og:title" content="A complete investigation with photographs and video evidence">
+  <meta property="og:site_name" content="Example Gazette">
+  <meta name="description" content="A regression article for complete headlines, lazy images and clean media controls.">
+</head>
+<body>
+  <main>
+    <article>
+      <h1>A complete investigation</h1>
+      <p class="byline">By Morgan Lee</p>
+      <p>The opening paragraph establishes a substantial article whose full headline is supplied by trustworthy page metadata. The visible heading is intentionally shorter so the reader must compare plausible titles without inventing or joining unrelated navigation text.</p>
+      <p>The second paragraph confirms that every sentence should remain in its original order. Article prose must survive media cleanup even when a publisher places a photograph, caption or video player between consecutive sections of the report.</p>
+      <figure>
+        <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-src="/store-reading.svg" data-srcset="/store-reading.svg 1280w" alt="A calm desk beside an open book">
+        <figcaption>The photograph caption remains attached to its lazy-loaded image.</figcaption>
+      </figure>
+      <p>The third paragraph follows the photograph and provides enough natural language for article extraction. Safari-style lazy loading should be promoted to an ordinary image source before readability analysis and before data attributes are removed by sanitisation.</p>
+      <figure>
+        <p>Watch the original interview</p>
+        <video controls data-poster="/store-reading.svg" preload="none">
+          <source data-src="/sample-video.mp4" type="video/mp4">
+        </video>
+        <div class="player-interface">
+          <p>Loaded: 0%</p>
+          <p>Progress: 0%</p>
+          <p>0:00</p>
+          <p>LIVE</p>
+          <p>Current Time 0:00</p>
+          <p>/</p>
+          <p>Duration Time 1:12</p>
+          <p>Full Size</p>
+        </div>
+        <figcaption>The interview caption should remain, while its player-interface labels should disappear.</figcaption>
+      </figure>
+      <p>The fourth paragraph verifies that the player cleanup is tightly scoped. Ordinary words such as live, progress and time can belong in editorial prose, so Textuary removes them only when several recognisable player labels occur together inside a compact media container.</p>
+      <p>The fifth paragraph checks safe playback. Native video elements may retain an HTTPS source, poster and user-operated controls, but autoplay is removed. Remote frames and arbitrary executable widgets remain outside the clean reading surface.</p>
+      <p>The final paragraph marks the successful end of the regression article. A complete result has the longer credible headline, all six prose paragraphs, the lazy photograph, the native video and both useful media captions without any playback-status debris.</p>
+    </article>
+  </main>
+</body>
+</html>
