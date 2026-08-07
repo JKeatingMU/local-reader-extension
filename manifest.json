@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Textuary — Article Reader & Text Sanctuary",
   "short_name": "Textuary",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "description": "A calm, private text sanctuary with article reading, typography controls, progress and read-aloud.",
   "icons": {
     "16": "icons/icon-16.png",
