@@ -12,6 +12,14 @@ const onnxRuntimeSource = resolve(root, "node_modules/@huggingface/transformers/
 
 const readability = await readFile(readabilitySource, "utf8");
 const purify = await readFile(purifySource, "utf8");
+const kokoro = await readFile(kokoroSource, "utf8");
+const asyncStreamIteration = "t=[];for await(const e of A)t.push(e);const r=await new Blob(t).arrayBuffer();";
+const readerStreamIteration = "t=[];{const e=A.getReader();for(;;){const{done:A,value:r}=await e.read();if(A)break;t.push(r)}}const r=await new Blob(t).arrayBuffer();";
+const safariCompatibleKokoro = kokoro.replace(asyncStreamIteration, readerStreamIteration);
+
+if (safariCompatibleKokoro === kokoro) {
+  throw new Error("Could not apply the Safari ReadableStream compatibility patch to Kokoro.js");
+}
 
 await writeFile(
   resolve(vendor, "Readability.js"),
@@ -30,7 +38,7 @@ await copyFile(
   resolve(root, "node_modules/dompurify/LICENSE"),
   resolve(vendor, "LICENSE-dompurify.txt")
 );
-await copyFile(kokoroSource, resolve(vendor, "kokoro.web.js"));
+await writeFile(resolve(vendor, "kokoro.web.js"), safariCompatibleKokoro);
 await copyFile(
   resolve(onnxRuntimeSource, "ort-wasm-simd-threaded.jsep.mjs"),
   resolve(vendor, "ort-wasm-simd-threaded.jsep.mjs")
