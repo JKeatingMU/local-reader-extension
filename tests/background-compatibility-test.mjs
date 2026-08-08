@@ -18,7 +18,8 @@ for (const namespace of ["browser", "chrome"]) {
       async executeScript(options) {
         calls.push(["executeScript", options]);
         return options.func ? [{ result: { reader: false, ready: true } }] : undefined;
-      }
+      },
+      async insertCSS(options) { calls.push(["insertCSS", options]); }
     },
     tabs: {
       async create(options) { calls.push(["tabCreate", options]); },
@@ -50,6 +51,10 @@ for (const namespace of ["browser", "chrome"]) {
     Array.from(calls.find(([type]) => type === "executeScript")?.[1].files || []),
     ["vendor/Readability.js", "vendor/purify.min.js", "reader.js"],
     `${namespace} script injection`
+  );
+  assert.ok(
+    calls.some(([type, options]) => type === "insertCSS" && Array.from(options.files || []).includes("print.css")),
+    `${namespace} protected print stylesheet injection`
   );
 
   calls.length = 0;
@@ -88,6 +93,10 @@ for (const namespace of ["browser", "chrome"]) {
       type === "executeScript" && Array.from(options.files || []).includes("reader.js")
     ),
     `${namespace} restores reader when history reloads the article`
+  );
+  assert.ok(
+    calls.some(([type, options]) => type === "insertCSS" && Array.from(options.files || []).includes("print.css")),
+    `${namespace} restores print stylesheet after navigation`
   );
   assert.ok(
     calls.some(([type, options]) =>

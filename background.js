@@ -60,6 +60,7 @@ async function returnToReader(tabId, sourceUrl, progress) {
   }
 
   if (!/^https?:\/\//i.test(sourceUrl || "")) return;
+  await installPrintStyles(tabId);
 
   let readerPresent = false;
   for (let attempt = 0; attempt < 16; attempt += 1) {
@@ -108,6 +109,18 @@ function delay(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
+async function installPrintStyles(tabId) {
+  if (typeof extensionApi.scripting?.insertCSS !== "function") return;
+  try {
+    await extensionApi.scripting.insertCSS({
+      target: { tabId },
+      files: ["print.css"]
+    });
+  } catch {
+    // The linked stylesheet remains available as a fallback on extension pages.
+  }
+}
+
 extensionApi.action.onClicked.addListener(async (tab) => {
   if (!tab.id || !/^https?:\/\//i.test(tab.url || "")) {
     if (typeof extensionApi.tabs?.create === "function") {
@@ -119,6 +132,7 @@ extensionApi.action.onClicked.addListener(async (tab) => {
   }
 
   try {
+    await installPrintStyles(tab.id);
     await extensionApi.scripting.executeScript({
       target: { tabId: tab.id },
       files: [
