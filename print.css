@@ -39,7 +39,8 @@
     width: auto;
     max-width: none;
     margin: 0;
-    padding: 0 1in;
+    /* Keep a physical inset even when Chrome remembers "Margins: None". */
+    padding: 1in;
   }
 
   .lr-page > article {
