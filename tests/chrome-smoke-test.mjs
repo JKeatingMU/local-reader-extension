@@ -226,6 +226,8 @@ const inspection = await call("Runtime.evaluate", {
       voiceSelectDisabled: document.querySelector('#lr-speech-voice')?.disabled,
       rateOptions: document.querySelector('#lr-speech-rate')?.options.length,
       toolbarHeight: Math.round(document.querySelector('.lr-toolbar')?.getBoundingClientRect().height || 0),
+      toolbarButtonFontSizes: [...document.querySelectorAll('.lr-toolbar button')].map((control) => getComputedStyle(control).fontSize),
+      toolbarSummaryFontSizes: [...document.querySelectorAll('.lr-toolbar summary')].map((control) => getComputedStyle(control).fontSize),
       viewportWidth: innerWidth,
       documentWidth: document.documentElement.scrollWidth,
       readerWidth: Math.round(document.querySelector('.lr-page')?.getBoundingClientRect().width || 0),
@@ -589,6 +591,8 @@ if (
   result.voiceOptions !== 3 ||
   result.voiceSelectDisabled ||
   result.rateOptions !== 5 ||
+  new Set([...result.toolbarButtonFontSizes, ...result.toolbarSummaryFontSizes]).size !== 1 ||
+  result.toolbarButtonFontSizes[0] !== "14px" ||
   result.toolbarHeight > 60 ||
   result.documentWidth > result.viewportWidth ||
   result.readerWidth < 1000 ||
