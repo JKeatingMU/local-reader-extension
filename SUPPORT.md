@@ -23,7 +23,7 @@
 - Open **More** and choose **Save article** in the reading view; **Saved ✓** confirms that the clean snapshot was written to local extension storage.
 - The saved prose is available offline. Pictures and video remain externally hosted in version 2.8 and need a connection.
 - The Library restores the last recorded reading position and marks an article finished when its progress reaches the end.
-- The Library opens in a separate tab so the active reader remains available. Choose **Return to article** in the Library header to close it and focus that reader again; the button remains available when the saved list is empty.
+- The Library temporarily replaces the reader in the same browser tab. Choose **Return to article** in the Library header to restore that reader; the button remains available when the saved list is empty.
 - Pausing read-aloud on a saved article remembers the current short passage. After reloading or reopening that snapshot, **Resume aloud** restarts at the beginning of that passage. **Stop** deliberately resets speech to the beginning.
 - Use the per-article **Delete** button or **Clear library** to remove saved content. Removing the extension or clearing its browser data may also erase the Library.
 - An open reader updates its **Saved ✓** state when its snapshot is deleted or the Library is cleared; switch back to the reader tab if the browser has not already focused it.

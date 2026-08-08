@@ -13,14 +13,16 @@
   const clear = document.getElementById("library-clear");
   const returnButton = document.getElementById("library-return");
   const template = document.getElementById("article-card-template");
-  const returnTabValue = new URLSearchParams(location.search).get("returnTab");
-  const returnTabId = returnTabValue === null ? NaN : Number(returnTabValue);
+  const parameters = new URLSearchParams(location.search);
+  const canReturnToArticle = parameters.get("returnTo") === "article";
+  const returnSourceUrl = parameters.get("sourceUrl") || "";
+  const returnProgress = Math.max(0, Math.min(1, Number(parameters.get("returnProgress")) || 0));
   let library = { version: 1, articles: [] };
 
   search.addEventListener("input", render);
   filter.addEventListener("change", render);
   clear.addEventListener("click", clearLibrary);
-  if (Number.isInteger(returnTabId) && returnTabId >= 0) {
+  if (canReturnToArticle) {
     returnButton.hidden = false;
     returnButton.addEventListener("click", returnToArticle);
   }
@@ -30,17 +32,15 @@
     returnButton.disabled = true;
     returnButton.textContent = "Returning…";
     try {
-      if (!runtime?.sendMessage) throw new Error("The extension could not reach the original article tab");
+      if (!runtime?.sendMessage) throw new Error("The extension could not restore the reader");
       const response = await runtime.sendMessage({
-        type: "textuary-return-to-article",
-        returnTabId
+        type: "textuary-return-to-reader",
+        sourceUrl: returnSourceUrl,
+        progress: returnProgress
       });
       if (response?.ok === false) throw new Error(response.error);
-    } catch (error) {
-      returnButton.disabled = false;
-      returnButton.textContent = safeError(error).includes("no longer available")
-        ? "Article tab was closed"
-        : "← Return to article";
+    } catch {
+      history.back();
     }
   }
 

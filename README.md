@@ -21,7 +21,7 @@ Textuary now includes an Xcode project for the permanent Safari Web Extension co
 1. Open an article on any ordinary `http` or `https` page and wait for it to load.
 2. Click the **Textuary** toolbar icon, or press **Option+Shift+R** on macOS (**Alt+Shift+R** elsewhere).
 3. Choose **System** speech for voices exposed by the browser; in Chrome choose **Natural (Kokoro)** for locally generated speech; or in the packaged Safari version choose **Premium (Apple)** for installed Apple Enhanced and Premium voices. Then choose a **Voice** and **Speed**. Click **Read aloud**; the same button pauses or resumes, and **Stop** returns to the beginning.
-4. Open **More**, then click **Save article** to keep the clean article in this browser. Use **Open Library** to search it, continue from the saved reading or read-aloud passage, mark it read or unread, or delete it. The Library opens separately so the current reader stays intact; use **Return to article** in its header to close the Library and go back. Saved prose remains available offline without an account. Remote pictures and video still require a connection in this first library release.
+4. Open **More**, then click **Save article** to keep the clean article in this browser. Use **Open Library** to search it, continue from the saved reading or read-aloud passage, mark it read or unread, or delete it. The Library temporarily replaces the reader in the same tab; use **Return to article** in its header to go back without creating duplicate tabs. Saved prose remains available offline without an account. Remote pictures and video still require a connection in this first library release.
 5. Open **Reading style** to choose the paper, evening or automatic ambient theme; select a typeface; and adjust text size, spacing and column width. Textuary remembers these choices locally.
 6. Follow the slim progress bar and estimated time remaining while reading. During read-aloud, the current passage is highlighted automatically.
 7. Open **More** and use **Print or PDF** for clean output, or click **Original page** to return to the normal site. **Stop** begins again from the start; pausing a saved article remembers the current short passage across a reload.
@@ -68,7 +68,7 @@ Chrome Web Store preparation materials are under [`store/chrome`](store/chrome),
 - Natural voices require WebGPU in Chrome. Safari uses the native Apple voice bridge because ONNX Runtime's Safari WebGPU path can hang. The first Chrome model load and passage take longer; generation speed depends on the computer's GPU.
 - A reader can only process text delivered to the browser. Content that is never present in the rendered page cannot be extracted.
 - After changing extension files, open `chrome://extensions` and click the extension's reload button.
-- Saved article text is offline, but externally hosted images and video need a connection in version 2.8. The Library shows its local storage use and provides individual and clear-all deletion controls. Its **Return to article** button remains available even after clearing the list.
+- Saved article text is offline, but externally hosted images and video need a connection in version 2.8. The Library shows its local storage use and provides individual and clear-all deletion controls. Its same-tab **Return to article** button remains available even after clearing the list.
 
 ## Versions and development
 

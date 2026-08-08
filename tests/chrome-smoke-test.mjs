@@ -441,7 +441,27 @@ const screenshot = await call("Page.captureScreenshot", { format: "png" });
 const screenshotPath = requestedScreenshotPath || `/private/tmp/local-reader-${fixtureName}.png`;
 await writeFile(screenshotPath, Buffer.from(screenshot.data, "base64"));
 
-console.log(JSON.stringify({ fixtureName, ...result, library, speech, naturalSpeech, style, progress, themeState, screenshotPath }, null, 2));
+const printPdf = await call("Page.printToPDF", {
+  printBackground: true,
+  preferCSSPageSize: true
+});
+const printPdfPath = `/private/tmp/textuary-print-${fixtureName}.pdf`;
+const printPdfBuffer = Buffer.from(printPdf.data, "base64");
+await writeFile(printPdfPath, printPdfBuffer);
+
+console.log(JSON.stringify({
+  fixtureName,
+  ...result,
+  library,
+  speech,
+  naturalSpeech,
+  style,
+  progress,
+  themeState,
+  printPdfBytes: printPdfBuffer.length,
+  screenshotPath,
+  printPdfPath
+}, null, 2));
 
 const expectations = {
   dailymail: {
@@ -536,6 +556,7 @@ if (
   !result.moreMenu ||
   !printControl.called ||
   printControl.menuOpen ||
+  printPdfBuffer.length < 10_000 ||
   result.saveLabel !== "Save article" ||
   !result.libraryButton ||
   result.settingsSelects !== 4 ||

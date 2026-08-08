@@ -84,7 +84,9 @@ await call("Page.addScriptToEvaluateOnNewDocument", {
   })()`
 });
 
-await call("Page.navigate", { url: `${fixtureOrigin}/library.html?returnTab=77` });
+await call("Page.navigate", {
+  url: `${fixtureOrigin}/library.html?returnTo=article&sourceUrl=${encodeURIComponent("https://example.com/quiet-reading")}&returnProgress=0.42`
+});
 await new Promise((resolve) => setTimeout(resolve, 700));
 const libraryView = await evaluate(`(() => {
   const search = document.querySelector('#library-search');

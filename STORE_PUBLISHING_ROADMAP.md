@@ -188,8 +188,9 @@ Still required before Chrome submission:
 - [x] restore the current read-aloud passage after pause and reload
 - [x] read and unread state
 - [x] approximate storage usage, individual deletion and clear-all controls
-- [x] explicit Library return-to-article navigation and live saved-state synchronisation
+- [x] same-tab Library return-to-article navigation and live saved-state synchronisation
 - [x] consolidate Save, Library and Print under a compact More menu
+- [x] print-specific page margins, typography and page-break rules
 - [x] update the privacy policy and README for local article storage
 - [x] automated live-package validation in Chrome and Safari modes
 - [ ] manual macOS Chrome and Safari validation

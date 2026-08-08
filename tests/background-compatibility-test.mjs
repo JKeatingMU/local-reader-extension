@@ -15,12 +15,15 @@ for (const namespace of ["browser", "chrome"]) {
       async setBadgeText(options) { calls.push(["badgeText", options]); }
     },
     scripting: {
-      async executeScript(options) { calls.push(["executeScript", options]); }
+      async executeScript(options) {
+        calls.push(["executeScript", options]);
+        return options.func ? [{ result: { reader: false, ready: true } }] : undefined;
+      }
     },
     tabs: {
       async create(options) { calls.push(["tabCreate", options]); },
       async update(tabId, options) { calls.push(["tabUpdate", { tabId, ...options }]); },
-      async remove(tabId) { calls.push(["tabRemove", tabId]); }
+      async goBack(tabId) { calls.push(["tabGoBack", tabId]); }
     },
     runtime: {
       onMessage: { addListener(listener) { onMessage = listener; } },
@@ -57,28 +60,41 @@ for (const namespace of ["browser", "chrome"]) {
   );
 
   calls.length = 0;
-  const libraryResponse = await onMessage({ type: "textuary-open-library" }, { tab: { id: 7 } });
+  const libraryResponse = await onMessage(
+    { type: "textuary-open-library", progress: .37 },
+    { tab: { id: 7, url: "https://example.com/article" } }
+  );
   assert.equal(libraryResponse.ok, true, `${namespace} library response`);
   assert.ok(
     calls.some(([type, options]) =>
-      type === "tabCreate" &&
-      options.url.endsWith("/library.html?returnTab=7") &&
-      options.openerTabId === 7
+      type === "tabUpdate" &&
+      options.tabId === 7 &&
+      options.url.includes("/library.html?returnTo=article") &&
+      options.url.includes("sourceUrl=https%3A%2F%2Fexample.com%2Farticle") &&
+      options.url.includes("returnProgress=0.37")
     ),
-    `${namespace} library message`
+    `${namespace} library replaces reader tab`
   );
 
   calls.length = 0;
   const returnResponse = await onMessage(
-    { type: "textuary-return-to-article", returnTabId: 7 },
-    { tab: { id: 9 } }
+    { type: "textuary-return-to-reader", sourceUrl: "https://example.com/article", progress: .37 },
+    { tab: { id: 7 } }
   );
   assert.equal(returnResponse.ok, true, `${namespace} return response`);
+  assert.ok(calls.some(([type, tabId]) => type === "tabGoBack" && tabId === 7), `${namespace} same-tab return`);
   assert.ok(
-    calls.some(([type, options]) => type === "tabUpdate" && options.tabId === 7 && options.active),
-    `${namespace} focuses article tab`
+    calls.some(([type, options]) =>
+      type === "executeScript" && Array.from(options.files || []).includes("reader.js")
+    ),
+    `${namespace} restores reader when history reloads the article`
   );
-  assert.ok(calls.some(([type, tabId]) => type === "tabRemove" && tabId === 9), `${namespace} closes library tab`);
+  assert.ok(
+    calls.some(([type, options]) =>
+      type === "executeScript" && Array.from(options.args || [])[0] === .37
+    ),
+    `${namespace} restores reading position`
+  );
 
   calls.length = 0;
   const nativeResponse = await onMessage({
