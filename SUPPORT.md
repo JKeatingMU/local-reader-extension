@@ -18,6 +18,14 @@
 - Install an Enhanced or Premium voice in the device's Accessibility speech settings before opening Textuary. If it does not appear, close and reopen the reader after the download completes.
 - If the native bridge is unavailable, disable any duplicate temporary Textuary entry, enable the packaged extension in Safari Settings, and try again. **System** remains available as a fallback.
 
+## Local Library troubleshooting
+
+- Choose **Save article** in the reading view; **Saved ✓** confirms that the clean snapshot was written to local extension storage.
+- The saved prose is available offline. Pictures and video remain externally hosted in version 2.8 and need a connection.
+- The Library restores the last recorded reading position and marks an article finished when its progress reaches the end.
+- Use the per-article **Delete** button or **Clear library** to remove saved content. Removing the extension or clearing its browser data may also erase the Library.
+- Chrome and Safari keep separate local libraries. Textuary does not yet synchronise saved articles between browsers or devices.
+
 ## Report an issue
 
 Use the [GitHub issue tracker](https://github.com/JKeatingMU/local-reader-extension/issues) and include:

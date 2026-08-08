@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Library — Textuary</title>
+    <link rel="stylesheet" href="library.css">
+  </head>
+  <body>
+    <header class="library-header">
+      <div>
+        <p class="eyebrow">Textuary</p>
+        <h1>Your quiet reading library</h1>
+        <p>Clean articles saved locally in this browser—no account required.</p>
+      </div>
+      <img src="icons/icon-128-store.png" alt="" width="72" height="72">
+    </header>
+
+    <main>
+      <section class="library-controls" aria-label="Library controls">
+        <label class="search-field">
+          <span>Search saved articles</span>
+          <input id="library-search" type="search" placeholder="Title, publication or author">
+        </label>
+        <label class="filter-field">
+          <span>Show</span>
+          <select id="library-filter">
+            <option value="all">All articles</option>
+            <option value="unread">Unread</option>
+            <option value="finished">Finished</option>
+          </select>
+        </label>
+        <button id="library-clear" class="quiet danger" type="button">Clear library</button>
+      </section>
+
+      <div class="library-summary">
+        <p id="library-count" aria-live="polite">Loading library…</p>
+        <p id="library-storage"></p>
+      </div>
+
+      <section id="library-list" class="library-list" aria-label="Saved articles"></section>
+
+      <section id="library-empty" class="library-empty" hidden>
+        <h2>No saved articles yet</h2>
+        <p>Open an article, activate Textuary and choose <strong>Save article</strong>. Its clean text will then be available here, even when you are offline.</p>
+      </section>
+    </main>
+
+    <template id="article-card-template">
+      <article class="article-card">
+        <div class="article-card-main">
+          <p class="article-site"></p>
+          <h2><a class="article-title"></a></h2>
+          <p class="article-description"></p>
+          <p class="article-details"></p>
+          <div class="article-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+            <span></span>
+          </div>
+        </div>
+        <div class="article-actions">
+          <a class="article-read primary">Read</a>
+          <button class="article-state quiet" type="button"></button>
+          <button class="article-delete quiet danger" type="button">Delete</button>
+        </div>
+      </article>
+    </template>
+
+    <script src="library.js"></script>
+  </body>
+</html>

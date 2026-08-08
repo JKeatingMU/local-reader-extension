@@ -1,10 +1,10 @@
 # Install and test Textuary in Safari
 
-Textuary 2.7 includes a containing Apple application and Safari Web Extension for macOS, iPhone and iPad. This packaged version can use installed Apple Enhanced and Premium voices through the on-device `AVSpeechSynthesizer` API. The older temporary-extension method still works for article-reader testing, but it cannot use this native voice bridge.
+Textuary 2.8 includes a containing Apple application and Safari Web Extension for macOS, iPhone and iPad. This packaged version can use installed Apple Enhanced and Premium voices through the on-device `AVSpeechSynthesizer` API. The older temporary-extension method still works for article-reader testing, but it cannot use this native voice bridge.
 
 ## macOS: packaged extension with Premium voices
 
-1. Download an Apple Premium or Enhanced voice in **System Settings > Accessibility > Read & Speak**. Selena Premium is one tested example.
+1. Download an Apple Premium or Enhanced voice in **System Settings > Accessibility > Read & Speak**. Open the system voice chooser, choose **Manage Voices…** if shown, and download a voice labelled **Enhanced** or **Premium**. Selena Premium is one tested example; the available names vary by language and macOS version.
 2. Open `safari/Textuary/Textuary.xcodeproj` in Xcode.
 3. Select the **Textuary (macOS)** scheme and **My Mac**, then click **Run**.
 4. In the Textuary application, click **Quit and Open Safari Settings…**, or open **Safari > Settings > Extensions** yourself.
@@ -12,6 +12,8 @@ Textuary 2.7 includes a containing Apple application and Safari Web Extension fo
 6. If the temporary development version is also listed, disable it so there is only one active Textuary extension.
 7. Open an ordinary article and click the Textuary toolbar button.
 8. In the reader, choose **Premium (Apple)** under Speech, then select the installed voice and speed.
+
+If a newly downloaded voice is missing, close the current Textuary reading view and activate the extension again. Safari discovers installed native voices when the new reader opens.
 
 The Premium voice menu deliberately shows only Apple's Enhanced and Premium voices. Choose **System** if you want the broader voice list exposed through browser speech synthesis.
 

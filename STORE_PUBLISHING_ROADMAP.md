@@ -1,12 +1,12 @@
 # Textuary Store Publishing and Product Roadmap
 
-Last reviewed: 7 August 2026
+Last reviewed: 8 August 2026
 
 Textuary can be distributed through both the Chrome Web Store and Apple's App Store. Chrome accepts a packaged browser extension directly. Safari distribution uses a signed macOS or iOS application containing the Safari Web Extension.
 
 ## Current position
 
-Version 2.5.0 remains the preserved release candidate on `main`. Chrome's Kokoro work is preserved on `feature/kokoro-natural-voices`. Version 2.7.0 is being validated on `feature/safari-native-premium-voices` and adds a native Apple voice path for Safari while retaining:
+Version 2.5.0 remains the preserved release candidate on `main`. Chrome's Kokoro work is preserved on `feature/kokoro-natural-voices`. The current `feature/safari-native-premium-voices` branch has now passed manual macOS Chrome and Safari testing through version 2.7.1. Version 2.8.0 begins the local reading-library phase while retaining:
 
 - Manifest V3 extension
 - compatible with Chrome and Safari
@@ -23,6 +23,8 @@ Version 2.5.0 remains the preserved release candidate on `main`. Chrome's Kokoro
 - system-voice fallback and spoken author/publication metadata
 - a containing macOS/iOS application and Safari Web Extension
 - installed Apple Enhanced and Premium voices through on-device `AVSpeechSynthesizer`
+- an account-free local Library with offline clean-text snapshots
+- restored article position, read/unread state, storage reporting and deletion controls
 
 ## Shared preparation
 
@@ -104,8 +106,8 @@ Safari extensions are distributed in the Extensions category of Apple's App Stor
 3. Submit the proven desktop version to the Chrome Web Store.
 4. Create and test the permanent macOS Safari package.
 5. Submit the Safari version to the App Store.
-6. Continue developing the personal reading library while the first submissions are being reviewed.
-7. Treat later storage features carefully: saved articles, offline snapshots and persistent typography settings must be reflected in permissions, privacy disclosures and store descriptions.
+6. Refresh store copy, screenshots and privacy disclosures for the 2.8 local Library if it is included in the first public release.
+7. Continue with media-complete offline snapshots and export while the first submissions are being reviewed.
 
 ## Current publishing progress
 
@@ -121,10 +123,14 @@ Completed on 6 August 2026:
 - estimated reading time, progress indicator and dynamic time remaining
 - remembered typography controls plus paper, evening and automatic ambient themes
 - read-aloud follow highlighting
+- manual macOS Chrome listening and reader validation, including Kokoro voices
+- manual packaged macOS Safari validation with Selena Premium
+- manual Chrome and Safari validation of complete headlines, images and video cleanup
 
 Still required before Chrome submission:
 
 - complete the Windows Chrome validation
+- refresh the listing screenshots and copy if version 2.8 becomes the first submitted build
 - complete the developer account, dashboard, upload and review steps in [`store/chrome/SUBMISSION_CHECKLIST.md`](store/chrome/SUBMISSION_CHECKLIST.md)
 
 ## Product roadmap after publication
@@ -139,7 +145,7 @@ Still required before Chrome submission:
 - [x] locally remembered preferences
 - [x] read-aloud follow highlighting
 
-### Version 2.6: natural read-aloud — experimental 7 August 2026
+### Version 2.6: natural read-aloud — completed on macOS 8 August 2026
 
 - [x] opt-in Kokoro FP32 model and 28 English voices
 - [x] local WebGPU speech generation with system fallback
@@ -147,11 +153,11 @@ Still required before Chrome submission:
 - [x] passage prefetch, pause, resume and stop
 - [x] speak title, author, publication date and standfirst before the body
 - [x] automated Chrome control-flow test and real FP32/WebGPU generation test on macOS
-- [ ] manual listening test in ordinary macOS Chrome
+- [x] manual listening test in ordinary macOS Chrome
 - [ ] Windows Chrome WebGPU, performance and fallback test
 - [x] keep Safari System-only for 2.6 after ONNX WebGPU testing hung during first inference
 
-### Version 2.7: native Apple Premium voices — in validation 7 August 2026
+### Version 2.7: native Apple Premium voices — completed on macOS 8 August 2026
 
 - [x] preserve the failed Safari Kokoro experiment on `feature/safari-kokoro-wasm`
 - [x] create a multiplatform macOS/iOS containing application and Safari Web Extension
@@ -160,26 +166,40 @@ Still required before Chrome submission:
 - [x] retain Chrome's Kokoro implementation and Chrome manifest independently
 - [x] automated mocked Safari control-flow test
 - [x] unsigned and locally signed macOS builds
-- [ ] manual packaged-Safari listening test with Selena Premium
+- [x] manual packaged-Safari listening test with Selena Premium
 - [ ] install Xcode's matching iOS platform component and complete a generic device build
 - [ ] physical iPad/iPhone Safari test
 
-### Version 2.7.1: reader media refinement — in validation 7 August 2026
+### Version 2.7.1: reader media refinement — completed 8 August 2026
 
 - [x] prefer a longer credible metadata headline when Readability selects a shortened visible heading
 - [x] promote common lazy-image and responsive-image sources before extraction
 - [x] preserve sanitised native video sources, posters and user-operated controls without autoplay
 - [x] remove clustered video-player status labels without removing editorial captions or prose
 - [x] automated Chrome and Safari-mode media regression tests
-- [ ] manual Safari test against the Daily Mail comparison article
+- [x] manual Safari test against the Daily Mail comparison article
 
-### Later release: personal reading library
+### Version 2.8: personal reading library — ready for manual validation 8 August 2026
 
-- save clean articles locally without an account
-- offline article snapshots
-- restore reading position
-- read and unread state
-- storage usage and clear deletion controls
+- [x] save clean article text locally without an account
+- [x] reopen a saved article in the full Textuary reading experience
+- [x] search and filter the local Library
+- [x] restore reading position
+- [x] read and unread state
+- [x] approximate storage usage, individual deletion and clear-all controls
+- [x] update the privacy policy and README for local article storage
+- [x] automated live-package validation in Chrome and Safari modes
+- [ ] manual macOS Chrome and Safari validation
+- [ ] Windows Chrome validation
+- [ ] physical iPad/iPhone Safari test
+
+### Version 2.8.1: media-complete offline snapshots
+
+- cache selected article images locally with bounded size and clear failure handling
+- show when a snapshot is text-only or fully offline
+- define per-article and total storage limits before requesting any broader storage permission
+- evaluate whether video should remain linked rather than cached because of storage cost
+- update privacy and store disclosures if storage behaviour or permissions change
 
 ### Later release: useful extras
 
@@ -187,6 +207,7 @@ Still required before Chrome submission:
 - PDF export through the print workflow
 - optional focus timer
 - local reading history and statistics
+- optional import/export backup for moving a local Library between browsers
 
 ## Actions that require the account owner
 

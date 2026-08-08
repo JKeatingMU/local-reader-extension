@@ -4,6 +4,7 @@
   const READER_ID = "local-reader-view";
   const PRODUCT_NAME = "Textuary";
   const PREFERENCES_KEY = "textuaryReadingPreferences";
+  const LIBRARY_KEY = "textuarySavedArticles";
   const KOKORO_MODEL_ID = "onnx-community/Kokoro-82M-v1.0-ONNX";
   const KOKORO_VOICES = Object.freeze([
     ["af_heart", "Heart", "US", "female"],
@@ -48,9 +49,10 @@
     kokoroVoice: "bf_emma",
     kokoroConsent: false
   });
+  const isSavedDocument = /\/saved\.html$/i.test(location.pathname);
   if (document.getElementById(READER_ID)) {
     globalThis.speechSynthesis?.cancel();
-    location.reload();
+    if (!isSavedDocument) location.reload();
     return;
   }
 
@@ -59,7 +61,44 @@
     return;
   }
 
-  void openReader();
+  void (isSavedDocument ? openSavedReader() : openReader());
+
+  async function openSavedReader() {
+    const savedId = new URLSearchParams(location.search).get("id") || "";
+    const library = await loadLibrary();
+    const saved = library.articles.find((article) => article.id === savedId);
+    if (!saved) {
+      showNotice(`${PRODUCT_NAME} could not find that saved article. Open the Library and choose another article.`);
+      return;
+    }
+
+    const content = sanitizeContent(saved.content, saved.sourceUrl);
+    const paragraphCount = content.querySelectorAll("p").length;
+    const textLength = content.textContent.replace(/\s+/g, " ").trim().length;
+    const wordCount = Number(saved.wordCount) || countWords(content.textContent, saved.language);
+    const readingMinutes = Number(saved.readingMinutes) || Math.max(1, Math.ceil(wordCount / 225));
+    const preferences = await loadPreferences();
+
+    renderReader({
+      sourceUrl: saved.sourceUrl,
+      title: saved.title,
+      description: saved.description,
+      byline: saved.byline,
+      published: saved.published,
+      siteName: saved.siteName,
+      content,
+      paragraphCount,
+      textLength,
+      wordCount,
+      readingMinutes,
+      language: saved.language || navigator.language,
+      extractionMethod: "Saved locally",
+      preferences,
+      isSavedView: true,
+      savedArticleId: saved.id,
+      savedProgress: Math.max(0, Math.min(1, Number(saved.progress) || 0))
+    });
+  }
 
   async function openReader() {
     const sourceUrl = location.href;
@@ -455,7 +494,7 @@
       <body>
         <div id="${READER_ID}">
           <header class="lr-toolbar" aria-label="Reader controls">
-            <button id="lr-original" type="button" title="Reload the original article">← Original page</button>
+            <button id="lr-original" type="button" title="${data.isSavedView ? "Open the original article" : "Reload the original article"}">← Original page</button>
             <div class="lr-tools">
               <details class="lr-settings">
                 <summary>Reading style</summary>
@@ -527,6 +566,8 @@
               </label>
               <button id="lr-speech-toggle" type="button">Read aloud</button>
               <button id="lr-speech-stop" type="button" disabled>Stop</button>
+              <button id="lr-save" type="button">${data.isSavedView ? "Saved ✓" : "Save article"}</button>
+              <button id="lr-library" type="button">Library</button>
               <button id="lr-print" type="button">Print</button>
             </div>
             <div class="lr-progress-track" role="progressbar" aria-label="Reading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
@@ -548,6 +589,7 @@
               </footer>
             </article>
           </main>
+          <p id="lr-library-status" class="lr-speech-status" role="status" aria-live="polite" hidden></p>
           <p id="lr-speech-status" class="lr-speech-status" role="status" aria-live="polite" hidden></p>
           <dialog id="lr-kokoro-consent" class="lr-consent-dialog" aria-labelledby="lr-kokoro-consent-title">
             <form method="dialog">
@@ -563,10 +605,104 @@
         </div>
       </body>`;
 
-    document.getElementById("lr-original").addEventListener("click", () => location.reload());
+    document.getElementById("lr-original").addEventListener("click", () => {
+      if (data.isSavedView) location.assign(data.sourceUrl);
+      else location.reload();
+    });
     document.getElementById("lr-print").addEventListener("click", () => window.print());
+    setupLibraryControls(data);
     setupReadingExperience(data);
     setupReadAloud(data);
+  }
+
+  function setupLibraryControls(data) {
+    const save = document.getElementById("lr-save");
+    const open = document.getElementById("lr-library");
+    const status = document.getElementById("lr-library-status");
+    let noticeTimer = 0;
+
+    if (data.isSavedView) save.disabled = true;
+    else void reflectSavedState();
+
+    save.addEventListener("click", async () => {
+      save.disabled = true;
+      save.textContent = "Saving…";
+      try {
+        const library = await loadLibrary();
+        const normalizedUrl = normalizeArticleUrl(data.sourceUrl);
+        const existing = library.articles.find((article) =>
+          article.id === data.savedArticleId || normalizeArticleUrl(article.sourceUrl) === normalizedUrl
+        );
+        const now = Date.now();
+        const progress = currentReadingRatio();
+        const snapshot = {
+          id: existing?.id || articleId(normalizedUrl),
+          sourceUrl: data.sourceUrl,
+          title: data.title,
+          description: data.description || "",
+          byline: data.byline || "",
+          published: data.published || "",
+          siteName: data.siteName || "",
+          content: data.content.innerHTML,
+          wordCount: data.wordCount,
+          readingMinutes: data.readingMinutes,
+          language: data.language || "",
+          extractionMethod: data.extractionMethod || "",
+          savedAt: existing?.savedAt || now,
+          updatedAt: now,
+          progress,
+          read: progress >= .95
+        };
+        library.articles = library.articles.filter((article) => article.id !== snapshot.id);
+        library.articles.push(snapshot);
+        await saveLibrary(library);
+        data.savedArticleId = snapshot.id;
+        data.savedProgress = progress;
+        save.textContent = "Saved ✓";
+        setStatus("Saved locally. The clean article text is now available offline.");
+      } catch (error) {
+        save.disabled = false;
+        save.textContent = "Save article";
+        setStatus(`Could not save this article: ${safeStorageError(error)}`, true);
+      }
+    });
+
+    open.addEventListener("click", async () => {
+      const runtime = globalThis.browser?.runtime || globalThis.chrome?.runtime;
+      if (!runtime) return;
+      if (isSavedDocument) {
+        location.assign(runtime.getURL("library.html"));
+        return;
+      }
+      try {
+        const response = await runtime.sendMessage({ type: "textuary-open-library" });
+        if (response?.ok === false) throw new Error(response.error);
+      } catch (error) {
+        setStatus(`Could not open the Library: ${safeStorageError(error)}`, true);
+      }
+    });
+
+    async function reflectSavedState() {
+      try {
+        const library = await loadLibrary();
+        const normalizedUrl = normalizeArticleUrl(data.sourceUrl);
+        const existing = library.articles.find((article) => normalizeArticleUrl(article.sourceUrl) === normalizedUrl);
+        if (!existing) return;
+        data.savedArticleId = existing.id;
+        data.savedProgress = Number(existing.progress) || 0;
+        save.textContent = "Update saved";
+      } catch {
+        // The explicit Save action will surface a useful storage error if needed.
+      }
+    }
+
+    function setStatus(message, isError = false) {
+      clearTimeout(noticeTimer);
+      status.textContent = message;
+      status.hidden = !message;
+      status.dataset.error = String(isError);
+      noticeTimer = setTimeout(() => { status.hidden = true; }, 5000);
+    }
   }
 
   function setupReadingExperience(data) {
@@ -583,6 +719,7 @@
     const progressLabel = document.getElementById("lr-progress-label");
     const preferences = data.preferences;
     let progressFrame = 0;
+    let progressSaveTimer = 0;
 
     applyPreferences(preferences);
 
@@ -622,17 +759,30 @@
         progressFrame = 0;
         const available = Math.max(1, document.documentElement.scrollHeight - innerHeight);
         const rawRatio = Math.min(1, Math.max(0, scrollY / available));
-        const ratio = rawRatio >= .975 ? 1 : rawRatio;
+        const ratio = rawRatio >= .95 ? 1 : rawRatio;
         const percentage = Math.round(ratio * 100);
         const minutesLeft = Math.max(0, Math.ceil(data.readingMinutes * (1 - ratio)));
         progressBar.style.width = `${percentage}%`;
         progress.setAttribute("aria-valuenow", String(percentage));
         progressLabel.textContent = percentage >= 100 ? "Finished" : `${minutesLeft} min left`;
+        if (data.savedArticleId) {
+          clearTimeout(progressSaveTimer);
+          progressSaveTimer = setTimeout(() => void saveArticleProgress(data.savedArticleId, ratio), 650);
+        }
       });
     };
     addEventListener("scroll", requestProgressUpdate, { passive: true });
     addEventListener("resize", requestProgressUpdate, { passive: true });
     requestProgressUpdate();
+    if (data.isSavedView && data.savedProgress > 0) {
+      const restore = () => {
+        const available = Math.max(0, document.documentElement.scrollHeight - innerHeight);
+        scrollTo(0, available * data.savedProgress);
+        requestProgressUpdate();
+      };
+      setTimeout(restore, 120);
+      setTimeout(restore, 900);
+    }
 
     function updatePreferences() {
       Object.assign(preferences, {
@@ -1352,6 +1502,79 @@
     return normalized.match(/\p{L}[\p{L}\p{M}\p{N}’'-]*/gu)?.length || normalized.split(" ").length;
   }
 
+  async function loadLibrary() {
+    const storage = extensionStorage();
+    if (!storage) return { version: 1, articles: [] };
+    const result = await storage.get(LIBRARY_KEY);
+    const articles = Array.isArray(result?.[LIBRARY_KEY]?.articles)
+      ? result[LIBRARY_KEY].articles.filter((article) =>
+        article && typeof article.id === "string" && typeof article.content === "string"
+      )
+      : [];
+    return { version: 1, articles };
+  }
+
+  async function saveLibrary(library) {
+    const storage = extensionStorage();
+    if (!storage) throw new Error("local extension storage is unavailable");
+    await storage.set({
+      [LIBRARY_KEY]: {
+        version: 1,
+        articles: Array.isArray(library?.articles) ? library.articles : []
+      }
+    });
+  }
+
+  async function saveArticleProgress(id, progress) {
+    try {
+      const library = await loadLibrary();
+      const article = library.articles.find((candidate) => candidate.id === id);
+      if (!article) return;
+      const normalized = Math.max(0, Math.min(1, Number(progress) || 0));
+      if (Math.abs((Number(article.progress) || 0) - normalized) < .01 && article.read === (normalized >= .95)) return;
+      article.progress = normalized;
+      article.read = normalized >= .95;
+      article.lastReadAt = Date.now();
+      await saveLibrary(library);
+    } catch (error) {
+      console.info(`${PRODUCT_NAME} could not save reading progress`, error);
+    }
+  }
+
+  function currentReadingRatio() {
+    const available = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+    const ratio = Math.min(1, Math.max(0, scrollY / available));
+    return ratio >= .95 ? 1 : ratio;
+  }
+
+  function normalizeArticleUrl(value) {
+    try {
+      const url = new URL(value);
+      url.hash = "";
+      return url.href;
+    } catch {
+      return String(value || "").split("#")[0];
+    }
+  }
+
+  function articleId(value) {
+    let hash = 2166136261;
+    for (const character of String(value || "")) {
+      hash ^= character.codePointAt(0);
+      hash = Math.imul(hash, 16777619);
+    }
+    return `article-${(hash >>> 0).toString(36)}`;
+  }
+
+  function safeStorageError(error) {
+    return String(error?.message || error || "unknown error")
+      .replace(/chrome-extension:\/\/[a-z]+\//gi, "the extension/")
+      .replace(/safari-web-extension:\/\/[a-z0-9.-]+\//gi, "the extension/")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 180);
+  }
+
   async function loadPreferences() {
     const storage = extensionStorage();
     if (!storage) return { ...DEFAULT_PREFERENCES };
@@ -1543,8 +1766,8 @@
       body[data-lr-theme="evening"], body[data-lr-theme="ambient"][data-lr-ambient="evening"] { color-scheme: dark; --lr-bg: #171817; --lr-paper: #222320; --lr-text: #eee6d8; --lr-muted: #b4aa9b; --lr-line: #41413b; --lr-accent: #e9b872; }
       body[data-lr-theme="ambient"][data-lr-ambient="day"] { --lr-bg: #e8efea; --lr-paper: #fcfdf9; --lr-text: #1f2924; --lr-muted: #68746d; --lr-line: #d0dbd3; --lr-accent: #2d6e55; }
       body[data-lr-theme="ambient"] { background-image: radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--lr-accent) 9%, transparent), transparent 32rem); background-attachment: fixed; }
-      .lr-toolbar { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; gap: 12px; padding: 10px max(16px, calc((100vw - 1240px) / 2)); border-bottom: 1px solid var(--lr-line); background: var(--lr-paper); background: color-mix(in srgb, var(--lr-paper) 94%, transparent); backdrop-filter: blur(10px); font: 14px/1.2 system-ui, sans-serif; }
-      .lr-toolbar button { min-height: 36px; padding: 7px 11px; border: 1px solid var(--lr-line); border-radius: 7px; background: var(--lr-paper); color: var(--lr-text); cursor: pointer; }
+      .lr-toolbar { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; gap: 12px; padding: 10px max(16px, calc((100vw - 1480px) / 2)); border-bottom: 1px solid var(--lr-line); background: var(--lr-paper); background: color-mix(in srgb, var(--lr-paper) 94%, transparent); backdrop-filter: blur(10px); font: 14px/1.2 system-ui, sans-serif; }
+      .lr-toolbar button { min-height: 36px; padding: 7px 11px; border: 1px solid var(--lr-line); border-radius: 7px; background: var(--lr-paper); color: var(--lr-text); cursor: pointer; white-space: nowrap; }
       .lr-toolbar button:hover:not(:disabled) { border-color: var(--lr-accent); color: var(--lr-accent); }
       .lr-toolbar button:disabled { cursor: default; opacity: .45; }
       .lr-toolbar select { min-height: 36px; padding: 6px 28px 6px 8px; border: 1px solid var(--lr-line); border-radius: 7px; background: var(--lr-paper); color: var(--lr-text); font: inherit; }
@@ -1570,6 +1793,7 @@
       .lr-progress-track { position: absolute; right: 0; bottom: -1px; left: 0; height: 3px; overflow: hidden; background: transparent; }
       #lr-progress-bar { width: 0; height: 100%; background: var(--lr-accent); transition: width .12s linear; }
       .lr-speech-status { position: fixed; z-index: 11; top: 66px; right: max(18px, calc((100vw - 1240px) / 2)); max-width: min(430px, calc(100vw - 36px)); margin: 0; padding: 9px 13px; border: 1px solid var(--lr-line); border-radius: 8px; background: var(--lr-paper); color: var(--lr-muted); box-shadow: 0 8px 28px rgba(0, 0, 0, .15); font: 12px/1.4 system-ui, sans-serif; }
+      #lr-library-status { top: 108px; }
       .lr-consent-dialog { width: min(520px, calc(100vw - 36px)); padding: 0; border: 1px solid var(--lr-line); border-radius: 12px; background: var(--lr-paper); color: var(--lr-text); box-shadow: 0 24px 80px rgba(0, 0, 0, .28); }
       .lr-consent-dialog::backdrop { background: rgba(12, 16, 20, .55); backdrop-filter: blur(3px); }
       .lr-consent-dialog form { padding: 26px; font: 15px/1.55 system-ui, sans-serif; }
@@ -1608,7 +1832,7 @@
       #lr-content video + figcaption { margin-top: .7em; }
       #lr-content .lr-speaking, h1.lr-speaking, .lr-standfirst.lr-speaking, .lr-byline .lr-speaking { border-radius: 4px; background: color-mix(in srgb, var(--lr-accent) 14%, transparent); box-shadow: 0 0 0 5px color-mix(in srgb, var(--lr-accent) 14%, transparent); transition: background .18s ease, box-shadow .18s ease; }
       footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--lr-line); color: var(--lr-muted); font: 12px/1.5 system-ui, sans-serif; }
-      @media (max-width: 1050px) { .lr-progress-label, .lr-speech-setting > span { display: none; } #lr-speech-engine { width: 116px; } #lr-speech-voice { width: min(160px, 22vw); } }
+      @media (max-width: 1320px) { .lr-progress-label, .lr-speech-setting > span { display: none; } #lr-speech-engine { width: 116px; } #lr-speech-voice { width: min(160px, 22vw); } }
       @media (max-width: 700px) { .lr-toolbar { align-items: flex-start; } .lr-tools { flex-wrap: wrap; } .lr-page { padding: 0; } .lr-page > article { border: 0; padding: 34px 20px 60px; } #lr-speech-engine { width: 116px; } #lr-speech-voice { width: min(150px, 38vw); } .lr-settings-panel { position: fixed; top: 60px; right: 12px; left: 12px; width: auto; } }
       @media print { .lr-toolbar { display: none; } html, body, .lr-page, .lr-page > article { background: white; color: black; } .lr-page { width: 100%; padding: 0; } .lr-page > article { border: 0; box-shadow: none; padding: 0; } }
     `;

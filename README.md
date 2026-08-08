@@ -1,6 +1,6 @@
 # Textuary — Article Reader & Text Sanctuary
 
-A browser extension for Chrome and Safari that turns articles into a calm, focused text sanctuary. Textuary combines generic article extraction with estimated reading time, live progress, remembered typography and themes, and private read-aloud. Chrome offers optional Kokoro natural voices generated locally with WebGPU. Version 2.7 adds a native Safari bridge for Apple's installed Enhanced and Premium voices on macOS, iPhone and iPad. Textuary does not transmit article text to a reading or analytics service and does not collect browsing data.
+A browser extension for Chrome and Safari that turns articles into a calm, focused text sanctuary. Textuary combines generic article extraction with estimated reading time, live progress, remembered typography and themes, private read-aloud, and a local reading library that requires no account. Chrome offers optional Kokoro natural voices generated locally with WebGPU. Safari can use Apple's installed Enhanced and Premium voices through its native Textuary bridge. Textuary does not transmit article text to a reading or analytics service and does not collect browsing data.
 
 ## Install in Chrome
 
@@ -10,7 +10,7 @@ A browser extension for Chrome and Safari that turns articles into a calm, focus
 4. Select this `local-reader-extension` folder.
 5. Open Chrome's Extensions menu (the puzzle-piece icon) and pin **Textuary**.
 
-If an earlier version is already loaded, open `chrome://extensions` and click its reload button. Chrome will update it to **Textuary 2.7.1**.
+If an earlier version is already loaded, open `chrome://extensions` and click its reload button. Chrome will update it to **Textuary 2.8.0**.
 
 ## Try in Safari on macOS
 
@@ -21,12 +21,28 @@ Textuary now includes an Xcode project for the permanent Safari Web Extension co
 1. Open an article on any ordinary `http` or `https` page and wait for it to load.
 2. Click the **Textuary** toolbar icon, or press **Option+Shift+R** on macOS (**Alt+Shift+R** elsewhere).
 3. Choose **System** speech for voices exposed by the browser; in Chrome choose **Natural (Kokoro)** for locally generated speech; or in the packaged Safari version choose **Premium (Apple)** for installed Apple Enhanced and Premium voices. Then choose a **Voice** and **Speed**. Click **Read aloud**; the same button pauses or resumes, and **Stop** returns to the beginning.
-4. On the first use of Natural voices in Chrome, Textuary explains and asks permission for an approximately 330 MB model download from Hugging Face. The model and selected voice data are cached by the browser; article text remains on the device. Natural voices require WebGPU and automatically give way to System speech when it is unavailable.
+4. Click **Save article** to keep the clean article in this browser, then use **Library** to search it, continue from the saved reading position, mark it read or unread, or delete it. Saved prose remains available offline without an account. Remote pictures and video still require a connection in this first library release.
 5. Open **Reading style** to choose the paper, evening or automatic ambient theme; select a typeface; and adjust text size, spacing and column width. Textuary remembers these choices locally.
 6. Follow the slim progress bar and estimated time remaining while reading. During read-aloud, the current passage is highlighted automatically.
 7. Use **Print** for clean paper or PDF output, or click **Original page** to return to the normal site.
 
-The extension requests `activeTab` and `scripting` for the article you choose, plus `storage` to remember reader settings locally. It has no persistent access to browsing history or other sites.
+## Set up natural and premium voices
+
+### Chrome: Natural (Kokoro)
+
+1. Open any article in Textuary and choose **Natural (Kokoro)** under **Speech**.
+2. Choose one of the available Kokoro voices and a speed, then click **Read aloud**.
+3. On first use, approve the approximately 330 MB model download from Hugging Face. Chrome caches the model and selected voice data; speech generation and article text stay on the device.
+4. The first passage takes longer while the model starts. Natural voices require WebGPU and automatically fall back to **System** when it is unavailable.
+
+### Safari: Premium (Apple)
+
+1. On macOS, open **System Settings > Accessibility > Read & Speak**, open the system voice chooser, and download an Apple voice labelled **Enhanced** or **Premium**. Selena Premium is one tested example. On iPhone or iPad, use **Settings > Accessibility > Spoken Content > Voices**.
+2. Install the packaged Safari extension using [the Xcode instructions](SAFARI.md); a temporary folder-loaded extension cannot reach Apple's native Premium voices.
+3. Reopen the Textuary reading view after the voice download finishes. Choose **Premium (Apple)** under **Speech**, select the installed voice and speed, then click **Read aloud**.
+4. Choose **System** at any time to use the broader browser-provided voice list.
+
+The extension requests `activeTab` and `scripting` for the article you choose, plus `storage` for reader settings and articles the user explicitly saves locally. It has no persistent access to browsing history or other sites.
 
 ## How it works
 
@@ -52,6 +68,7 @@ Chrome Web Store preparation materials are under [`store/chrome`](store/chrome),
 - Natural voices require WebGPU in Chrome. Safari uses the native Apple voice bridge because ONNX Runtime's Safari WebGPU path can hang. The first Chrome model load and passage take longer; generation speed depends on the computer's GPU.
 - A reader can only process text delivered to the browser. Content that is never present in the rendered page cannot be extracted.
 - After changing extension files, open `chrome://extensions` and click the extension's reload button.
+- Saved article text is offline, but externally hosted images and video need a connection in version 2.8. The Library shows its local storage use and provides individual and clear-all deletion controls.
 
 ## Versions and development
 
@@ -72,6 +89,7 @@ See [the store-publishing and product roadmap](STORE_PUBLISHING_ROADMAP.md) for 
 - `v2.6.4` keeps Safari on reliable System speech after testing exposed an upstream ONNX WebGPU hang.
 - `v2.7.0` adds the packaged macOS/iOS Safari extension and on-device Apple Enhanced/Premium voice support with Textuary's existing controls and passage highlighting.
 - `v2.7.1` improves complete-headline selection, promotes lazy-loaded article images, preserves safe native video, and removes player-interface text from the reading view.
+- `v2.8.0` adds the account-free local Library, offline clean-text snapshots, search and read/unread controls, restored reading position, storage reporting and deletion controls.
 
 The project is a Git repository. To inspect the preserved version without changing the working tree, run `git show v1.0.0:reader.js` from this folder.
 

@@ -21,7 +21,11 @@ if (!stageRoot.startsWith(`${outputRoot}${sep}`)) {
 
 const packageFiles = [
   "background.js",
+  "library.css",
+  "library.html",
+  "library.js",
   "reader.js",
+  "saved.html",
   "icons/icon-16.png",
   "icons/icon-32.png",
   "icons/icon-48.png",

@@ -69,6 +69,14 @@
 		A982C0213026315C00F9EC0E /* reader.js in Resources */ = {isa = PBXBuildFile; fileRef = A982BFF93026315C00F9EC0E /* reader.js */; };
 		A982C0223026315C00F9EC0E /* vendor in Resources */ = {isa = PBXBuildFile; fileRef = A982BFFA3026315C00F9EC0E /* vendor */; };
 		A982C0233026315C00F9EC0E /* store in Resources */ = {isa = PBXBuildFile; fileRef = A982BFFB3026315C00F9EC0E /* store */; };
+		A982C0283026315C00F9EC0E /* library.css in Resources */ = {isa = PBXBuildFile; fileRef = A982C0243026315C00F9EC0E /* library.css */; };
+		A982C0293026315C00F9EC0E /* library.html in Resources */ = {isa = PBXBuildFile; fileRef = A982C0253026315C00F9EC0E /* library.html */; };
+		A982C02A3026315C00F9EC0E /* library.js in Resources */ = {isa = PBXBuildFile; fileRef = A982C0263026315C00F9EC0E /* library.js */; };
+		A982C02B3026315C00F9EC0E /* saved.html in Resources */ = {isa = PBXBuildFile; fileRef = A982C0273026315C00F9EC0E /* saved.html */; };
+		A982C02C3026315C00F9EC0E /* library.css in Resources */ = {isa = PBXBuildFile; fileRef = A982C0243026315C00F9EC0E /* library.css */; };
+		A982C02D3026315C00F9EC0E /* library.html in Resources */ = {isa = PBXBuildFile; fileRef = A982C0253026315C00F9EC0E /* library.html */; };
+		A982C02E3026315C00F9EC0E /* library.js in Resources */ = {isa = PBXBuildFile; fileRef = A982C0263026315C00F9EC0E /* library.js */; };
+		A982C02F3026315C00F9EC0E /* saved.html in Resources */ = {isa = PBXBuildFile; fileRef = A982C0273026315C00F9EC0E /* saved.html */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -155,6 +163,10 @@
 		A982BFF93026315C00F9EC0E /* reader.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = reader.js; path = ../../../reader.js; sourceTree = "<group>"; };
 		A982BFFA3026315C00F9EC0E /* vendor */ = {isa = PBXFileReference; lastKnownFileType = folder; name = vendor; path = ../../../vendor; sourceTree = "<group>"; };
 		A982BFFB3026315C00F9EC0E /* store */ = {isa = PBXFileReference; lastKnownFileType = folder; name = store; path = ../../../store; sourceTree = "<group>"; };
+		A982C0243026315C00F9EC0E /* library.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = library.css; path = ../../../library.css; sourceTree = "<group>"; };
+		A982C0253026315C00F9EC0E /* library.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = library.html; path = ../../../library.html; sourceTree = "<group>"; };
+		A982C0263026315C00F9EC0E /* library.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = library.js; path = ../../../library.js; sourceTree = "<group>"; };
+		A982C0273026315C00F9EC0E /* saved.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = saved.html; path = ../../../saved.html; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -304,6 +316,10 @@
 				A982BFF93026315C00F9EC0E /* reader.js */,
 				A982BFFA3026315C00F9EC0E /* vendor */,
 				A982BFFB3026315C00F9EC0E /* store */,
+				A982C0243026315C00F9EC0E /* library.css */,
+				A982C0253026315C00F9EC0E /* library.html */,
+				A982C0263026315C00F9EC0E /* library.js */,
+				A982C0273026315C00F9EC0E /* saved.html */,
 			);
 			name = Resources;
 			path = "Shared (Extension)";
@@ -470,6 +486,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A982C02C3026315C00F9EC0E /* library.css in Resources */,
+				A982C02D3026315C00F9EC0E /* library.html in Resources */,
+				A982C02E3026315C00F9EC0E /* library.js in Resources */,
+				A982C02F3026315C00F9EC0E /* saved.html in Resources */,
 				A982C01C3026315C00F9EC0E /* package.json in Resources */,
 				A982C0213026315C00F9EC0E /* reader.js in Resources */,
 				A982C01A3026315C00F9EC0E /* SUPPORT.md in Resources */,
@@ -497,6 +517,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A982C0283026315C00F9EC0E /* library.css in Resources */,
+				A982C0293026315C00F9EC0E /* library.html in Resources */,
+				A982C02A3026315C00F9EC0E /* library.js in Resources */,
+				A982C02B3026315C00F9EC0E /* saved.html in Resources */,
 				A982C0083026315C00F9EC0E /* package.json in Resources */,
 				A982C00D3026315C00F9EC0E /* reader.js in Resources */,
 				A982C0063026315C00F9EC0E /* SUPPORT.md in Resources */,
@@ -738,7 +762,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.7.1;
+				MARKETING_VERSION = 2.8.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -771,7 +795,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.7.1;
+				MARKETING_VERSION = 2.8.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -810,7 +834,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.7.1;
+				MARKETING_VERSION = 2.8.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -850,7 +874,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.7.1;
+				MARKETING_VERSION = 2.8.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -889,7 +913,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.7.1;
+				MARKETING_VERSION = 2.8.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -924,7 +948,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.7.1;
+				MARKETING_VERSION = 2.8.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -962,7 +986,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.7.1;
+				MARKETING_VERSION = 2.8.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -1003,7 +1027,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.7.1;
+				MARKETING_VERSION = 2.8.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,

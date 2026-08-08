@@ -202,6 +202,8 @@ const inspection = await call("Runtime.evaluate", {
       videoSources: [...document.querySelectorAll('#lr-content video')].map((video) => ({ src: video.src, poster: video.poster, controls: video.controls, autoplay: video.autoplay })),
       sourceSources: [...document.querySelectorAll('#lr-content video source')].map((source) => source.src),
       controls: document.querySelectorAll('.lr-toolbar button').length,
+      saveLabel: document.querySelector('#lr-save')?.textContent,
+      libraryButton: Boolean(document.querySelector('#lr-library')),
       settingsSelects: document.querySelectorAll('.lr-settings-panel select').length,
       settingsRanges: document.querySelectorAll('.lr-settings-panel input[type="range"]').length,
       progressBars: document.querySelectorAll('[role="progressbar"]').length,
@@ -213,6 +215,8 @@ const inspection = await call("Runtime.evaluate", {
       voiceSelectDisabled: document.querySelector('#lr-speech-voice')?.disabled,
       rateOptions: document.querySelector('#lr-speech-rate')?.options.length,
       toolbarHeight: Math.round(document.querySelector('.lr-toolbar')?.getBoundingClientRect().height || 0),
+      viewportWidth: innerWidth,
+      documentWidth: document.documentElement.scrollWidth,
       readerWidth: Math.round(document.querySelector('.lr-page')?.getBoundingClientRect().width || 0),
       extractionSummary: document.querySelector('footer span')?.textContent?.trim(),
       textLength: document.querySelector('#lr-content')?.textContent?.replace(/\\s+/g, ' ').trim().length,
@@ -226,6 +230,27 @@ const inspection = await call("Runtime.evaluate", {
   returnByValue: true
 });
 const result = JSON.parse(inspection.result.value);
+
+const libraryInspection = await call("Runtime.evaluate", {
+  expression: `(async () => {
+    document.querySelector('#lr-save')?.click();
+    await new Promise((resolveWait) => setTimeout(resolveWait, 40));
+    const library = globalThis.__textuaryStoredPreferences.textuarySavedArticles;
+    const article = library?.articles?.[0];
+    return JSON.stringify({
+      label: document.querySelector('#lr-save')?.textContent,
+      count: library?.articles?.length || 0,
+      title: article?.title,
+      sourceUrl: article?.sourceUrl,
+      contentLength: article?.content?.length || 0,
+      progress: article?.progress,
+      read: article?.read
+    });
+  })()`,
+  awaitPromise: true,
+  returnByValue: true
+});
+const library = JSON.parse(libraryInspection.result.value);
 
 const speechInspection = await call("Runtime.evaluate", {
   expression: `(async () => {
@@ -393,7 +418,7 @@ const screenshot = await call("Page.captureScreenshot", { format: "png" });
 const screenshotPath = requestedScreenshotPath || `/private/tmp/local-reader-${fixtureName}.png`;
 await writeFile(screenshotPath, Buffer.from(screenshot.data, "base64"));
 
-console.log(JSON.stringify({ fixtureName, ...result, speech, naturalSpeech, style, progress, themeState, screenshotPath }, null, 2));
+console.log(JSON.stringify({ fixtureName, ...result, library, speech, naturalSpeech, style, progress, themeState, screenshotPath }, null, 2));
 
 const expectations = {
   dailymail: {
@@ -482,7 +507,9 @@ if (
   !result.reader ||
   (expected.title && result.title !== expected.title) ||
   result.paragraphs < expected.minParagraphs ||
-  result.controls !== 5 ||
+  result.controls !== 7 ||
+  result.saveLabel !== "Save article" ||
+  !result.libraryButton ||
   result.settingsSelects !== 4 ||
   result.settingsRanges !== 1 ||
   result.progressBars !== 1 ||
@@ -494,6 +521,7 @@ if (
   result.voiceSelectDisabled ||
   result.rateOptions !== 5 ||
   result.toolbarHeight > 60 ||
+  result.documentWidth > result.viewportWidth ||
   result.readerWidth < 1000 ||
   result.images < 1 ||
   (expected.minVideos && result.videos < expected.minVideos) ||
@@ -543,7 +571,13 @@ if (
   style.saved?.fontSize !== 23 ||
   style.saved?.speechRate !== "1.5" ||
   progress.value < 99 ||
-  progress.label !== "Finished"
+  progress.label !== "Finished" ||
+  library.label !== "Saved ✓" ||
+  library.count !== 1 ||
+  library.title !== result.title ||
+  library.sourceUrl !== fixtureUrl ||
+  library.contentLength < expected.minTextLength ||
+  library.read !== false
 ) {
   process.exitCode = 1;
 }

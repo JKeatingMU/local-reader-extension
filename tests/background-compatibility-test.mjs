@@ -17,8 +17,12 @@ for (const namespace of ["browser", "chrome"]) {
     scripting: {
       async executeScript(options) { calls.push(["executeScript", options]); }
     },
+    tabs: {
+      async create(options) { calls.push(["tabCreate", options]); }
+    },
     runtime: {
       onMessage: { addListener(listener) { onMessage = listener; } },
+      getURL(path) { return `${namespace}-extension://textuary/${path}`; },
       async sendNativeMessage(application, payload) {
         calls.push(["nativeMessage", { application, payload }]);
         return { ok: true, engine: "AVSpeechSynthesizer" };
@@ -45,10 +49,19 @@ for (const namespace of ["browser", "chrome"]) {
   calls.length = 0;
   await onClicked({ id: 8, url: "safari-web-extension://settings" });
   assert.ok(
-    calls.some(([type, options]) => type === "badgeText" && options.text === "WEB"),
-    `${namespace} unsupported-page badge`
+    calls.some(([type, options]) => type === "tabCreate" && options.url.endsWith("/library.html")),
+    `${namespace} unsupported page opens library`
   );
 
+  calls.length = 0;
+  const libraryResponse = await onMessage({ type: "textuary-open-library" });
+  assert.equal(libraryResponse.ok, true, `${namespace} library response`);
+  assert.ok(
+    calls.some(([type, options]) => type === "tabCreate" && options.url.endsWith("/library.html")),
+    `${namespace} library message`
+  );
+
+  calls.length = 0;
   const nativeResponse = await onMessage({
     type: "textuary-native-speech",
     payload: { command: "ping" }
