@@ -107,7 +107,7 @@ Safari extensions are distributed in the Extensions category of Apple's App Stor
 4. Create and test the permanent macOS Safari package.
 5. Submit the Safari version to the App Store.
 6. Refresh store copy, screenshots and privacy disclosures for the 2.8 local Library if it is included in the first public release.
-7. Continue with media-complete offline snapshots and export while the first submissions are being reviewed.
+7. Continue with media-complete offline snapshots and the version 2.9 personal-archive design while the first submissions are being reviewed.
 
 ## Current publishing progress
 
@@ -206,13 +206,30 @@ Still required before Chrome submission:
 - evaluate whether video should remain linked rather than cached because of storage cost
 - update privacy and store disclosures if storage behaviour or permissions change
 
+### Version 2.9: personal reading archive
+
+Detailed design: [`VERSION_2_9_PLAN.md`](VERSION_2_9_PLAN.md)
+
+- [ ] create user-defined reading lists with many-to-many article membership
+- [ ] add free-form tags and Library filtering by tag
+- [ ] add searchable article-level Markdown notes with timestamps
+- [ ] define a versioned Textuary Library XML vocabulary and XSD
+- [ ] export and import full-fidelity XML archives, including original links and optional offline snapshots
+- [ ] provide an equivalent versioned JSON backup and restore format
+- [ ] export human-readable Markdown reading lists containing links, metadata, tags and notes
+- [ ] support XML-based OPML exchange for interoperable link-oriented reading lists
+- [ ] preview imports and safely merge duplicates, lists, tags and notes
+- [ ] migrate the current Library schema without losing version 2.8 articles or progress
+- [ ] validate hostile, malformed and oversized imports before changing local storage
+- [ ] retain the local-only, no-account design and current minimal permission model
+
 ### Later release: useful extras
 
-- Markdown and clean HTML export
+- clean HTML article export
 - PDF export through the print workflow
 - optional focus timer
 - local reading history and statistics
-- optional import/export backup for moving a local Library between browsers
+- passage-level highlights and resiliently anchored comments
 
 ## Actions that require the account owner
 
