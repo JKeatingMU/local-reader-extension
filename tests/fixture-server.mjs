@@ -11,6 +11,7 @@ const fixtures = new Map([
   ["/library.html", ["library.html", "text/html; charset=utf-8"]],
   ["/library.css", ["library.css", "text/css; charset=utf-8"]],
   ["/library.js", ["library.js", "text/javascript; charset=utf-8"]],
+  ["/print.css", ["print.css", "text/css; charset=utf-8"]],
   ["/saved.html", ["saved.html", "text/html; charset=utf-8"]],
   ["/reader.js", ["reader.js", "text/javascript; charset=utf-8"]],
   ["/vendor/Readability.js", ["vendor/Readability.js", "text/javascript; charset=utf-8"]],

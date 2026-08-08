@@ -138,6 +138,7 @@ const speechMock = await call("Runtime.evaluate", {
     let nativeRequestId = '';
     const runtime = {
       getURL(path) {
+        if (path === 'print.css') return ${JSON.stringify(`${new URL(fixtureUrl).origin}/print.css`)};
         return path === 'vendor/kokoro.web.js' ? kokoroModule : 'chrome-extension://textuary-test/' + path;
       },
       async sendMessage(message) {

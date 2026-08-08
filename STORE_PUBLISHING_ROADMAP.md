@@ -190,7 +190,7 @@ Still required before Chrome submission:
 - [x] approximate storage usage, individual deletion and clear-all controls
 - [x] same-tab Library return-to-article navigation and live saved-state synchronisation
 - [x] consolidate Save, Library and Print under a compact More menu
-- [x] print-specific page margins, typography and page-break rules
+- [x] standalone print stylesheet with one-inch layout, selected reader typeface and page-break rules
 - [x] update the privacy policy and README for local article storage
 - [x] automated live-package validation in Chrome and Safari modes
 - [ ] manual macOS Chrome and Safari validation

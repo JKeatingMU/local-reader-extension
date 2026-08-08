@@ -473,6 +473,8 @@
   function renderReader(data) {
     const safeTitle = escapeHtml(data.title);
     const safeSiteName = escapeHtml(data.siteName);
+    const runtime = globalThis.browser?.runtime || globalThis.chrome?.runtime;
+    const printStylesheet = runtime?.getURL ? runtime.getURL("print.css") : "";
     const safeDescription = data.description && data.description !== data.title
       ? `<p class="lr-standfirst">${escapeHtml(data.description)}</p>`
       : "";
@@ -491,6 +493,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>${safeTitle} — ${PRODUCT_NAME}</title>
         <style>${readerCss()}</style>
+        ${printStylesheet ? `<link rel="stylesheet" href="${escapeAttribute(printStylesheet)}" media="print">` : ""}
       </head>
       <body>
         <div id="${READER_ID}">
@@ -1935,34 +1938,6 @@
       footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--lr-line); color: var(--lr-muted); font: 12px/1.5 system-ui, sans-serif; }
       @media (max-width: 1320px) { .lr-progress-label, .lr-speech-setting > span { display: none; } #lr-speech-engine { width: 116px; } #lr-speech-voice { width: min(160px, 22vw); } }
       @media (max-width: 700px) { .lr-toolbar { align-items: flex-start; } .lr-tools { flex-wrap: wrap; } .lr-page { padding: 0; } .lr-page > article { border: 0; padding: 34px 20px 60px; } #lr-speech-engine { width: 116px; } #lr-speech-voice { width: min(150px, 38vw); } .lr-settings-panel { position: fixed; top: 60px; right: 12px; left: 12px; width: auto; } }
-      @page { margin: 18mm 19mm 20mm; }
-      @media print {
-        :root { --lr-text: #111; --lr-muted: #555; --lr-line: #bbb; --lr-accent: #174f7d; }
-        .lr-toolbar, .lr-speech-status, .lr-consent-dialog { display: none !important; }
-        html, body, .lr-page, .lr-page > article { background: white !important; color: black; }
-        html, body { width: auto; margin: 0; padding: 0; }
-        body { font-family: Georgia, 'Times New Roman', serif; }
-        .lr-page { width: auto; max-width: none; margin: 0; padding: 0; }
-        .lr-page > article { padding: 0; border: 0; box-shadow: none; }
-        .lr-kicker { margin-bottom: 8pt; font-size: 8.5pt; }
-        h1 { margin: 0; font-size: 27pt; line-height: 1.08; letter-spacing: -.02em; text-wrap: balance; }
-        .lr-standfirst { margin-top: 12pt; font-size: 13.5pt; line-height: 1.4; }
-        .lr-byline { margin-top: 12pt; font-size: 8.5pt; }
-        .lr-reading-meta { margin-top: 3pt; font-size: 8pt; }
-        .lr-rule { width: 42pt; height: 1.5pt; margin: 15pt 0 19pt; }
-        #lr-content { overflow-wrap: break-word; }
-        #lr-content p, #lr-content li { font-size: 11.5pt; line-height: 1.52; }
-        #lr-content p { margin: 0 0 8.5pt; orphans: 3; widows: 3; }
-        #lr-content > *:first-child:is(p, div) > p:first-child::first-letter, #lr-content > p:first-child::first-letter { float: none; margin: 0; color: inherit; font-size: inherit; font-weight: inherit; line-height: inherit; }
-        #lr-content h2, #lr-content h3, #lr-content h4 { break-after: avoid; page-break-after: avoid; margin: 18pt 0 7pt; }
-        #lr-content h2 { font-size: 18pt; }
-        #lr-content h3 { font-size: 15pt; }
-        #lr-content figure, #lr-content blockquote, #lr-content table { break-inside: avoid; page-break-inside: avoid; }
-        #lr-content img { max-height: 190mm; margin: 12pt auto; background: white; }
-        #lr-content video { display: none; }
-        #lr-content figcaption { margin-top: 4pt; font-size: 8.5pt; }
-        footer { margin-top: 22pt; padding-top: 10pt; font-size: 8pt; }
-      }
     `;
   }
 })();

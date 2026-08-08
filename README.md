@@ -24,7 +24,7 @@ Textuary now includes an Xcode project for the permanent Safari Web Extension co
 4. Open **More**, then click **Save article** to keep the clean article in this browser. Use **Open Library** to search it, continue from the saved reading or read-aloud passage, mark it read or unread, or delete it. The Library temporarily replaces the reader in the same tab; use **Return to article** in its header to go back without creating duplicate tabs. Saved prose remains available offline without an account. Remote pictures and video still require a connection in this first library release.
 5. Open **Reading style** to choose the paper, evening or automatic ambient theme; select a typeface; and adjust text size, spacing and column width. Textuary remembers these choices locally.
 6. Follow the slim progress bar and estimated time remaining while reading. During read-aloud, the current passage is highlighted automatically.
-7. Open **More** and use **Print or PDF** for clean output, or click **Original page** to return to the normal site. **Stop** begins again from the start; pausing a saved article remembers the current short passage across a reload.
+7. Open **More** and use **Print or PDF** for clean output with one-inch margins and the selected reader typeface, or click **Original page** to return to the normal site. **Stop** begins again from the start; pausing a saved article remembers the current short passage across a reload.
 
 ## Set up natural and premium voices
 

@@ -24,6 +24,7 @@ const packageFiles = [
   "library.css",
   "library.html",
   "library.js",
+  "print.css",
   "reader.js",
   "saved.html",
   "icons/icon-16.png",
