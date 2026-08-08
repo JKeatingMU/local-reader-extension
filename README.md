@@ -20,17 +20,17 @@ Textuary now includes an Xcode project for the permanent Safari Web Extension co
 
 1. Open an article on any ordinary `http` or `https` page and wait for it to load.
 2. Click the **Textuary** toolbar icon, or press **Option+Shift+R** on macOS (**Alt+Shift+R** elsewhere).
-3. Choose **System** speech for voices exposed by the browser; in Chrome choose **Natural (Kokoro)** for locally generated speech; or in the packaged Safari version choose **Premium (Apple)** for installed Apple Enhanced and Premium voices. Then choose a **Voice** and **Speed**. Click **Read aloud**; the same button pauses or resumes, and **Stop** returns to the beginning.
-4. Open **More**, then click **Save article** to keep the clean article in this browser. Use **Open Library** to search it, continue from the saved reading or read-aloud passage, mark it read or unread, or delete it. The Library temporarily replaces the reader in the same tab; use **Return to article** in its header to go back without creating duplicate tabs. Saved prose remains available offline without an account. Remote pictures and video still require a connection in this first library release.
+3. Open **Voice** to choose **System** speech for voices exposed by the browser; in Chrome choose **Natural (Kokoro)** for locally generated speech; or in the packaged Safari version choose **Premium (Apple)** for installed Apple Enhanced and Premium voices. Choose a voice and speed, then click **Read aloud**. The same button pauses or resumes; **Stop** appears during playback and returns to the beginning.
+4. Open **Actions** and click **Save article** to keep the clean article in this browser. Use the **Library** button beside **Original page** to search it, continue from the saved reading or read-aloud passage, mark it read or unread, or delete it. The Library temporarily replaces the reader in the same tab; use **Return to article** in its header to go back without creating duplicate tabs. Saved prose remains available offline without an account. Remote pictures and video still require a connection in this first library release.
 5. Open **Reading style** to choose the paper, evening or automatic ambient theme; select a typeface; and adjust text size, spacing and column width. Textuary remembers these choices locally.
-6. Follow the slim progress bar and estimated time remaining while reading. During read-aloud, the current passage is highlighted automatically.
-7. Open **More** and use **Print or PDF** for clean output with one-inch margins and the selected reader typeface, or click **Original page** to return to the normal site. **Stop** begins again from the start; pausing a saved article remembers the current short passage across a reload.
+6. Follow the slim progress bar and floating time-remaining indicator while reading. On narrower screens the estimate returns to the toolbar. During read-aloud, the current passage is highlighted automatically.
+7. Open **Actions** and use **Print or PDF** for clean output with one-inch margins and the selected reader typeface, or click **Original page** to return to the normal site. **Stop** begins again from the start; pausing a saved article remembers the current short passage across a reload.
 
 ## Set up natural and premium voices
 
 ### Chrome: Natural (Kokoro)
 
-1. Open any article in Textuary and choose **Natural (Kokoro)** under **Speech**.
+1. Open any article in Textuary, open **Voice**, and choose **Natural (Kokoro)** under **Speech engine**.
 2. Choose one of the available Kokoro voices and a speed, then click **Read aloud**.
 3. On first use, approve the approximately 330 MB model download from Hugging Face. Chrome caches the model and selected voice data; speech generation and article text stay on the device.
 4. The first passage takes longer while the model starts. Natural voices require WebGPU and automatically fall back to **System** when it is unavailable.
@@ -39,7 +39,7 @@ Textuary now includes an Xcode project for the permanent Safari Web Extension co
 
 1. On macOS, open **System Settings > Accessibility > Read & Speak**, open the system voice chooser, and download an Apple voice labelled **Enhanced** or **Premium**. Selena Premium is one tested example. On iPhone or iPad, use **Settings > Accessibility > Spoken Content > Voices**.
 2. Install the packaged Safari extension using [the Xcode instructions](SAFARI.md); a temporary folder-loaded extension cannot reach Apple's native Premium voices.
-3. Reopen the Textuary reading view after the voice download finishes. Choose **Premium (Apple)** under **Speech**, select the installed voice and speed, then click **Read aloud**.
+3. Reopen the Textuary reading view after the voice download finishes. Open **Voice**, choose **Premium (Apple)** under **Speech engine**, select the installed voice and speed, then click **Read aloud**.
 4. Choose **System** at any time to use the broader browser-provided voice list.
 
 The extension requests `activeTab` and `scripting` for the article you choose, plus `storage` for reader settings and articles the user explicitly saves locally. It has no persistent access to browsing history or other sites.

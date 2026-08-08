@@ -189,7 +189,8 @@ Still required before Chrome submission:
 - [x] read and unread state
 - [x] approximate storage usage, individual deletion and clear-all controls
 - [x] same-tab Library return-to-article navigation and live saved-state synchronisation
-- [x] consolidate Save, Library and Print under a compact More menu
+- [x] group Original page and Library as navigation, consolidate Save and Print under Actions, and combine engine, voice and speed in a labelled Voice popover
+- [x] move dynamic time remaining into a floating desktop gutter indicator with a responsive toolbar fallback
 - [x] standalone print stylesheet with one-inch layout, selected reader typeface and page-break rules
 - [x] update the privacy policy and README for local article storage
 - [x] automated live-package validation in Chrome and Safari modes

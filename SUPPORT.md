@@ -13,14 +13,14 @@
 - Natural (Kokoro) speech requires a WebGPU-capable Chrome browser and graphics adapter.
 - The first activation downloads and caches approximately 330 MB of model data. Check the internet connection and allow time for the progress message to complete.
 - The first passage is slower than later passages. Performance varies by GPU; Textuary prepares one passage ahead to reduce pauses.
-- If Natural speech fails, switch **Speech** to **System**. Article reading and system read-aloud do not depend on the Kokoro model.
+- If Natural speech fails, open **Voice** and switch **Speech engine** to **System**. Article reading and system read-aloud do not depend on the Kokoro model.
 - **Premium (Apple)** requires the packaged Safari extension from `safari/Textuary/Textuary.xcodeproj`; it is unavailable in a temporary folder-loaded extension.
 - Install an Enhanced or Premium voice in the device's Accessibility speech settings before opening Textuary. If it does not appear, close and reopen the reader after the download completes.
 - If the native bridge is unavailable, disable any duplicate temporary Textuary entry, enable the packaged extension in Safari Settings, and try again. **System** remains available as a fallback.
 
 ## Local Library troubleshooting
 
-- Open **More** and choose **Save article** in the reading view; **Saved ✓** confirms that the clean snapshot was written to local extension storage.
+- Open **Actions** and choose **Save article** in the reading view; **Saved ✓** confirms that the clean snapshot was written to local extension storage. Use the separate **Library** navigation button to view saved articles.
 - The saved prose is available offline. Pictures and video remain externally hosted in version 2.8 and need a connection.
 - The Library restores the last recorded reading position and marks an article finished when its progress reaches the end.
 - The Library temporarily replaces the reader in the same browser tab. Choose **Return to article** in the Library header to restore that reader; the button remains available when the saved list is empty.

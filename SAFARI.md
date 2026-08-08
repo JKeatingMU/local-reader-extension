@@ -11,7 +11,7 @@ Textuary 2.8 includes a containing Apple application and Safari Web Extension fo
 5. Enable **Textuary** and approve website access when Safari asks.
 6. If the temporary development version is also listed, disable it so there is only one active Textuary extension.
 7. Open an ordinary article and click the Textuary toolbar button.
-8. In the reader, choose **Premium (Apple)** under Speech, then select the installed voice and speed.
+8. In the reader, open **Voice**, choose **Premium (Apple)** under **Speech engine**, then select the installed voice and speed.
 
 If a newly downloaded voice is missing, close the current Textuary reading view and activate the extension again. Safari discovers installed native voices when the new reader opens.
 

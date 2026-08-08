@@ -498,8 +498,9 @@
       <body>
         <div id="${READER_ID}">
           <header class="lr-toolbar" aria-label="Reader controls">
-            <button id="lr-original" type="button" title="${data.isSavedView ? "Open the original article" : "Reload the original article"}">← Original page</button>
-            <div class="lr-tools">
+            <nav class="lr-nav" aria-label="Reader navigation and appearance">
+              <button id="lr-original" type="button" title="${data.isSavedView ? "Open the original article" : "Reload the original article"}">← Original page</button>
+              <button id="lr-library" type="button">Library</button>
               <details class="lr-settings">
                 <summary>Reading style</summary>
                 <div class="lr-settings-panel" aria-label="Typography and theme settings">
@@ -544,37 +545,46 @@
                   <button id="lr-style-reset" type="button">Reset style</button>
                 </div>
               </details>
-              <span id="lr-progress-label" class="lr-progress-label" aria-live="polite">${data.readingMinutes} min left</span>
-              <label class="lr-speech-setting">
-                <span>Speech</span>
-                <select id="lr-speech-engine" aria-label="Read-aloud speech engine">
-                  <option value="system">System</option>
-                  <option value="kokoro">Natural (Kokoro)</option>
-                </select>
-              </label>
-              <label class="lr-speech-setting">
-                <span>Voice</span>
-                <select id="lr-speech-voice" aria-label="Read-aloud voice" title="Voice changes apply from the next passage">
-                  <option value="">System default</option>
-                </select>
-              </label>
-              <label class="lr-speech-setting">
-                <span>Speed</span>
-                <select id="lr-speech-rate" aria-label="Read-aloud speed" title="Speed changes apply from the next passage">
-                  <option value="0.75">0.75×</option>
-                  <option value="1" selected>1×</option>
-                  <option value="1.25">1.25×</option>
-                  <option value="1.5">1.5×</option>
-                  <option value="2">2×</option>
-                </select>
-              </label>
+            </nav>
+            <div class="lr-tools" aria-label="Read-aloud and article controls">
+              <span class="lr-progress-toolbar-label" aria-hidden="true">${data.readingMinutes} min left</span>
+              <details class="lr-voice-settings">
+                <summary aria-label="Voice and speed settings">
+                  <span>Voice</span>
+                  <strong id="lr-voice-summary">System default · 1×</strong>
+                </summary>
+                <div class="lr-voice-settings-panel" aria-label="Voice and speed settings">
+                  <label class="lr-speech-setting">
+                    <span>Speech engine</span>
+                    <select id="lr-speech-engine" aria-label="Read-aloud speech engine">
+                      <option value="system">System</option>
+                      <option value="kokoro">Natural (Kokoro)</option>
+                    </select>
+                  </label>
+                  <label class="lr-speech-setting">
+                    <span>Voice</span>
+                    <select id="lr-speech-voice" aria-label="Read-aloud voice" title="Voice changes apply from the next passage">
+                      <option value="">System default</option>
+                    </select>
+                  </label>
+                  <label class="lr-speech-setting">
+                    <span>Speed</span>
+                    <select id="lr-speech-rate" aria-label="Read-aloud speed" title="Speed changes apply from the next passage">
+                      <option value="0.75">0.75×</option>
+                      <option value="1" selected>1×</option>
+                      <option value="1.25">1.25×</option>
+                      <option value="1.5">1.5×</option>
+                      <option value="2">2×</option>
+                    </select>
+                  </label>
+                </div>
+              </details>
               <button id="lr-speech-toggle" type="button">Read aloud</button>
-              <button id="lr-speech-stop" type="button" disabled>Stop</button>
+              <button id="lr-speech-stop" type="button" hidden disabled>Stop</button>
               <details class="lr-actions">
-                <summary>More</summary>
+                <summary>Actions</summary>
                 <div class="lr-actions-panel" aria-label="Article actions">
                   <button id="lr-save" type="button">${data.isSavedView ? "Saved ✓" : "Save article"}</button>
-                  <button id="lr-library" type="button">Open Library</button>
                   <button id="lr-print" type="button">Print or PDF</button>
                 </div>
               </details>
@@ -583,6 +593,7 @@
               <div id="lr-progress-bar"></div>
             </div>
           </header>
+          <span id="lr-progress-label" class="lr-progress-label" aria-live="polite">${data.readingMinutes} min left</span>
           <main class="lr-page">
             <article>
               <p class="lr-kicker">${safeSiteName} · ${PRODUCT_NAME}</p>
@@ -764,7 +775,7 @@
     const reset = document.getElementById("lr-style-reset");
     const progress = document.querySelector(".lr-progress-track");
     const progressBar = document.getElementById("lr-progress-bar");
-    const progressLabel = document.getElementById("lr-progress-label");
+    const progressLabels = document.querySelectorAll(".lr-progress-label, .lr-progress-toolbar-label");
     const preferences = data.preferences;
     let progressFrame = 0;
     let progressSaveTimer = 0;
@@ -812,7 +823,9 @@
         const minutesLeft = Math.max(0, Math.ceil(data.readingMinutes * (1 - ratio)));
         progressBar.style.width = `${percentage}%`;
         progress.setAttribute("aria-valuenow", String(percentage));
-        progressLabel.textContent = percentage >= 100 ? "Finished" : `${minutesLeft} min left`;
+        for (const label of progressLabels) {
+          label.textContent = percentage >= 100 ? "Finished" : `${minutesLeft} min left`;
+        }
         if (data.savedArticleId) {
           clearTimeout(progressSaveTimer);
           progressSaveTimer = setTimeout(() => void saveArticleProgress(data.savedArticleId, ratio), 650);
@@ -865,6 +878,8 @@
     const { language, preferences } = data;
     const toggle = document.getElementById("lr-speech-toggle");
     const stop = document.getElementById("lr-speech-stop");
+    const voiceSettings = document.querySelector(".lr-voice-settings");
+    const voiceSummary = document.getElementById("lr-voice-summary");
     const engineSelect = document.getElementById("lr-speech-engine");
     const voiceSelect = document.getElementById("lr-speech-voice");
     const rateSelect = document.getElementById("lr-speech-rate");
@@ -924,6 +939,7 @@
       stopSpeaking(true);
       preferences.speechEngine = engineSelect.value;
       configureVoiceMenu();
+      updateVoiceSummary();
       void savePreferences(preferences);
     });
     voiceSelect.addEventListener("change", () => {
@@ -931,12 +947,24 @@
       else if (engineSelect.value === "apple") preferences.appleVoice = voiceSelect.value;
       else preferences.speechVoice = voiceSelect.value;
       clearNaturalCache(chunkIndex + 1);
+      updateVoiceSummary();
       void savePreferences(preferences);
     });
     rateSelect.addEventListener("change", () => {
       preferences.speechRate = rateSelect.value;
       clearNaturalCache(chunkIndex + 1);
+      updateVoiceSummary();
       void savePreferences(preferences);
+    });
+
+    document.addEventListener("click", (event) => {
+      if (voiceSettings.open && !voiceSettings.contains(event.target)) voiceSettings.open = false;
+    });
+    voiceSettings.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        voiceSettings.open = false;
+        voiceSettings.querySelector("summary").focus();
+      }
     });
 
     toggle.addEventListener("click", () => void handleToggle().catch((error) => {
@@ -1372,7 +1400,9 @@
       toggle.disabled = state === "loading" || state === "generating" || (!hasSystemSpeech && !hasNaturalSpeech && !hasAppleSpeech);
       toggle.setAttribute("aria-pressed", String(state !== "idle"));
       stop.disabled = state === "idle";
+      stop.hidden = state === "idle";
       engineSelect.disabled = state !== "idle";
+      updateVoiceSummary();
     }
 
     function savedSpeechIndex() {
@@ -1414,9 +1444,11 @@
           voiceSelect.replaceChildren(new Option("Loading premium voices…", ""));
           voiceSelect.disabled = true;
           voiceSelect.title = "Textuary is asking the native Apple speech engine for installed premium voices";
+          updateVoiceSummary();
           void loadAppleVoices().catch((error) => {
             voiceSelect.replaceChildren(new Option("Premium voices unavailable", ""));
             voiceSelect.disabled = true;
+            updateVoiceSummary();
             showNotice(`Textuary could not list Apple premium voices: ${naturalSpeechError(error)}.`);
           });
           return;
@@ -1425,6 +1457,7 @@
           voiceSelect.replaceChildren(new Option("No premium voices installed", ""));
           voiceSelect.disabled = true;
           voiceSelect.title = "Install an enhanced or premium voice in Accessibility > Read & Speak";
+          updateVoiceSummary();
           return;
         }
         voiceSelect.replaceChildren(...appleVoices.map((voice) =>
@@ -1437,6 +1470,7 @@
         preferences.appleVoice = selected;
         voiceSelect.disabled = false;
         voiceSelect.title = "Enhanced and premium voices installed on this Apple device";
+        updateVoiceSummary();
         return;
       }
       if (engineSelect.value === "kokoro") {
@@ -1448,6 +1482,7 @@
           : DEFAULT_PREFERENCES.kokoroVoice;
         voiceSelect.disabled = !hasNaturalSpeech;
         voiceSelect.title = "Natural voices are generated locally; changes apply from the next passage";
+        updateVoiceSummary();
         return;
       }
 
@@ -1461,6 +1496,20 @@
       }
       voiceSelect.disabled = !hasSystemSpeech || voices.length === 0;
       voiceSelect.title = "System voices are supplied by the browser and operating system";
+      updateVoiceSummary();
+    }
+
+    function updateVoiceSummary() {
+      const selectedOption = voiceSelect.selectedOptions?.[0]?.textContent || "";
+      let voiceName = selectedOption.replace(/\s*\([^)]*\)\s*$/, "").trim();
+      if (engineSelect.value === "kokoro") voiceName = naturalVoiceName();
+      if (engineSelect.value === "apple") voiceName = selectedAppleVoice()?.name || voiceName;
+      if (!voiceName || /loading|unavailable|no premium/i.test(voiceName)) {
+        voiceName = engineSelect.value === "apple" ? "Apple premium" : "System default";
+      }
+      const rate = rateSelect.selectedOptions?.[0]?.textContent || `${rateSelect.value || 1}×`;
+      voiceSummary.textContent = `${voiceName} · ${rate}`;
+      voiceSettings.querySelector("summary").title = `Voice: ${voiceName}; speed ${rate}`;
     }
 
     function naturalVoiceName() {
@@ -1868,32 +1917,38 @@
       body[data-lr-theme="evening"], body[data-lr-theme="ambient"][data-lr-ambient="evening"] { color-scheme: dark; --lr-bg: #171817; --lr-paper: #222320; --lr-text: #eee6d8; --lr-muted: #b4aa9b; --lr-line: #41413b; --lr-accent: #e9b872; }
       body[data-lr-theme="ambient"][data-lr-ambient="day"] { --lr-bg: #e8efea; --lr-paper: #fcfdf9; --lr-text: #1f2924; --lr-muted: #68746d; --lr-line: #d0dbd3; --lr-accent: #2d6e55; }
       body[data-lr-theme="ambient"] { background-image: radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--lr-accent) 9%, transparent), transparent 32rem); background-attachment: fixed; }
-      .lr-toolbar { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; gap: 12px; padding: 10px max(16px, calc((100vw - 1480px) / 2)); border-bottom: 1px solid var(--lr-line); background: var(--lr-paper); background: color-mix(in srgb, var(--lr-paper) 94%, transparent); backdrop-filter: blur(10px); font: 14px/1.2 system-ui, sans-serif; }
+      .lr-toolbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 10px max(16px, calc((100vw - 1480px) / 2)); border-bottom: 1px solid var(--lr-line); background: var(--lr-paper); background: color-mix(in srgb, var(--lr-paper) 94%, transparent); backdrop-filter: blur(10px); font: 14px/1.2 system-ui, sans-serif; }
       .lr-toolbar button { min-height: 36px; padding: 7px 11px; border: 1px solid var(--lr-line); border-radius: 7px; background: var(--lr-paper); color: var(--lr-text); cursor: pointer; white-space: nowrap; }
       .lr-toolbar button:hover:not(:disabled) { border-color: var(--lr-accent); color: var(--lr-accent); }
       .lr-toolbar button:disabled { cursor: default; opacity: .45; }
       .lr-toolbar select { min-height: 36px; padding: 6px 28px 6px 8px; border: 1px solid var(--lr-line); border-radius: 7px; background: var(--lr-paper); color: var(--lr-text); font: inherit; }
       .lr-toolbar select:focus { border-color: var(--lr-accent); outline: 2px solid color-mix(in srgb, var(--lr-accent) 30%, transparent); outline-offset: 1px; }
       #lr-speech-toggle[aria-pressed="true"] { border-color: var(--lr-accent); color: var(--lr-accent); }
+      .lr-nav { display: flex; flex: 0 1 auto; align-items: center; gap: 6px; min-width: 0; }
+      .lr-nav .lr-settings { margin-left: 10px; }
       .lr-tools { display: flex; flex-wrap: nowrap; align-items: center; justify-content: flex-end; gap: 6px; }
-      .lr-speech-setting { display: flex; align-items: center; gap: 5px; color: var(--lr-muted); font-size: 12px; }
-      #lr-speech-engine { width: 150px; }
-      #lr-speech-voice { width: min(190px, 24vw); }
-      #lr-speech-rate { width: 76px; }
-      .lr-settings, .lr-actions { position: relative; }
-      .lr-settings > summary, .lr-actions > summary { min-height: 36px; padding: 9px 11px 7px; border: 1px solid var(--lr-line); border-radius: 7px; background: var(--lr-paper); color: var(--lr-text); cursor: pointer; list-style: none; white-space: nowrap; }
-      .lr-settings > summary::-webkit-details-marker, .lr-actions > summary::-webkit-details-marker { display: none; }
-      .lr-settings > summary::after, .lr-actions > summary::after { content: " ▾"; color: var(--lr-muted); }
-      .lr-settings[open] > summary, .lr-actions[open] > summary { border-color: var(--lr-accent); color: var(--lr-accent); }
+      .lr-speech-setting { display: grid; gap: 6px; color: var(--lr-muted); font-size: 12px; }
+      #lr-speech-engine, #lr-speech-voice, #lr-speech-rate { width: 100%; }
+      .lr-settings, .lr-voice-settings, .lr-actions { position: relative; }
+      .lr-settings > summary, .lr-voice-settings > summary, .lr-actions > summary { min-height: 36px; padding: 9px 11px 7px; border: 1px solid var(--lr-line); border-radius: 7px; background: var(--lr-paper); color: var(--lr-text); cursor: pointer; list-style: none; white-space: nowrap; }
+      .lr-settings > summary::-webkit-details-marker, .lr-voice-settings > summary::-webkit-details-marker, .lr-actions > summary::-webkit-details-marker { display: none; }
+      .lr-settings > summary::after, .lr-voice-settings > summary::after, .lr-actions > summary::after { content: " ▾"; color: var(--lr-muted); }
+      .lr-settings[open] > summary, .lr-voice-settings[open] > summary, .lr-actions[open] > summary { border-color: var(--lr-accent); color: var(--lr-accent); }
       .lr-settings-panel { position: absolute; top: calc(100% + 10px); right: 0; display: grid; width: 300px; gap: 13px; padding: 18px; border: 1px solid var(--lr-line); border-radius: 10px; background: var(--lr-paper); box-shadow: 0 18px 50px rgba(0, 0, 0, .18); }
       .lr-settings-panel label { display: grid; gap: 6px; color: var(--lr-muted); font-size: 12px; }
       .lr-settings-panel label > span { display: flex; justify-content: space-between; }
       .lr-settings-panel select, .lr-settings-panel input { width: 100%; }
       .lr-settings-panel output { color: var(--lr-text); }
       .lr-settings-panel button { justify-self: start; }
+      .lr-voice-settings > summary { display: flex; align-items: baseline; width: min(250px, 26vw); gap: 7px; }
+      .lr-voice-settings > summary > span { flex: none; color: var(--lr-muted); font-size: 11px; }
+      .lr-voice-settings > summary > strong { min-width: 0; overflow: hidden; font-size: 13px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+      .lr-voice-settings > summary::after { flex: none; margin-left: auto; }
+      .lr-voice-settings-panel { position: absolute; z-index: 3; top: calc(100% + 10px); right: 0; display: grid; width: min(360px, calc(100vw - 32px)); gap: 13px; padding: 18px; border: 1px solid var(--lr-line); border-radius: 10px; background: var(--lr-paper); box-shadow: 0 18px 50px rgba(0, 0, 0, .18); }
       .lr-actions-panel { position: absolute; z-index: 2; top: calc(100% + 10px); right: 0; display: grid; width: 190px; gap: 7px; padding: 9px; border: 1px solid var(--lr-line); border-radius: 10px; background: var(--lr-paper); box-shadow: 0 18px 50px rgba(0, 0, 0, .18); }
       .lr-actions-panel button { width: 100%; text-align: left; }
-      .lr-progress-label { min-width: 64px; color: var(--lr-muted); font-size: 12px; text-align: center; white-space: nowrap; }
+      .lr-progress-toolbar-label { display: none; color: var(--lr-muted); font-size: 12px; white-space: nowrap; }
+      .lr-progress-label { position: fixed; z-index: 8; top: 50%; right: max(18px, calc((100vw - var(--lr-page-width)) / 2 - 102px)); min-width: 84px; padding: 9px 12px; border: 1px solid var(--lr-line); border-radius: 999px; background: color-mix(in srgb, var(--lr-paper) 94%, transparent); color: var(--lr-muted); box-shadow: 0 8px 24px rgba(40, 36, 30, .1); font-size: 12px; text-align: center; white-space: nowrap; transform: translateY(-50%); backdrop-filter: blur(8px); }
       .lr-progress-track { position: absolute; right: 0; bottom: -1px; left: 0; height: 3px; overflow: hidden; background: transparent; }
       #lr-progress-bar { width: 0; height: 100%; background: var(--lr-accent); transition: width .12s linear; }
       .lr-speech-status { position: fixed; z-index: 11; top: 66px; right: max(18px, calc((100vw - 1240px) / 2)); max-width: min(430px, calc(100vw - 36px)); margin: 0; padding: 9px 13px; border: 1px solid var(--lr-line); border-radius: 8px; background: var(--lr-paper); color: var(--lr-muted); box-shadow: 0 8px 28px rgba(0, 0, 0, .15); font: 12px/1.4 system-ui, sans-serif; }
@@ -1936,8 +1991,8 @@
       #lr-content video + figcaption { margin-top: .7em; }
       #lr-content .lr-speaking, h1.lr-speaking, .lr-standfirst.lr-speaking, .lr-byline .lr-speaking { border-radius: 4px; background: color-mix(in srgb, var(--lr-accent) 14%, transparent); box-shadow: 0 0 0 5px color-mix(in srgb, var(--lr-accent) 14%, transparent); transition: background .18s ease, box-shadow .18s ease; }
       footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--lr-line); color: var(--lr-muted); font: 12px/1.5 system-ui, sans-serif; }
-      @media (max-width: 1320px) { .lr-progress-label, .lr-speech-setting > span { display: none; } #lr-speech-engine { width: 116px; } #lr-speech-voice { width: min(160px, 22vw); } }
-      @media (max-width: 700px) { .lr-toolbar { align-items: flex-start; } .lr-tools { flex-wrap: wrap; } .lr-page { padding: 0; } .lr-page > article { border: 0; padding: 34px 20px 60px; } #lr-speech-engine { width: 116px; } #lr-speech-voice { width: min(150px, 38vw); } .lr-settings-panel { position: fixed; top: 60px; right: 12px; left: 12px; width: auto; } }
+      @media (max-width: 1320px) { .lr-toolbar { flex-wrap: wrap; gap: 8px 16px; } .lr-nav { flex: 1 1 auto; } .lr-tools { flex: 1 1 auto; } .lr-progress-label { display: none; } .lr-progress-toolbar-label { display: inline; padding: 0 5px; } .lr-voice-settings > summary { width: min(220px, 34vw); } }
+      @media (max-width: 700px) { .lr-toolbar { align-items: stretch; } .lr-nav, .lr-tools { width: 100%; flex-wrap: wrap; justify-content: flex-start; } .lr-nav .lr-settings { margin-left: 0; } .lr-tools { justify-content: flex-end; } .lr-progress-toolbar-label { margin-right: auto; } .lr-voice-settings > summary { width: min(220px, calc(100vw - 32px)); } .lr-page { padding: 0; } .lr-page > article { border: 0; padding: 34px 20px 60px; } .lr-settings-panel, .lr-voice-settings-panel { position: fixed; top: 108px; right: 12px; left: 12px; width: auto; } }
     `;
   }
 })();

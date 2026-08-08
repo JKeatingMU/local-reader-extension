@@ -12,7 +12,7 @@ const screenshotTheme = process.argv[9] || "light";
 const screenshotState = process.argv[10] || "reader";
 const speechPlatform = process.argv[11] || "chrome";
 if (!fixtureUrl) {
-  throw new Error("Usage: node tests/chrome-smoke-test.mjs <debug-port> <fixture-url> [fixture-name] [source-root] [screenshot-path] [width] [height] [light|dark] [reader|settings] [chrome|safari]");
+  throw new Error("Usage: node tests/chrome-smoke-test.mjs <debug-port> <fixture-url> [fixture-name] [source-root] [screenshot-path] [width] [height] [light|dark] [reader|settings|voice] [chrome|safari]");
 }
 
 const targets = await fetch(`http://127.0.0.1:${port}/json/list`).then((response) => response.json());
@@ -208,8 +208,13 @@ const inspection = await call("Runtime.evaluate", {
       controls: document.querySelectorAll('.lr-toolbar button').length,
       primaryActionButtons: document.querySelectorAll('.lr-tools > button').length,
       moreMenu: Boolean(document.querySelector('.lr-actions')),
+      actionsLabel: document.querySelector('.lr-actions > summary')?.textContent?.trim(),
       saveLabel: document.querySelector('#lr-save')?.textContent,
       libraryButton: Boolean(document.querySelector('#lr-library')),
+      libraryInNavigation: Boolean(document.querySelector('.lr-nav > #lr-library')),
+      voiceSettings: Boolean(document.querySelector('.lr-voice-settings')),
+      voiceSummary: document.querySelector('#lr-voice-summary')?.textContent?.trim(),
+      progressLabelPosition: getComputedStyle(document.querySelector('#lr-progress-label')).position,
       settingsSelects: document.querySelectorAll('.lr-settings-panel select').length,
       settingsRanges: document.querySelectorAll('.lr-settings-panel input[type="range"]').length,
       progressBars: document.querySelectorAll('[role="progressbar"]').length,
@@ -283,7 +288,7 @@ const speechInspection = await call("Runtime.evaluate", {
     rate.dispatchEvent(new Event('change'));
     toggle?.click();
     await new Promise((resolveWait) => setTimeout(resolveWait, 20));
-    const afterPlay = { label: toggle?.textContent, stopDisabled: stop?.disabled, highlighted: document.querySelectorAll('.lr-speaking').length };
+    const afterPlay = { label: toggle?.textContent, stopDisabled: stop?.disabled, stopHidden: stop?.hidden, highlighted: document.querySelectorAll('.lr-speaking').length };
     speechSynthesis.current?.onend?.();
     const advancedToNextChunk = globalThis.__localReaderSpeechTest.filter(({ type }) => type === 'speak').length >= 2;
     toggle?.click();
@@ -299,7 +304,8 @@ const speechInspection = await call("Runtime.evaluate", {
       advancedToNextChunk,
       afterPause,
       afterResume,
-      afterStop: { label: toggle?.textContent, stopDisabled: stop?.disabled, highlighted: document.querySelectorAll('.lr-speaking').length },
+      afterStop: { label: toggle?.textContent, stopDisabled: stop?.disabled, stopHidden: stop?.hidden, highlighted: document.querySelectorAll('.lr-speaking').length },
+      voiceSummary: document.querySelector('#lr-voice-summary')?.textContent?.trim(),
       pausePosition,
       stopPosition: globalThis.__textuaryStoredPreferences.textuarySavedArticles?.articles?.[0]?.speechIndex,
       calls: globalThis.__localReaderSpeechTest,
@@ -412,8 +418,14 @@ await call("Runtime.evaluate", {
     }
     const voice = document.querySelector('#lr-speech-voice');
     const rate = document.querySelector('#lr-speech-rate');
-    if (voice) voice.value = '';
-    if (rate) rate.value = '1';
+    if (voice) {
+      voice.value = '';
+      voice.dispatchEvent(new Event('change'));
+    }
+    if (rate) {
+      rate.value = '1';
+      rate.dispatchEvent(new Event('change'));
+    }
     const theme = document.querySelector('#lr-theme');
     if (theme) {
       theme.value = ${JSON.stringify(screenshotTheme)} === 'dark' ? 'evening' : 'paper';
@@ -421,6 +433,8 @@ await call("Runtime.evaluate", {
     }
     const settings = document.querySelector('.lr-settings');
     if (settings) settings.open = ${JSON.stringify(screenshotState)} === 'settings';
+    const voiceSettings = document.querySelector('.lr-voice-settings');
+    if (voiceSettings) voiceSettings.open = ${JSON.stringify(screenshotState)} === 'voice';
   })()`,
   returnByValue: true
 });
@@ -555,11 +569,16 @@ if (
   result.controls !== 7 ||
   result.primaryActionButtons !== 2 ||
   !result.moreMenu ||
+  result.actionsLabel !== "Actions" ||
   !printControl.called ||
   printControl.menuOpen ||
   printPdfBuffer.length < 10_000 ||
   result.saveLabel !== "Save article" ||
   !result.libraryButton ||
+  !result.libraryInNavigation ||
+  !result.voiceSettings ||
+  !result.voiceSummary?.includes("1×") ||
+  result.progressLabelPosition !== "fixed" ||
   result.settingsSelects !== 4 ||
   result.settingsRanges !== 1 ||
   result.progressBars !== 1 ||
@@ -591,6 +610,7 @@ if (
   !result.extractionSummary?.includes(expected.method) ||
   speech.afterPlay.label !== "Pause" ||
   speech.afterPlay.stopDisabled ||
+  speech.afterPlay.stopHidden ||
   speech.afterPlay.highlighted !== 1 ||
   !speech.advancedToNextChunk ||
   speech.afterPause.label !== "Resume" ||
@@ -601,7 +621,9 @@ if (
   speech.stopPosition !== 0 ||
   speech.afterStop.label !== "Read aloud" ||
   !speech.afterStop.stopDisabled ||
+  !speech.afterStop.stopHidden ||
   speech.afterStop.highlighted !== 0 ||
+  !speech.voiceSummary?.includes("Test Alternate · 1.5×") ||
   !speech.calls.some(({ type }) => type === "speak") ||
   !speech.firstSpokenText?.startsWith(result.title) ||
   !speech.secondSpokenText?.startsWith("By ") ||
