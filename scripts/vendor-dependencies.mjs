@@ -15,10 +15,22 @@ const purify = await readFile(purifySource, "utf8");
 const kokoro = await readFile(kokoroSource, "utf8");
 const asyncStreamIteration = "t=[];for await(const e of A)t.push(e);const r=await new Blob(t).arrayBuffer();";
 const responseStreamConsumption = "r=await new Response(A).arrayBuffer();";
-const safariCompatibleKokoro = kokoro.replace(asyncStreamIteration, responseStreamConsumption);
+const missingContentLengthWarning = 'null===t&&console.warn("Unable to determine content-length from response headers. Will expand buffer when needed.");';
+const kokoroEnvironmentBridge = "const Mf={set wasmPaths(e){Wg.backends.onnx.wasm.wasmPaths=e},get wasmPaths(){return Wg.backends.onnx.wasm.wasmPaths}};";
+const quietKokoroEnvironmentBridge = "const Mf={set wasmPaths(e){Wg.backends.onnx.wasm.wasmPaths=e},get wasmPaths(){return Wg.backends.onnx.wasm.wasmPaths},set logLevel(e){Wg.backends.onnx.logLevel=e},get logLevel(){return Wg.backends.onnx.logLevel}};";
+const patchedKokoro = kokoro
+  .replace(asyncStreamIteration, responseStreamConsumption)
+  .replace(missingContentLengthWarning, "")
+  .replace(kokoroEnvironmentBridge, quietKokoroEnvironmentBridge);
 
-if (safariCompatibleKokoro === kokoro) {
+if (!patchedKokoro.includes(responseStreamConsumption)) {
   throw new Error("Could not apply the Safari ReadableStream compatibility patch to Kokoro.js");
+}
+if (patchedKokoro.includes("Unable to determine content-length from response headers")) {
+  throw new Error("Could not suppress Kokoro's harmless missing Content-Length warning");
+}
+if (!patchedKokoro.includes("set logLevel(e){Wg.backends.onnx.logLevel=e}")) {
+  throw new Error("Could not expose ONNX Runtime's log-level control through Kokoro.js");
 }
 
 await writeFile(
@@ -38,7 +50,7 @@ await copyFile(
   resolve(root, "node_modules/dompurify/LICENSE"),
   resolve(vendor, "LICENSE-dompurify.txt")
 );
-await writeFile(resolve(vendor, "kokoro.web.js"), safariCompatibleKokoro);
+await writeFile(resolve(vendor, "kokoro.web.js"), patchedKokoro);
 await copyFile(
   resolve(onnxRuntimeSource, "ort-wasm-simd-threaded.jsep.mjs"),
   resolve(vendor, "ort-wasm-simd-threaded.jsep.mjs")

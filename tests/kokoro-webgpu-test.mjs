@@ -40,6 +40,7 @@ const evaluation = await call("Runtime.evaluate", {
     const started = performance.now();
     const { KokoroTTS, env } = await import(${JSON.stringify(moduleUrl)});
     env.wasmPaths = new URL('.', ${JSON.stringify(moduleUrl)}).href;
+    env.logLevel = 'error';
     let lastProgress = -1;
     const tts = await KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX', {
       dtype: ${JSON.stringify(dtype)},
@@ -67,6 +68,7 @@ const evaluation = await call("Runtime.evaluate", {
     return JSON.stringify({
       adapter: adapter.info || null,
       dtype: ${JSON.stringify(dtype)},
+      logLevel: env.logLevel,
       modelLoadSeconds: Number(((loaded - started) / 1000).toFixed(2)),
       firstGenerationSeconds: Number(((firstFinished - loaded) / 1000).toFixed(2)),
       warmGenerationSeconds: Number(((finished - firstFinished) / 1000).toFixed(2)),
@@ -84,5 +86,9 @@ if (evaluation.exceptionDetails) {
   throw new Error(evaluation.exceptionDetails.exception?.description || "Kokoro WebGPU test failed");
 }
 
-console.log(JSON.stringify(JSON.parse(evaluation.result.value), null, 2));
+const result = JSON.parse(evaluation.result.value);
+if (result.logLevel !== "error" || result.samples <= 0 || result.sampleRate <= 0) {
+  throw new Error(`Kokoro did not retain error-only logging or generate valid audio: ${JSON.stringify(result)}`);
+}
+console.log(JSON.stringify(result, null, 2));
 socket.close();

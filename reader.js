@@ -1168,6 +1168,7 @@
           const moduleUrl = extensionApi.runtime.getURL("vendor/kokoro.web.js");
           const { KokoroTTS, env } = await import(moduleUrl);
           env.wasmPaths = extensionApi.runtime.getURL("vendor/");
+          env.logLevel = "error";
           return KokoroTTS.from_pretrained(KOKORO_MODEL_ID, {
             dtype: "fp32",
             device: "webgpu",

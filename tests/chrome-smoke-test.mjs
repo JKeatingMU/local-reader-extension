@@ -104,6 +104,9 @@ const speechMock = await call("Runtime.evaluate", {
       export const env = {
         set wasmPaths(value) {
           globalThis.__localReaderNaturalTest.push({ type: 'wasm-path', value });
+        },
+        set logLevel(value) {
+          globalThis.__localReaderNaturalTest.push({ type: 'log-level', value });
         }
       };
       export const KokoroTTS = {
@@ -498,6 +501,7 @@ const chromeNaturalSpeechOkay = speechPlatform === "safari" || (
   naturalSpeech.voiceOptions === 28 &&
   naturalSpeech.calls.some(({ type, dtype, device }) => type === "model" && dtype === "fp32" && device === "webgpu") &&
   naturalSpeech.calls.some(({ type, value }) => type === "wasm-path" && value === "chrome-extension://textuary-test/vendor/") &&
+  naturalSpeech.calls.some(({ type, value }) => type === "log-level" && value === "error") &&
   naturalSpeech.calls.some(({ type, voice, speed }) => type === "generate" && voice === "bf_emma" && speed === 1.5) &&
   naturalSpeech.saved?.speechEngine === "kokoro" &&
   naturalSpeech.saved?.kokoroConsent === true

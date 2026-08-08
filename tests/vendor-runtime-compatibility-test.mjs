@@ -13,6 +13,14 @@ if (!bundle.includes("new Response(A).arrayBuffer()")) {
   throw new Error("Kokoro is missing Safari-compatible pronunciation-dictionary stream consumption");
 }
 
+if (bundle.includes("Unable to determine content-length from response headers")) {
+  throw new Error("Kokoro still emits a harmless missing Content-Length warning as an extension error");
+}
+
+if (!bundle.includes("set logLevel(e){Wg.backends.onnx.logLevel=e}")) {
+  throw new Error("Kokoro does not expose ONNX Runtime's log-level control");
+}
+
 for (const resource of [
   "vendor/kokoro.web.js",
   "vendor/ort-wasm-simd-threaded.jsep.mjs",
