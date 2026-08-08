@@ -21,10 +21,10 @@ Textuary now includes an Xcode project for the permanent Safari Web Extension co
 1. Open an article on any ordinary `http` or `https` page and wait for it to load.
 2. Click the **Textuary** toolbar icon, or press **Option+Shift+R** on macOS (**Alt+Shift+R** elsewhere).
 3. Choose **System** speech for voices exposed by the browser; in Chrome choose **Natural (Kokoro)** for locally generated speech; or in the packaged Safari version choose **Premium (Apple)** for installed Apple Enhanced and Premium voices. Then choose a **Voice** and **Speed**. Click **Read aloud**; the same button pauses or resumes, and **Stop** returns to the beginning.
-4. Click **Save article** to keep the clean article in this browser, then use **Library** to search it, continue from the saved reading position, mark it read or unread, or delete it. Saved prose remains available offline without an account. Remote pictures and video still require a connection in this first library release.
+4. Open **More**, then click **Save article** to keep the clean article in this browser. Use **Open Library** to search it, continue from the saved reading or read-aloud passage, mark it read or unread, or delete it. The Library opens separately so the current reader stays intact; use **Return to article** in its header to close the Library and go back. Saved prose remains available offline without an account. Remote pictures and video still require a connection in this first library release.
 5. Open **Reading style** to choose the paper, evening or automatic ambient theme; select a typeface; and adjust text size, spacing and column width. Textuary remembers these choices locally.
 6. Follow the slim progress bar and estimated time remaining while reading. During read-aloud, the current passage is highlighted automatically.
-7. Use **Print** for clean paper or PDF output, or click **Original page** to return to the normal site.
+7. Open **More** and use **Print or PDF** for clean output, or click **Original page** to return to the normal site. **Stop** begins again from the start; pausing a saved article remembers the current short passage across a reload.
 
 ## Set up natural and premium voices
 
@@ -68,7 +68,7 @@ Chrome Web Store preparation materials are under [`store/chrome`](store/chrome),
 - Natural voices require WebGPU in Chrome. Safari uses the native Apple voice bridge because ONNX Runtime's Safari WebGPU path can hang. The first Chrome model load and passage take longer; generation speed depends on the computer's GPU.
 - A reader can only process text delivered to the browser. Content that is never present in the rendered page cannot be extracted.
 - After changing extension files, open `chrome://extensions` and click the extension's reload button.
-- Saved article text is offline, but externally hosted images and video need a connection in version 2.8. The Library shows its local storage use and provides individual and clear-all deletion controls.
+- Saved article text is offline, but externally hosted images and video need a connection in version 2.8. The Library shows its local storage use and provides individual and clear-all deletion controls. Its **Return to article** button remains available even after clearing the list.
 
 ## Versions and development
 
@@ -89,7 +89,7 @@ See [the store-publishing and product roadmap](STORE_PUBLISHING_ROADMAP.md) for 
 - `v2.6.4` keeps Safari on reliable System speech after testing exposed an upstream ONNX WebGPU hang.
 - `v2.7.0` adds the packaged macOS/iOS Safari extension and on-device Apple Enhanced/Premium voice support with Textuary's existing controls and passage highlighting.
 - `v2.7.1` improves complete-headline selection, promotes lazy-loaded article images, preserves safe native video, and removes player-interface text from the reading view.
-- `v2.8.0` adds the account-free local Library, offline clean-text snapshots, search and read/unread controls, restored reading position, storage reporting and deletion controls.
+- `v2.8.0` adds the account-free local Library, offline clean-text snapshots, search and read/unread controls, restored reading and read-aloud positions, direct return-to-article navigation, storage reporting and synchronised deletion controls.
 
 The project is a Git repository. To inspect the preserved version without changing the working tree, run `git show v1.0.0:reader.js` from this folder.
 

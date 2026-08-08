@@ -205,6 +205,8 @@ const inspection = await call("Runtime.evaluate", {
       videoSources: [...document.querySelectorAll('#lr-content video')].map((video) => ({ src: video.src, poster: video.poster, controls: video.controls, autoplay: video.autoplay })),
       sourceSources: [...document.querySelectorAll('#lr-content video source')].map((source) => source.src),
       controls: document.querySelectorAll('.lr-toolbar button').length,
+      primaryActionButtons: document.querySelectorAll('.lr-tools > button').length,
+      moreMenu: Boolean(document.querySelector('.lr-actions')),
       saveLabel: document.querySelector('#lr-save')?.textContent,
       libraryButton: Boolean(document.querySelector('#lr-library')),
       settingsSelects: document.querySelectorAll('.lr-settings-panel select').length,
@@ -233,6 +235,19 @@ const inspection = await call("Runtime.evaluate", {
   returnByValue: true
 });
 const result = JSON.parse(inspection.result.value);
+
+const printInspection = await call("Runtime.evaluate", {
+  expression: `(() => {
+    let called = false;
+    window.print = () => { called = true; };
+    const menu = document.querySelector('.lr-actions');
+    menu.open = true;
+    document.querySelector('#lr-print')?.click();
+    return JSON.stringify({ called, menuOpen: menu.open });
+  })()`,
+  returnByValue: true
+});
+const printControl = JSON.parse(printInspection.result.value);
 
 const libraryInspection = await call("Runtime.evaluate", {
   expression: `(async () => {
@@ -272,15 +287,20 @@ const speechInspection = await call("Runtime.evaluate", {
     const advancedToNextChunk = globalThis.__localReaderSpeechTest.filter(({ type }) => type === 'speak').length >= 2;
     toggle?.click();
     const afterPause = { label: toggle?.textContent, paused: speechSynthesis.paused };
+    await new Promise((resolveWait) => setTimeout(resolveWait, 60));
+    const pausePosition = globalThis.__textuaryStoredPreferences.textuarySavedArticles?.articles?.[0]?.speechIndex;
     toggle?.click();
     const afterResume = { label: toggle?.textContent, paused: speechSynthesis.paused };
     stop?.click();
+    await new Promise((resolveWait) => setTimeout(resolveWait, 60));
     return JSON.stringify({
       afterPlay,
       advancedToNextChunk,
       afterPause,
       afterResume,
       afterStop: { label: toggle?.textContent, stopDisabled: stop?.disabled, highlighted: document.querySelectorAll('.lr-speaking').length },
+      pausePosition,
+      stopPosition: globalThis.__textuaryStoredPreferences.textuarySavedArticles?.articles?.[0]?.speechIndex,
       calls: globalThis.__localReaderSpeechTest,
       firstSpokenText: globalThis.__localReaderSpeechTest.find(({ type }) => type === 'speak')?.text,
       secondSpokenText: globalThis.__localReaderSpeechTest.filter(({ type }) => type === 'speak')[1]?.text,
@@ -512,6 +532,10 @@ if (
   (expected.title && result.title !== expected.title) ||
   result.paragraphs < expected.minParagraphs ||
   result.controls !== 7 ||
+  result.primaryActionButtons !== 2 ||
+  !result.moreMenu ||
+  !printControl.called ||
+  printControl.menuOpen ||
   result.saveLabel !== "Save article" ||
   !result.libraryButton ||
   result.settingsSelects !== 4 ||
@@ -551,6 +575,8 @@ if (
   !speech.afterPause.paused ||
   speech.afterResume.label !== "Pause" ||
   speech.afterResume.paused ||
+  speech.pausePosition < 1 ||
+  speech.stopPosition !== 0 ||
   speech.afterStop.label !== "Read aloud" ||
   !speech.afterStop.stopDisabled ||
   speech.afterStop.highlighted !== 0 ||

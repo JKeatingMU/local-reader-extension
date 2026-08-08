@@ -18,7 +18,9 @@ for (const namespace of ["browser", "chrome"]) {
       async executeScript(options) { calls.push(["executeScript", options]); }
     },
     tabs: {
-      async create(options) { calls.push(["tabCreate", options]); }
+      async create(options) { calls.push(["tabCreate", options]); },
+      async update(tabId, options) { calls.push(["tabUpdate", { tabId, ...options }]); },
+      async remove(tabId) { calls.push(["tabRemove", tabId]); }
     },
     runtime: {
       onMessage: { addListener(listener) { onMessage = listener; } },
@@ -32,6 +34,7 @@ for (const namespace of ["browser", "chrome"]) {
   const context = {
     console,
     Promise,
+    URL,
     setTimeout(callback) { callback(); },
     [namespace]: api
   };
@@ -54,12 +57,28 @@ for (const namespace of ["browser", "chrome"]) {
   );
 
   calls.length = 0;
-  const libraryResponse = await onMessage({ type: "textuary-open-library" });
+  const libraryResponse = await onMessage({ type: "textuary-open-library" }, { tab: { id: 7 } });
   assert.equal(libraryResponse.ok, true, `${namespace} library response`);
   assert.ok(
-    calls.some(([type, options]) => type === "tabCreate" && options.url.endsWith("/library.html")),
+    calls.some(([type, options]) =>
+      type === "tabCreate" &&
+      options.url.endsWith("/library.html?returnTab=7") &&
+      options.openerTabId === 7
+    ),
     `${namespace} library message`
   );
+
+  calls.length = 0;
+  const returnResponse = await onMessage(
+    { type: "textuary-return-to-article", returnTabId: 7 },
+    { tab: { id: 9 } }
+  );
+  assert.equal(returnResponse.ok, true, `${namespace} return response`);
+  assert.ok(
+    calls.some(([type, options]) => type === "tabUpdate" && options.tabId === 7 && options.active),
+    `${namespace} focuses article tab`
+  );
+  assert.ok(calls.some(([type, tabId]) => type === "tabRemove" && tabId === 9), `${namespace} closes library tab`);
 
   calls.length = 0;
   const nativeResponse = await onMessage({

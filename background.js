@@ -5,17 +5,36 @@ if (!extensionApi) throw new Error("Textuary could not find a Web Extensions API
 const NATIVE_SPEECH_MESSAGE = "textuary-native-speech";
 
 if (extensionApi.runtime?.onMessage?.addListener) {
-  extensionApi.runtime.onMessage.addListener((message) => {
+  extensionApi.runtime.onMessage.addListener((message, sender) => {
     if (message?.type === "textuary-open-library") {
       if (typeof extensionApi.tabs?.create !== "function") {
         return Promise.resolve({ ok: false, error: "The browser could not open the library" });
       }
+      const returnTabId = Number.isInteger(sender?.tab?.id) ? sender.tab.id : null;
+      const libraryUrl = new URL(extensionApi.runtime.getURL("library.html"));
+      if (returnTabId !== null) libraryUrl.searchParams.set("returnTab", String(returnTabId));
       return Promise.resolve(extensionApi.tabs.create({
-        url: extensionApi.runtime.getURL("library.html")
+        url: libraryUrl.href,
+        ...(returnTabId !== null ? { openerTabId: returnTabId } : {})
       })).then(() => ({ ok: true })).catch((error) => ({
         ok: false,
         error: String(error?.message || error)
       }));
+    }
+
+    if (message?.type === "textuary-return-to-article") {
+      const libraryTabId = sender?.tab?.id;
+      const returnTabId = Number(message.returnTabId);
+      if (!Number.isInteger(libraryTabId) || typeof extensionApi.tabs?.remove !== "function") {
+        return Promise.resolve({ ok: false, error: "The browser could not close the Library tab" });
+      }
+      const focusArticle = Number.isInteger(returnTabId) && typeof extensionApi.tabs?.update === "function"
+        ? Promise.resolve(extensionApi.tabs.update(returnTabId, { active: true }))
+        : Promise.reject(new Error("The original article tab is no longer available"));
+      return focusArticle
+        .then(() => extensionApi.tabs.remove(libraryTabId))
+        .then(() => ({ ok: true }))
+        .catch((error) => ({ ok: false, error: String(error?.message || error) }));
     }
 
     if (message?.type === NATIVE_SPEECH_MESSAGE) {

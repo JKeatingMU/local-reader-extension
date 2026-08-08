@@ -54,6 +54,7 @@ const savedArticle = {
   savedAt: Date.now() - 60_000,
   updatedAt: Date.now() - 60_000,
   progress: .42,
+  speechIndex: 2,
   read: false
 };
 
@@ -83,7 +84,7 @@ await call("Page.addScriptToEvaluateOnNewDocument", {
   })()`
 });
 
-await call("Page.navigate", { url: `${fixtureOrigin}/library.html` });
+await call("Page.navigate", { url: `${fixtureOrigin}/library.html?returnTab=77` });
 await new Promise((resolve) => setTimeout(resolve, 700));
 const libraryView = await evaluate(`(() => {
   const search = document.querySelector('#library-search');
@@ -103,7 +104,9 @@ const libraryView = await evaluate(`(() => {
     count: document.querySelector('#library-count')?.textContent,
     storage: document.querySelector('#library-storage')?.textContent,
     visibleAfterMatch,
-    visibleAfterMiss
+    visibleAfterMiss,
+    returnVisible: !document.querySelector('#library-return')?.hidden,
+    returnLabel: document.querySelector('#library-return')?.textContent
   });
 })()`);
 await new Promise((resolve) => setTimeout(resolve, 100));
@@ -121,6 +124,8 @@ const savedResult = await evaluate(`JSON.stringify({
   saveLabel: document.querySelector('#lr-save')?.textContent,
   saveDisabled: document.querySelector('#lr-save')?.disabled,
   libraryButton: Boolean(document.querySelector('#lr-library')),
+  speechLabel: document.querySelector('#lr-speech-toggle')?.textContent,
+  moreMenu: Boolean(document.querySelector('.lr-actions')),
   progress: Number(document.querySelector('[role="progressbar"]')?.getAttribute('aria-valuenow'))
 })`);
 
@@ -134,6 +139,8 @@ if (
   !libraryResult.storage?.includes("stored locally") ||
   libraryResult.visibleAfterMatch !== 1 ||
   libraryResult.visibleAfterMiss !== 0 ||
+  !libraryResult.returnVisible ||
+  !libraryResult.returnLabel?.includes("Return to article") ||
   libraryResult.state.read !== true ||
   libraryResult.state.progress !== 1 ||
   !savedResult.reader ||
@@ -144,6 +151,8 @@ if (
   savedResult.saveLabel !== "Saved ✓" ||
   !savedResult.saveDisabled ||
   !savedResult.libraryButton ||
+  savedResult.speechLabel !== "Resume aloud" ||
+  !savedResult.moreMenu ||
   savedResult.progress < 35
 ) process.exitCode = 1;
 

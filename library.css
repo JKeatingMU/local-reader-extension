@@ -32,6 +32,15 @@ main {
   padding: 64px 0 30px;
 }
 
+.library-header-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 13px;
+}
+
+.library-header-actions button { white-space: nowrap; }
+
 .library-header img {
   border-radius: 18px;
   box-shadow: 0 12px 28px rgb(65 50 35 / 16%);
@@ -155,6 +164,7 @@ button:hover, .article-actions a:hover { border-color: var(--accent); }
   .library-header, main { width: min(100% - 24px, 1040px); }
   .library-header { padding-top: 36px; }
   .library-header img { width: 54px; height: 54px; }
+  .library-header-actions { align-items: center; }
   .library-controls { grid-template-columns: 1fr; }
   .article-card { grid-template-columns: 1fr; }
   .article-actions { flex-direction: row; flex-wrap: wrap; }

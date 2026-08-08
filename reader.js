@@ -96,7 +96,8 @@
       preferences,
       isSavedView: true,
       savedArticleId: saved.id,
-      savedProgress: Math.max(0, Math.min(1, Number(saved.progress) || 0))
+      savedProgress: Math.max(0, Math.min(1, Number(saved.progress) || 0)),
+      savedSpeechIndex: Math.max(0, Math.floor(Number(saved.speechIndex) || 0))
     });
   }
 
@@ -566,9 +567,14 @@
               </label>
               <button id="lr-speech-toggle" type="button">Read aloud</button>
               <button id="lr-speech-stop" type="button" disabled>Stop</button>
-              <button id="lr-save" type="button">${data.isSavedView ? "Saved ✓" : "Save article"}</button>
-              <button id="lr-library" type="button">Library</button>
-              <button id="lr-print" type="button">Print</button>
+              <details class="lr-actions">
+                <summary>More</summary>
+                <div class="lr-actions-panel" aria-label="Article actions">
+                  <button id="lr-save" type="button">${data.isSavedView ? "Saved ✓" : "Save article"}</button>
+                  <button id="lr-library" type="button">Open Library</button>
+                  <button id="lr-print" type="button">Print or PDF</button>
+                </div>
+              </details>
             </div>
             <div class="lr-progress-track" role="progressbar" aria-label="Reading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
               <div id="lr-progress-bar"></div>
@@ -609,7 +615,10 @@
       if (data.isSavedView) location.assign(data.sourceUrl);
       else location.reload();
     });
-    document.getElementById("lr-print").addEventListener("click", () => window.print());
+    document.getElementById("lr-print").addEventListener("click", () => {
+      document.querySelector(".lr-actions").open = false;
+      window.print();
+    });
     setupLibraryControls(data);
     setupReadingExperience(data);
     setupReadAloud(data);
@@ -619,10 +628,10 @@
     const save = document.getElementById("lr-save");
     const open = document.getElementById("lr-library");
     const status = document.getElementById("lr-library-status");
+    const actions = document.querySelector(".lr-actions");
     let noticeTimer = 0;
 
-    if (data.isSavedView) save.disabled = true;
-    else void reflectSavedState();
+    void reflectSavedState();
 
     save.addEventListener("click", async () => {
       save.disabled = true;
@@ -651,6 +660,7 @@
           savedAt: existing?.savedAt || now,
           updatedAt: now,
           progress,
+          speechIndex: Math.max(0, Math.floor(Number(existing?.speechIndex ?? data.savedSpeechIndex) || 0)),
           read: progress >= .95
         };
         library.articles = library.articles.filter((article) => article.id !== snapshot.id);
@@ -658,7 +668,10 @@
         await saveLibrary(library);
         data.savedArticleId = snapshot.id;
         data.savedProgress = progress;
+        data.savedSpeechIndex = snapshot.speechIndex;
         save.textContent = "Saved ✓";
+        save.disabled = true;
+        actions.open = false;
         setStatus("Saved locally. The clean article text is now available offline.");
       } catch (error) {
         save.disabled = false;
@@ -670,13 +683,10 @@
     open.addEventListener("click", async () => {
       const runtime = globalThis.browser?.runtime || globalThis.chrome?.runtime;
       if (!runtime) return;
-      if (isSavedDocument) {
-        location.assign(runtime.getURL("library.html"));
-        return;
-      }
       try {
         const response = await runtime.sendMessage({ type: "textuary-open-library" });
         if (response?.ok === false) throw new Error(response.error);
+        actions.open = false;
       } catch (error) {
         setStatus(`Could not open the Library: ${safeStorageError(error)}`, true);
       }
@@ -687,10 +697,21 @@
         const library = await loadLibrary();
         const normalizedUrl = normalizeArticleUrl(data.sourceUrl);
         const existing = library.articles.find((article) => normalizeArticleUrl(article.sourceUrl) === normalizedUrl);
-        if (!existing) return;
+        if (!existing) {
+          data.savedArticleId = "";
+          data.savedProgress = 0;
+          data.savedSpeechIndex = 0;
+          save.textContent = "Save article";
+          save.disabled = false;
+          window.dispatchEvent(new CustomEvent("textuary-library-state-changed"));
+          return;
+        }
         data.savedArticleId = existing.id;
         data.savedProgress = Number(existing.progress) || 0;
-        save.textContent = "Update saved";
+        data.savedSpeechIndex = Math.max(0, Math.floor(Number(existing.speechIndex) || 0));
+        save.textContent = "Saved ✓";
+        save.disabled = true;
+        window.dispatchEvent(new CustomEvent("textuary-library-state-changed"));
       } catch {
         // The explicit Save action will surface a useful storage error if needed.
       }
@@ -703,6 +724,27 @@
       status.dataset.error = String(isError);
       noticeTimer = setTimeout(() => { status.hidden = true; }, 5000);
     }
+
+    const storageChanged = (changes, areaName) => {
+      if ((!areaName || areaName === "local") && changes?.[LIBRARY_KEY]) void reflectSavedState();
+    };
+    (globalThis.browser?.storage?.onChanged || globalThis.chrome?.storage?.onChanged)?.addListener?.(storageChanged);
+    window.addEventListener("focus", reflectSavedState);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) void reflectSavedState();
+    });
+    document.addEventListener("click", (event) => {
+      if (actions.open && !actions.contains(event.target)) actions.open = false;
+    });
+    actions.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        actions.open = false;
+        actions.querySelector("summary").focus();
+      }
+    });
+    window.addEventListener("pagehide", () => {
+      (globalThis.browser?.storage?.onChanged || globalThis.chrome?.storage?.onChanged)?.removeListener?.(storageChanged);
+    }, { once: true });
   }
 
   function setupReadingExperience(data) {
@@ -835,7 +877,10 @@
     const naturalOption = engineSelect.querySelector('option[value="kokoro"]');
     let voices = [];
     let state = "idle";
-    let chunkIndex = 0;
+    let chunkIndex = Math.min(
+      Math.max(0, Math.floor(Number(data.savedSpeechIndex) || 0)),
+      Math.max(0, chunks.length - 1)
+    );
     let session = 0;
     let highlightedElement = null;
     let naturalContext = null;
@@ -846,6 +891,7 @@
     let appleVoicesPromise = null;
     let applePollTimer = null;
     let generationTail = Promise.resolve();
+    let speechPositionTail = Promise.resolve();
     const naturalCache = new Map();
 
     if (isSafari) {
@@ -869,7 +915,7 @@
     rateSelect.value = preferences.speechRate;
 
     engineSelect.addEventListener("change", () => {
-      stopSpeaking();
+      stopSpeaking(true);
       preferences.speechEngine = engineSelect.value;
       configureVoiceMenu();
       void savePreferences(preferences);
@@ -888,14 +934,20 @@
     });
 
     toggle.addEventListener("click", () => void handleToggle().catch((error) => {
-      stopSpeaking();
+      stopSpeaking(true);
       showNotice(`Read-aloud control failed: ${naturalSpeechError(error)}.`);
     }));
-    stop.addEventListener("click", stopSpeaking);
+    stop.addEventListener("click", () => stopSpeaking(true));
     window.addEventListener("pagehide", () => {
-      stopSpeaking();
+      rememberSpeechPosition(chunkIndex);
+      stopSpeaking(false);
       void naturalContext?.close();
     }, { once: true });
+    window.addEventListener("textuary-library-state-changed", () => {
+      if (state !== "idle") return;
+      chunkIndex = savedSpeechIndex();
+      updateSpeechControls();
+    });
 
     async function handleToggle() {
       if (state === "playing") {
@@ -903,6 +955,7 @@
         else if (engineSelect.value === "kokoro") await naturalContext?.suspend();
         else synth.pause();
         state = "paused";
+        rememberSpeechPosition(chunkIndex);
         updateSpeechControls();
         return;
       }
@@ -923,7 +976,8 @@
       }
 
       session += 1;
-      chunkIndex = 0;
+      chunkIndex = savedSpeechIndex();
+      rememberSpeechPosition(chunkIndex);
       const activeSession = session;
       if (engineSelect.value === "apple") {
         await beginAppleSpeech(activeSession);
@@ -1014,6 +1068,7 @@
           }
           if (response.state === "finished") {
             chunkIndex += 1;
+            rememberSpeechPosition(chunkIndex);
             await speakAppleNext(activeSession);
             return;
           }
@@ -1112,6 +1167,7 @@
       utterance.onend = () => {
         if (activeSession !== session) return;
         chunkIndex += 1;
+        rememberSpeechPosition(chunkIndex);
         speakSystemNext(activeSession);
       };
       utterance.onerror = (event) => {
@@ -1144,6 +1200,7 @@
           naturalSource?.disconnect();
           naturalSource = null;
           chunkIndex += 1;
+          rememberSpeechPosition(chunkIndex);
           pruneNaturalCache();
           void speakNaturalNext(activeSession);
         }, { once: true });
@@ -1254,7 +1311,7 @@
       });
     }
 
-    function stopSpeaking() {
+    function stopSpeaking(resetPosition = true) {
       session += 1;
       clearTimeout(applePollTimer);
       applePollTimer = null;
@@ -1268,7 +1325,8 @@
         naturalSource = null;
       }
       void naturalContext?.suspend();
-      chunkIndex = 0;
+      if (resetPosition) rememberSpeechPosition(0);
+      chunkIndex = resetPosition ? 0 : savedSpeechIndex();
       state = "idle";
       setSpeechStatus("");
       highlightSpokenElement(null);
@@ -1280,6 +1338,7 @@
       applePollTimer = null;
       naturalSource = null;
       void naturalContext?.suspend();
+      rememberSpeechPosition(0);
       chunkIndex = 0;
       state = "idle";
       setSpeechStatus("");
@@ -1303,11 +1362,32 @@
         paused: "Resume",
         loading: "Loading voice…",
         generating: "Preparing…"
-      })[state] || "Read aloud";
+      })[state] || (savedSpeechIndex() > 0 ? "Resume aloud" : "Read aloud");
       toggle.disabled = state === "loading" || state === "generating" || (!hasSystemSpeech && !hasNaturalSpeech && !hasAppleSpeech);
       toggle.setAttribute("aria-pressed", String(state !== "idle"));
       stop.disabled = state === "idle";
       engineSelect.disabled = state !== "idle";
+    }
+
+    function savedSpeechIndex() {
+      return Math.min(
+        Math.max(0, Math.floor(Number(data.savedSpeechIndex) || 0)),
+        Math.max(0, chunks.length - 1)
+      );
+    }
+
+    function rememberSpeechPosition(index) {
+      const normalized = Math.min(
+        Math.max(0, Math.floor(Number(index) || 0)),
+        Math.max(0, chunks.length - 1)
+      );
+      data.savedSpeechIndex = normalized;
+      if (data.savedArticleId) {
+        const articleId = data.savedArticleId;
+        speechPositionTail = speechPositionTail
+          .catch(() => {})
+          .then(() => saveArticleSpeechPosition(articleId, normalized));
+      }
     }
 
     function populateSystemVoices() {
@@ -1539,6 +1619,21 @@
       await saveLibrary(library);
     } catch (error) {
       console.info(`${PRODUCT_NAME} could not save reading progress`, error);
+    }
+  }
+
+  async function saveArticleSpeechPosition(id, speechIndex) {
+    try {
+      const library = await loadLibrary();
+      const article = library.articles.find((candidate) => candidate.id === id);
+      if (!article) return;
+      const normalized = Math.max(0, Math.floor(Number(speechIndex) || 0));
+      if ((Number(article.speechIndex) || 0) === normalized) return;
+      article.speechIndex = normalized;
+      article.lastReadAt = Date.now();
+      await saveLibrary(library);
+    } catch (error) {
+      console.info(`${PRODUCT_NAME} could not save read-aloud position`, error);
     }
   }
 
@@ -1779,17 +1874,19 @@
       #lr-speech-engine { width: 150px; }
       #lr-speech-voice { width: min(190px, 24vw); }
       #lr-speech-rate { width: 76px; }
-      .lr-settings { position: relative; }
-      .lr-settings > summary { min-height: 36px; padding: 9px 11px 7px; border: 1px solid var(--lr-line); border-radius: 7px; background: var(--lr-paper); color: var(--lr-text); cursor: pointer; list-style: none; white-space: nowrap; }
-      .lr-settings > summary::-webkit-details-marker { display: none; }
-      .lr-settings > summary::after { content: " ▾"; color: var(--lr-muted); }
-      .lr-settings[open] > summary { border-color: var(--lr-accent); color: var(--lr-accent); }
+      .lr-settings, .lr-actions { position: relative; }
+      .lr-settings > summary, .lr-actions > summary { min-height: 36px; padding: 9px 11px 7px; border: 1px solid var(--lr-line); border-radius: 7px; background: var(--lr-paper); color: var(--lr-text); cursor: pointer; list-style: none; white-space: nowrap; }
+      .lr-settings > summary::-webkit-details-marker, .lr-actions > summary::-webkit-details-marker { display: none; }
+      .lr-settings > summary::after, .lr-actions > summary::after { content: " ▾"; color: var(--lr-muted); }
+      .lr-settings[open] > summary, .lr-actions[open] > summary { border-color: var(--lr-accent); color: var(--lr-accent); }
       .lr-settings-panel { position: absolute; top: calc(100% + 10px); right: 0; display: grid; width: 300px; gap: 13px; padding: 18px; border: 1px solid var(--lr-line); border-radius: 10px; background: var(--lr-paper); box-shadow: 0 18px 50px rgba(0, 0, 0, .18); }
       .lr-settings-panel label { display: grid; gap: 6px; color: var(--lr-muted); font-size: 12px; }
       .lr-settings-panel label > span { display: flex; justify-content: space-between; }
       .lr-settings-panel select, .lr-settings-panel input { width: 100%; }
       .lr-settings-panel output { color: var(--lr-text); }
       .lr-settings-panel button { justify-self: start; }
+      .lr-actions-panel { position: absolute; z-index: 2; top: calc(100% + 10px); right: 0; display: grid; width: 190px; gap: 7px; padding: 9px; border: 1px solid var(--lr-line); border-radius: 10px; background: var(--lr-paper); box-shadow: 0 18px 50px rgba(0, 0, 0, .18); }
+      .lr-actions-panel button { width: 100%; text-align: left; }
       .lr-progress-label { min-width: 64px; color: var(--lr-muted); font-size: 12px; text-align: center; white-space: nowrap; }
       .lr-progress-track { position: absolute; right: 0; bottom: -1px; left: 0; height: 3px; overflow: hidden; background: transparent; }
       #lr-progress-bar { width: 0; height: 100%; background: var(--lr-accent); transition: width .12s linear; }

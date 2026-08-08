@@ -185,8 +185,11 @@ Still required before Chrome submission:
 - [x] reopen a saved article in the full Textuary reading experience
 - [x] search and filter the local Library
 - [x] restore reading position
+- [x] restore the current read-aloud passage after pause and reload
 - [x] read and unread state
 - [x] approximate storage usage, individual deletion and clear-all controls
+- [x] explicit Library return-to-article navigation and live saved-state synchronisation
+- [x] consolidate Save, Library and Print under a compact More menu
 - [x] update the privacy policy and README for local article storage
 - [x] automated live-package validation in Chrome and Safari modes
 - [ ] manual macOS Chrome and Safari validation
