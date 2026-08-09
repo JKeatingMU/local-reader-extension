@@ -363,11 +363,11 @@
     return `
       :host { all:initial; position:fixed; inset:0; z-index:2147483647; overflow:auto; color-scheme:light; --ink:#23221f; --muted:#746d65; --line:#d9d2c7; --paper:#f5f1e8; --sheet:#fffdf8; --accent:#0d4a86; color:var(--ink); background:var(--paper); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
       * { box-sizing:border-box; }
-      .qfp-shell { min-height:100%; --headline-font:Georgia,"Times New Roman",serif; --reading-font:Georgia,"Times New Roman",serif; --headline-min:21px; --headline-fluid:2.45vw; --headline-max:34px; --title-max:64px; --summary-size:16px; color:var(--ink); background:var(--paper); }
+      .qfp-shell { min-height:100%; --headline-font:Georgia,"Times New Roman",serif; --reading-font:Georgia,"Times New Roman",serif; --headline-min:21px; --headline-fluid:2.45vw; --headline-max:34px; --title-max:64px; --summary-size:16px; --media-min:190px; --media-width:29%; --compact-media-width:150px; color:var(--ink); background:var(--paper); }
       .qfp-font-book { --headline-font:"Iowan Old Style","Palatino Linotype",Palatino,serif; --reading-font:"Iowan Old Style","Palatino Linotype",Palatino,serif; }
       .qfp-font-clean { --headline-font:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; --reading-font:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
-      .qfp-font-small { --headline-min:18px; --headline-fluid:2vw; --headline-max:28px; --title-max:56px; --summary-size:15px; }
-      .qfp-font-large { --headline-min:24px; --headline-fluid:3vw; --headline-max:40px; --title-max:72px; --summary-size:18px; }
+      .qfp-font-small { --headline-min:18px; --headline-fluid:2vw; --headline-max:28px; --title-max:56px; --summary-size:15px; --media-min:160px; --media-width:24%; --compact-media-width:125px; }
+      .qfp-font-large { --headline-min:24px; --headline-fluid:3vw; --headline-max:40px; --title-max:72px; --summary-size:18px; --media-min:220px; --media-width:34%; --compact-media-width:180px; }
       button { color:inherit; border:1px solid var(--line); background:var(--sheet); border-radius:9px; padding:.68rem .9rem; font:600 14px/1 inherit; cursor:pointer; }
       button:hover { border-color:#9e9487; background:#fff; }
       button:disabled { cursor:default; opacity:.42; }
@@ -391,7 +391,7 @@
       .qfp-deck { max-width:680px; margin:20px 0 8px; color:#5d564f; font:400 18px/1.48 var(--reading-font); }
       .qfp-source { margin:0; color:var(--muted); font-size:13px; }
       .qfp-stories { border-top:2px solid var(--ink); }
-      .qfp-story { display:grid; grid-template-columns:minmax(190px,29%) 1fr; gap:26px; padding:22px 0; border-bottom:1px solid var(--line); }
+      .qfp-story { display:grid; grid-template-columns:minmax(var(--media-min),var(--media-width)) 1fr; gap:26px; padding:22px 0; border-bottom:1px solid var(--line); }
       .qfp-media { overflow:hidden; aspect-ratio:16/9; background:#e8e1d6; border-radius:3px; }
       .qfp-media img { display:block; width:100%; height:100%; object-fit:cover; }
       .qfp-placeholder { display:grid; place-items:center; color:#978d80; background:linear-gradient(145deg,#e9e2d7,#ded5c7); }
@@ -409,7 +409,7 @@
       .qfp-headlines-only .qfp-summary { display:none; }
       .qfp-compact main { padding-top:42px; }
       .qfp-compact .qfp-intro { margin-bottom:30px; }
-      .qfp-compact .qfp-story { grid-template-columns:150px 1fr; gap:20px; padding:15px 0; }
+      .qfp-compact .qfp-story { grid-template-columns:var(--compact-media-width) 1fr; gap:20px; padding:15px 0; }
       .qfp-compact h2 { font-size:clamp(18px,2vw,26px); }
       .qfp-font-large.qfp-compact h2 { font-size:clamp(21px,2.4vw,31px); }
       .qfp-compact .qfp-summary { font-size:14px; }

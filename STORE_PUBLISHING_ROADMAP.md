@@ -239,6 +239,7 @@ This remains a separate locally loaded prototype while the Chrome Web Store revi
 - [x] provide comfortable, compact and headlines-only views
 - [x] refine the default image and headline scale after seven-publisher manual testing
 - [x] add typeface and text-size controls plus placeholders for image-less stories
+- [x] coordinate image and placeholder scale with the selected text size
 - [x] validate extraction and controls against an intentionally cluttered local fixture
 - [x] validate generic live extraction against the Irish Mirror homepage
 - [x] manually test seven newspaper home and section pages in Chrome

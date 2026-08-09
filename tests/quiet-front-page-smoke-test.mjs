@@ -122,6 +122,9 @@ const screenshot = await call("Page.captureScreenshot", { format: "png" });
 await writeFile(screenshotPath, Buffer.from(screenshot.data, "base64"));
 let placeholderScreenshotPath = null;
 let displayScreenshotPath = null;
+let smallScreenshotPath = null;
+let largeScreenshotPath = null;
+let sizeScale = null;
 
 let controls = null;
 if (mode === "fixture") {
@@ -147,16 +150,61 @@ if (mode === "fixture") {
   displayScreenshotPath = screenshotPath.replace(/\.png$/i, "-display.png");
   await writeFile(displayScreenshotPath, Buffer.from(displayScreenshot.data, "base64"));
 
-  await call("Runtime.evaluate", {
+  const smallScaleResult = await call("Runtime.evaluate", {
     expression: `(() => {
       const quiet = document.querySelector('#textuary-quiet-front-page').shadowRoot;
       const font = quiet.getElementById('qfp-font');
       font.value = 'clean';
       font.dispatchEvent(new Event('change', { bubbles: true }));
-      quiet.getElementById('qfp-size-up').click();
+      const media = quiet.querySelector('.qfp-media');
+      const headline = quiet.querySelector('.qfp-story h2');
+      quiet.getElementById('qfp-size-down').click();
+      quiet.querySelector('.qfp-display').open = false;
+      return JSON.stringify({
+        mediaWidth: Math.round(media.getBoundingClientRect().width),
+        headlineSize: parseFloat(getComputedStyle(headline).fontSize)
+      });
     })()`,
     returnByValue: true
   });
+  const smallScale = JSON.parse(smallScaleResult.result.value);
+  await new Promise((resolveWait) => setTimeout(resolveWait, 100));
+  const smallScreenshot = await call("Page.captureScreenshot", { format: "png" });
+  smallScreenshotPath = screenshotPath.replace(/\.png$/i, "-small.png");
+  await writeFile(smallScreenshotPath, Buffer.from(smallScreenshot.data, "base64"));
+
+  const largeScaleResult = await call("Runtime.evaluate", {
+    expression: `(() => {
+      const quiet = document.querySelector('#textuary-quiet-front-page').shadowRoot;
+      const media = quiet.querySelector('.qfp-media');
+      const headline = quiet.querySelector('.qfp-story h2');
+      quiet.getElementById('qfp-size-up').click();
+      quiet.getElementById('qfp-size-up').click();
+      return JSON.stringify({
+        mediaWidth: Math.round(media.getBoundingClientRect().width),
+        headlineSize: parseFloat(getComputedStyle(headline).fontSize)
+      });
+    })()`,
+    returnByValue: true
+  });
+  const largeScale = JSON.parse(largeScaleResult.result.value);
+  await new Promise((resolveWait) => setTimeout(resolveWait, 100));
+  const largeScreenshot = await call("Page.captureScreenshot", { format: "png" });
+  largeScreenshotPath = screenshotPath.replace(/\.png$/i, "-large.png");
+  await writeFile(largeScreenshotPath, Buffer.from(largeScreenshot.data, "base64"));
+
+  sizeScale = {
+    smallMediaWidth: smallScale.mediaWidth,
+    smallHeadlineSize: smallScale.headlineSize,
+    largeMediaWidth: largeScale.mediaWidth,
+    largeHeadlineSize: largeScale.headlineSize
+  };
+  if (inspection.viewportWidth >= 900) {
+    assert(sizeScale.smallMediaWidth < inspection.mediaWidth, "Small did not reduce story-image width");
+    assert(sizeScale.largeMediaWidth > inspection.mediaWidth, "Large did not increase story-image width");
+  }
+  assert(sizeScale.smallHeadlineSize < inspection.headlineSize, "Small did not reduce headline size");
+  assert(sizeScale.largeHeadlineSize > inspection.headlineSize, "Large did not increase headline size");
   const controlRectsResult = await call("Runtime.evaluate", {
     expression: `JSON.stringify(['qfp-detail', 'qfp-density'].map((id) => {
       const rect = document.querySelector('#textuary-quiet-front-page').shadowRoot.getElementById(id).getBoundingClientRect();
@@ -195,7 +243,16 @@ if (mode === "fixture") {
   assert(controls.sizeLabel === "Large" && controls.sizeIncreaseDisabled, "text-size state did not update");
 }
 
-console.log(JSON.stringify({ ...inspection, controls, screenshotPath, placeholderScreenshotPath, displayScreenshotPath }, null, 2));
+console.log(JSON.stringify({
+  ...inspection,
+  controls,
+  sizeScale,
+  screenshotPath,
+  placeholderScreenshotPath,
+  displayScreenshotPath,
+  smallScreenshotPath,
+  largeScreenshotPath
+}, null, 2));
 socket.close();
 
 function assert(condition, message) {

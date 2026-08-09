@@ -22,7 +22,7 @@ The prototype uses only `activeTab` and `scripting`. It has no persistent site a
 - resolve ordinary and lazy-loaded images
 - remove duplicate story URLs and obvious navigation, advertising and newsletter furniture
 - use a denser default layout with comfortable and compact reading options
-- offer Editorial, Book and Clean typefaces plus three text sizes for the current view
+- offer Editorial, Book and Clean typefaces plus three coordinated text-and-image sizes for the current view
 - give image-less stories a quiet newspaper placeholder so the list keeps its visual rhythm
 
 Story links open the publisher's original article. The existing Textuary extension can then provide the full article-reading view.
