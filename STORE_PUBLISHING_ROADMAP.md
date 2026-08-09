@@ -240,8 +240,13 @@ This remains a separate locally loaded prototype while the Chrome Web Store revi
 - [x] refine the default image and headline scale after seven-publisher manual testing
 - [x] add typeface and text-size controls plus placeholders for image-less stories
 - [x] coordinate image and placeholder scale with the selected text size
+- [x] label selected stories with publisher sections inferred from their original URLs
+- [x] distinguish likely article pages using metadata, structured data and long-form body signals
+- [x] replace misleading article-page extraction with a Textuary shortcut/toolbar hand-off
 - [x] validate extraction and controls against an intentionally cluttered local fixture
 - [x] validate generic live extraction against the Irish Mirror homepage
+- [x] validate section labelling against the live Irish Mirror and The Washington Post homepages
+- [x] validate article detection against both a controlled fixture and a live Irish Mirror article
 - [x] manually test seven newspaper home and section pages in Chrome
 - [ ] decide whether this should remain a companion extension, become a Textuary mode or stop at the experiment
 

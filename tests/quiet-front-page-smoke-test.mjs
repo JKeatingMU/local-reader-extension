@@ -65,8 +65,11 @@ const inspectionResult = await call("Runtime.evaluate", {
     const root = document.querySelector('#textuary-quiet-front-page');
     const quiet = root?.shadowRoot;
     const shell = quiet?.querySelector('.qfp-shell');
+    const headline = quiet?.querySelector('.qfp-story h2');
     return JSON.stringify({
       root: Boolean(root && quiet),
+      viewMode: root?.dataset.mode || 'landing',
+      articleScore: Number(root?.dataset.articleScore || 0),
       title: document.title,
       storyCount: Number(root?.dataset.storyCount),
       cards: quiet?.querySelectorAll('.qfp-story').length || 0,
@@ -75,13 +78,17 @@ const inspectionResult = await call("Runtime.evaluate", {
       placeholders: quiet?.querySelectorAll('.qfp-placeholder').length || 0,
       imageSources: [...(quiet?.querySelectorAll('.qfp-story img') || [])].map((image) => image.src),
       links: [...(quiet?.querySelectorAll('.qfp-story h2 a') || [])].map((link) => ({ text: link.textContent.trim(), href: link.href })),
+      sections: [...(quiet?.querySelectorAll('.qfp-section') || [])].map((node) => node.textContent.trim()),
       summaries: quiet?.querySelectorAll('.qfp-summary:not(.qfp-summary-muted)').length || 0,
       toolbarButtons: quiet?.querySelectorAll('.qfp-toolbar button').length || 0,
       toolbarMenus: quiet?.querySelectorAll('.qfp-toolbar details').length || 0,
-      headlineSize: parseFloat(getComputedStyle(quiet?.querySelector('.qfp-story h2')).fontSize),
+      headlineSize: headline ? parseFloat(getComputedStyle(headline).fontSize) : 0,
       mediaWidth: Math.round(quiet?.querySelector('.qfp-media')?.getBoundingClientRect().width || 0),
       pageWidth: shell?.scrollWidth || 0,
-      viewportWidth: innerWidth
+      viewportWidth: innerWidth,
+      handoff: Boolean(quiet?.querySelector('.qfp-handoff')),
+      handoffTitle: quiet?.querySelector('#qfp-handoff-title')?.textContent || '',
+      textuaryAction: quiet?.querySelector('.qfp-textuary-action')?.textContent?.replace(/\\s+/g, ' ').trim() || ''
     });
   })()`,
   returnByValue: true
@@ -89,6 +96,50 @@ const inspectionResult = await call("Runtime.evaluate", {
 const inspection = JSON.parse(inspectionResult.result.value);
 
 assert(inspection.root, "the quiet view was not rendered");
+if (mode === "article") {
+  assert(inspection.viewMode === "article", "article page was not classified as an article");
+  assert(inspection.articleScore >= 5, `article confidence was too low at ${inspection.articleScore}`);
+  assert(inspection.handoff, "Textuary hand-off was not rendered");
+  assert(inspection.cards === 0, "article page was incorrectly converted into a story list");
+  assert(inspection.handoffTitle === "This looks like an article", "article hand-off heading is missing");
+  assert(inspection.textuaryAction.includes("Open in Textuary"), "Textuary hand-off action is missing");
+
+  const screenshot = await call("Page.captureScreenshot", { format: "png" });
+  await writeFile(screenshotPath, Buffer.from(screenshot.data, "base64"));
+  await call("Runtime.evaluate", {
+    expression: `(() => {
+      const reader = document.createElement('div');
+      reader.id = 'local-reader-view';
+      document.documentElement.append(reader);
+    })()`,
+    returnByValue: true
+  });
+  await new Promise((resolveWait) => setTimeout(resolveWait, 50));
+  const handoffRemoval = await call("Runtime.evaluate", {
+    expression: `!document.querySelector('#textuary-quiet-front-page')`,
+    returnByValue: true
+  });
+  assert(handoffRemoval.result.value, "article hand-off did not yield when Textuary opened");
+  await call("Runtime.evaluate", {
+    expression: `document.querySelector('#local-reader-view')?.remove()`,
+    returnByValue: true
+  });
+  await call("Runtime.evaluate", { expression: source, awaitPromise: true, returnByValue: true });
+  await call("Runtime.evaluate", {
+    expression: `document.querySelector('#textuary-quiet-front-page').shadowRoot
+      .getElementById('qfp-continue').click()`,
+    returnByValue: true
+  });
+  const continueRemoval = await call("Runtime.evaluate", {
+    expression: `!document.querySelector('#textuary-quiet-front-page')`,
+    returnByValue: true
+  });
+  assert(continueRemoval.result.value, "Continue on original page did not dismiss the hand-off");
+  console.log(JSON.stringify({ ...inspection, handoffRemoval: true, continueRemoval: true, screenshotPath }, null, 2));
+  socket.close();
+  process.exit(0);
+}
+
 if (mode === "fixture") {
   assert(inspection.storyCount === 6, `expected 6 stories, found ${inspection.storyCount}`);
   assert(inspection.cards === 6, `expected 6 cards, found ${inspection.cards}`);
@@ -101,6 +152,8 @@ if (mode === "fixture") {
   assert(inspection.links.every(({ href }) => new URL(href).hostname === "127.0.0.1"), "an external link survived extraction");
   assert(inspection.links[0].text.startsWith("A forgotten coastal path"), "editorial order was not preserved");
   assert(inspection.links.at(-1).text.startsWith("Citizen scientists"), "last story order changed");
+  assert(inspection.sections.length === 6, "fixture stories are missing section labels");
+  assert(inspection.sections.every(Boolean), "an empty fixture section label was rendered");
   assert(inspection.summaries === 6, "story summaries were not retained");
   assert(inspection.headlineSize <= 34, `default headline is still oversized at ${inspection.headlineSize}px`);
   if (inspection.viewportWidth >= 900) {
@@ -112,6 +165,7 @@ if (mode === "fixture") {
   assert(inspection.cards === inspection.storyCount, "live story count and card count differ");
   assert(inspection.images >= 4, `expected at least 4 live story images, found ${inspection.images}`);
   assert(inspection.links.length === inspection.storyCount, "live story links were not deduplicated");
+  assert(inspection.sections.length === inspection.storyCount, "live stories are missing section labels");
   assert(inspection.links.every(({ href }) => new URL(href).hostname.replace(/^www\./, "") === sourceHost), "a cross-publication link survived extraction");
 }
 assert(inspection.toolbarButtons === 5, "quiet-view controls are incomplete");

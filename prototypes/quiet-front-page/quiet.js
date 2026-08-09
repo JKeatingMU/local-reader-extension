@@ -10,6 +10,12 @@
     return;
   }
 
+  const pageAssessment = assessPage();
+  if (pageAssessment.kind === "article") {
+    renderArticleHandoff(pageAssessment);
+    return;
+  }
+
   const stories = collectStories();
   if (stories.length < 3) {
     showNotice("Quiet Front Page could not find a reliable list of stories on this page.");
@@ -39,10 +45,11 @@
       const image = findStoryImage(container, headline);
       const summary = findSummary(container, headline);
       const time = findTime(container);
+      const section = findStorySection(anchor, container, url);
       const score = storyScore({ anchor, heading, container, image, summary, url });
       if (score < 5) return;
 
-      const candidate = { url, headline, image, summary, time, score, order };
+      const candidate = { url, headline, image, summary, time, section, score, order };
       const existing = candidates.get(url);
       if (!existing) {
         candidates.set(url, candidate);
@@ -52,6 +59,7 @@
       existing.image ||= candidate.image;
       existing.summary ||= candidate.summary;
       existing.time ||= candidate.time;
+      existing.section ||= candidate.section;
       if (candidate.score > existing.score) {
         existing.headline = candidate.headline;
         existing.score = candidate.score;
@@ -184,6 +192,117 @@
     return value.length <= 80 ? value : "";
   }
 
+  function findStorySection(anchor, container, url) {
+    const route = routeSection(url);
+    if (route) return route;
+
+    const section = anchor.closest("section") || container.closest?.("section");
+    if (!section) return "Latest";
+    const labelled = normalizedText(
+      section.getAttribute("aria-label")
+      || section.getAttribute("data-section")
+      || section.querySelector(":scope > h1, :scope > h2, :scope > h3")?.textContent
+    );
+    return plausibleSection(labelled) ? titleCase(labelled) : "Latest";
+  }
+
+  function routeSection(value) {
+    try {
+      const parts = new URL(value).pathname.split("/").filter(Boolean);
+      if (!parts.length) return "";
+      const ignored = /^(?:article|articles|story|stories|content|index|live|latest|home|homepage|amp|p|[12]\d{3})$/i;
+      let candidate = parts.find((part) => !ignored.test(part) && !/^\d+$/.test(part)) || "";
+      if (/^news$/i.test(candidate)) {
+        candidate = parts.slice(parts.indexOf(candidate) + 1)
+          .find((part) => !ignored.test(part) && !/^\d+$/.test(part)) || candidate;
+      }
+      const label = candidate.replace(/\.[a-z0-9]+$/i, "").replace(/[-_]+/g, " ");
+      return plausibleSection(label) ? titleCase(label) : "";
+    } catch {
+      return "";
+    }
+  }
+
+  function plausibleSection(value) {
+    if (!value || value.length < 3 || value.length > 38) return false;
+    const words = value.split(/\s+/).filter(Boolean);
+    return words.length <= 5 && !/^(?:featured|recommended|more stories|related|most read)$/i.test(value);
+  }
+
+  function titleCase(value) {
+    return normalizedText(value).toLocaleLowerCase()
+      .replace(/\b\p{L}/gu, (letter) => letter.toLocaleUpperCase());
+  }
+
+  function assessPage() {
+    let score = 0;
+    const signals = [];
+    const ogType = normalizedText(document.querySelector('meta[property="og:type"]')?.content)
+      .toLocaleLowerCase();
+    if (/^(?:article|news|news_article)$/.test(ogType)) {
+      score += 4;
+      signals.push("article metadata");
+    }
+
+    if (document.querySelector('meta[property="article:published_time"], meta[name="parsely-pub-date"], meta[name="date"]')) {
+      score += 3;
+      signals.push("publication date metadata");
+    }
+
+    if (hasArticleJsonLd()) {
+      score += 4;
+      signals.push("article structured data");
+    }
+
+    const mainHeading = document.querySelector("main h1, article h1, [role='main'] h1");
+    if (isPlausibleHeadline(normalizedText(mainHeading?.textContent))) {
+      score += 1;
+      signals.push("article headline");
+    }
+
+    const articleBodies = [...document.querySelectorAll("main article, article, [role='main']")];
+    const substantialBody = articleBodies.some((node) => {
+      const paragraphs = [...node.querySelectorAll("p")]
+        .map((paragraph) => normalizedText(paragraph.textContent))
+        .filter((text) => text.length >= 45);
+      return paragraphs.length >= 4 && paragraphs.join(" ").length >= 900;
+    });
+    if (substantialBody) {
+      score += 3;
+      signals.push("long-form article body");
+    }
+
+    if (document.querySelector('[rel="author"], [class*="byline" i], [data-testid*="byline" i]')) {
+      score += 1;
+      signals.push("author byline");
+    }
+
+    const storyGridHeadings = document.querySelectorAll("main article h2, main article h3, main section h2 a, main section h3 a").length;
+    if (storyGridHeadings >= 10 && score < 7) score -= 2;
+    return { kind: score >= 5 ? "article" : "landing", score, signals };
+  }
+
+  function hasArticleJsonLd() {
+    const scripts = [...document.querySelectorAll('script[type="application/ld+json"]')];
+    return scripts.some((script) => {
+      try {
+        return jsonContainsArticleType(JSON.parse(script.textContent));
+      } catch {
+        return false;
+      }
+    });
+  }
+
+  function jsonContainsArticleType(value) {
+    if (!value || typeof value !== "object") return false;
+    if (Array.isArray(value)) return value.some(jsonContainsArticleType);
+    const types = Array.isArray(value["@type"]) ? value["@type"] : [value["@type"]];
+    if (types.some((type) => /^(?:Article|NewsArticle|ReportageNewsArticle|AnalysisNewsArticle|OpinionNewsArticle)$/i.test(type || ""))) {
+      return true;
+    }
+    return Object.values(value).some(jsonContainsArticleType);
+  }
+
   function storyScore({ anchor, heading, container, image, summary, url }) {
     let score = 0;
     if (heading) score += ({ H1: 4, H2: 3, H3: 2, H4: 1 })[heading.tagName] || 1;
@@ -267,7 +386,7 @@
           <header class="qfp-intro">
             <p class="qfp-eyebrow">TEXTUARY LAB</p>
             <h1>${escapeHtml(publication)}</h1>
-            <p class="qfp-deck">A quieter front page with ${items.length} stories from the page you selected.</p>
+            <p class="qfp-deck">A quieter front page with ${items.length} selected stories, labelled by section.</p>
             <p class="qfp-source">${escapeHtml(originalTitle)}</p>
           </header>
           <section class="qfp-stories" aria-label="Stories">
@@ -326,7 +445,7 @@
       <article class="qfp-story${story.image ? "" : " qfp-story-placeholder"}" data-story-index="${index + 1}">
         ${media}
         <div class="qfp-copy">
-          <p class="qfp-number">${String(index + 1).padStart(2, "0")}</p>
+          <p class="qfp-story-meta"><span class="qfp-number">${String(index + 1).padStart(2, "0")}</span><span class="qfp-section">${escapeHtml(story.section || "Latest")}</span></p>
           <h2><a href="${escapeAttribute(story.url)}">${escapeHtml(story.headline)}</a></h2>
           ${story.time ? `<p class="qfp-time">${escapeHtml(story.time)}</p>` : ""}
           ${story.summary ? `<p class="qfp-summary">${escapeHtml(story.summary)}</p>` : ""}
@@ -334,6 +453,49 @@
         </div>
       </article>
     `;
+  }
+
+  function renderArticleHandoff(assessment) {
+    const host = document.createElement("div");
+    host.id = ROOT_ID;
+    host.dataset.mode = "article";
+    host.dataset.articleScore = String(assessment.score);
+    const shadow = host.attachShadow({ mode: "open" });
+    const isMac = /Mac|iPhone|iPad|iPod/i.test(navigator.platform || navigator.userAgent);
+    const shortcut = isMac
+      ? '<kbd>⌥</kbd><kbd>⇧</kbd><kbd>R</kbd>'
+      : '<kbd>Alt</kbd><kbd>Shift</kbd><kbd>R</kbd>';
+    shadow.innerHTML = `
+      <style>${handoffStyles()}</style>
+      <div class="qfp-handoff-backdrop">
+        <section class="qfp-handoff" role="dialog" aria-modal="true" aria-labelledby="qfp-handoff-title">
+          <p class="qfp-handoff-eyebrow">TEXTUARY LAB</p>
+          <h1 id="qfp-handoff-title">This looks like an article</h1>
+          <p class="qfp-handoff-copy">Quiet Front Page is designed for newspaper home and section pages. Textuary is the calmer reading view for this page.</p>
+          <div class="qfp-textuary-action">
+            <strong>Open in Textuary</strong>
+            <span>Press ${shortcut} or click Textuary in Chrome's toolbar.</span>
+          </div>
+          <button id="qfp-continue" type="button">Continue on original page</button>
+        </section>
+      </div>
+    `;
+    document.documentElement.append(host);
+    const observer = new MutationObserver(() => {
+      if (!document.getElementById("local-reader-view")) return;
+      observer.disconnect();
+      host.remove();
+    });
+    shadow.getElementById("qfp-continue").addEventListener("click", () => {
+      observer.disconnect();
+      host.remove();
+    });
+    if (document.getElementById("local-reader-view")) {
+      observer.disconnect();
+      host.remove();
+      return;
+    }
+    observer.observe(document.documentElement, { childList: true, subtree: true });
   }
 
   function showNotice(message) {
@@ -398,7 +560,9 @@
       .qfp-placeholder svg { width:min(34%,92px); height:auto; fill:none; stroke:currentColor; stroke-linecap:round; stroke-width:2; opacity:.72; }
       .qfp-placeholder .qfp-placeholder-photo { fill:currentColor; stroke:none; opacity:.32; }
       .qfp-copy { align-self:center; max-width:680px; }
-      .qfp-number { margin:0 0 10px; color:var(--accent); font-size:12px; font-weight:800; letter-spacing:.12em; }
+      .qfp-story-meta { display:flex; align-items:center; gap:10px; margin:0 0 10px; }
+      .qfp-number { color:var(--accent); font-size:12px; font-weight:800; letter-spacing:.12em; }
+      .qfp-section { color:var(--muted); font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
       h2 { margin:0; font:700 clamp(var(--headline-min),var(--headline-fluid),var(--headline-max))/1.1 var(--headline-font); letter-spacing:-.02em; }
       h2 a { color:inherit; text-decoration:none; text-decoration-thickness:1px; text-underline-offset:.16em; }
       h2 a:hover { color:var(--accent); text-decoration:underline; }
@@ -432,6 +596,30 @@
         .qfp-display[open] > summary { background:#292a27; }
         .qfp-media { background:#292a27; }
         .qfp-placeholder { color:#8f887f; background:linear-gradient(145deg,#292a27,#222320); }
+      }
+    `;
+  }
+
+  function handoffStyles() {
+    return `
+      :host { all:initial; position:fixed; inset:0; z-index:2147483647; color-scheme:light; --ink:#23221f; --muted:#746d65; --line:#d9d2c7; --paper:#f5f1e8; --sheet:#fffdf8; --accent:#0d4a86; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+      * { box-sizing:border-box; }
+      .qfp-handoff-backdrop { display:grid; place-items:center; width:100%; height:100%; padding:24px; background:rgba(19,20,18,.72); backdrop-filter:blur(7px); }
+      .qfp-handoff { width:min(620px,100%); padding:42px; color:var(--ink); border:1px solid var(--line); border-radius:18px; background:var(--sheet); box-shadow:0 28px 90px rgba(0,0,0,.34); }
+      .qfp-handoff-eyebrow { margin:0 0 12px; color:var(--accent); font-size:12px; font-weight:850; letter-spacing:.16em; }
+      h1 { margin:0; font:700 clamp(36px,7vw,58px)/1 Georgia,"Times New Roman",serif; letter-spacing:-.04em; }
+      .qfp-handoff-copy { margin:20px 0 26px; color:#5d564f; font:400 18px/1.55 Georgia,"Times New Roman",serif; }
+      .qfp-textuary-action { display:grid; gap:9px; padding:19px 20px; border:1px solid var(--line); border-left:4px solid var(--accent); border-radius:10px; background:var(--paper); }
+      .qfp-textuary-action strong { font-size:17px; }
+      .qfp-textuary-action span { color:var(--muted); font-size:14px; line-height:1.55; }
+      kbd { display:inline-block; min-width:29px; margin:0 2px; padding:5px 7px; color:var(--ink); border:1px solid var(--line); border-bottom-width:2px; border-radius:6px; background:var(--sheet); font:700 12px/1 inherit; text-align:center; }
+      button { margin-top:20px; padding:.72rem .95rem; color:var(--ink); border:1px solid var(--line); border-radius:9px; background:var(--sheet); font:650 14px/1 inherit; cursor:pointer; }
+      button:hover { border-color:#9e9487; background:#fff; }
+      @media (max-width:560px) { .qfp-handoff { padding:28px 24px; } }
+      @media (prefers-color-scheme:dark) {
+        :host { color-scheme:dark; --ink:#f1eadf; --muted:#b9afa2; --line:#47443e; --paper:#151614; --sheet:#20211e; --accent:#83bce9; }
+        .qfp-handoff-copy { color:#c9c0b5; }
+        button:hover { background:#292a27; border-color:#777168; }
       }
     `;
   }

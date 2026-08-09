@@ -24,8 +24,10 @@ The prototype uses only `activeTab` and `scripting`. It has no persistent site a
 - use a denser default layout with comfortable and compact reading options
 - offer Editorial, Book and Clean typefaces plus three coordinated text-and-image sizes for the current view
 - give image-less stories a quiet newspaper placeholder so the list keeps its visual rhythm
+- label each selected story with a section inferred from its original publisher URL
+- detect likely individual articles before extraction and offer a Textuary hand-off instead
 
-Story links open the publisher's original article. The existing Textuary extension can then provide the full article-reading view.
+Story links open the publisher's original article. When Quiet Front Page is invoked directly on a likely article, it asks the reader to press `Option+Shift+R` on macOS or `Alt+Shift+R` elsewhere, or click Textuary in the browser toolbar. The hand-off automatically disappears when Textuary opens.
 
 ## Known limits
 
@@ -34,5 +36,6 @@ Story links open the publisher's original article. The existing Textuary extensi
 - Cross-subdomain story links are deliberately excluded in this first conservative prototype.
 - Infinite-scroll stories that have not yet been loaded are not included.
 - External images still require a connection.
+- Browser security prevents one extension from programmatically pressing another extension's toolbar action, so the Textuary hand-off requires its shortcut or toolbar button.
 
-The local demonstration page is `demo/news-homepage.html`.
+The local demonstration pages are `demo/news-homepage.html` and `demo/article-page.html`.
