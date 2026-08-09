@@ -34,7 +34,7 @@ Updated for Textuary 2.8.0 on 9 August 2026.
 
 ## Required before submission
 
-- [ ] complete the Windows Chrome validation in the project roadmap
+- [x] complete Windows 11 Chrome validation using the exact RC1 ZIP; optional Kokoro generation remains untested where WebGPU is available
 - [ ] register and configure the Chrome Web Store developer account
 - [ ] confirm the developer/publisher display name
 - [ ] upload the generated ZIP from `dist/chrome`

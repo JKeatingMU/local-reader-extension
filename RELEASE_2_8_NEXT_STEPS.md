@@ -2,7 +2,7 @@
 
 Status: release preparation after successful macOS Chrome and Safari validation
 
-This checklist records the work required before beginning Textuary 2.9. Version 2.8 is functionally complete; the remaining work is release preparation, Windows validation and store submission.
+This checklist records the work required before beginning Textuary 2.9. Version 2.8 is functionally complete and has passed macOS Chrome, packaged Safari and Windows 11 validation; the remaining work is final release preparation and store submission.
 
 ## 1. Close the 2.8 documentation
 
@@ -22,19 +22,20 @@ This checklist records the work required before beginning Textuary 2.9. Version 
 
 ## 3. Validate the exact release on Windows Chrome
 
-- [ ] Install the unpacked release package in ordinary Windows Chrome.
-- [ ] Confirm extraction across several ordinary public publishers.
-- [ ] Check the complete toolbar at common desktop window sizes.
-- [ ] Check paper, evening and ambient themes plus every typography control.
-- [ ] Test Windows system voices, selection and playback speed.
-- [ ] Test Kokoro/WebGPU startup, performance and fallback behaviour.
-- [ ] Test pause, resume, Stop, passage highlighting and saved-passage restoration.
-- [ ] Test Save article, Library, deletion, clear-all and Return to article.
-- [ ] Test `Alt+Shift+R`.
-- [ ] Test printing/PDF margins and the selected reader typeface.
-- [ ] Confirm there are no macOS-only assumptions in copy, paths, fonts or shortcuts.
+- [x] Install the unpacked RC1 release package in ordinary Windows 11 Chrome.
+- [x] Confirm extraction across several ordinary public publishers.
+- [x] Check the complete toolbar at common desktop window sizes.
+- [x] Check paper, evening and ambient themes plus every typography control.
+- [x] Test Windows system voices, selection and playback speed.
+- [x] Confirm graceful System-voice fallback when Chrome does not expose WebGPU; Natural (Kokoro) is disabled in that environment.
+- [ ] Test Kokoro generation and performance on WebGPU-capable Windows hardware when such a device is available. This is useful coverage but not a blocker for the optional feature's documented fallback.
+- [x] Test pause, resume, Stop, passage highlighting and saved-passage restoration.
+- [x] Test Save article, Library, deletion, clear-all and Return to article.
+- [x] Test `Alt+Shift+R`.
+- [x] Test printing/PDF margins and the selected reader typeface.
+- [x] Confirm there are no macOS-only assumptions in copy, paths, fonts or shortcuts.
 
-Record the Windows version, Chrome version, graphics adapter and any WebGPU fallback observed.
+Result recorded 9 August 2026: Windows 11 validation passed using RC1 from commit `ed65bfe`. All tested reader, Library, navigation, system-speech, shortcut and print features worked. Natural (Kokoro) was greyed out because WebGPU was unavailable to that Chrome session; the System-voice fallback worked well. Chrome version and graphics adapter were not recorded.
 
 ## 4. Create the final release
 

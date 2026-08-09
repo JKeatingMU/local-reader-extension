@@ -41,7 +41,7 @@ Before either submission:
 
 ### Required Windows Chrome validation
 
-Before submitting to the Chrome Web Store, confirm on a Windows computer that:
+Completed on Windows 11 using the exact 2.8.0 RC1 ZIP on 9 August 2026:
 
 - the unpacked extension installs and opens correctly
 - article extraction works across several ordinary publishers
@@ -53,6 +53,8 @@ Before submitting to the Chrome Web Store, confirm on a Windows computer that:
 - printing and PDF output have a clean layout
 - returning to the original page works correctly
 - no macOS-only assumptions appear in paths, fonts, shortcuts or instructions
+
+All reader, Library, navigation, shortcut, print and System-speech checks passed. Natural (Kokoro) was disabled because that Chrome session did not expose WebGPU, and Textuary correctly retained its System-voice fallback. Kokoro generation performance on WebGPU-capable Windows hardware remains useful optional coverage.
 
 ## Chrome Web Store
 
@@ -131,7 +133,6 @@ Completed on 6 August 2026:
 
 Still required before Chrome submission:
 
-- complete the Windows Chrome validation
 - complete the developer account, dashboard, upload and review steps in [`store/chrome/SUBMISSION_CHECKLIST.md`](store/chrome/SUBMISSION_CHECKLIST.md)
 
 ## Product roadmap after publication
@@ -155,7 +156,7 @@ Still required before Chrome submission:
 - [x] speak title, author, publication date and standfirst before the body
 - [x] automated Chrome control-flow test and real FP32/WebGPU generation test on macOS
 - [x] manual listening test in ordinary macOS Chrome
-- [ ] Windows Chrome WebGPU, performance and fallback test
+- [ ] Kokoro generation and performance test on WebGPU-capable Windows hardware; Windows 11 fallback behaviour passed when WebGPU was unavailable
 - [x] keep Safari System-only for 2.6 after ONNX WebGPU testing hung during first inference
 
 ### Version 2.7: native Apple Premium voices — completed on macOS 8 August 2026
@@ -196,7 +197,7 @@ Still required before Chrome submission:
 - [x] update the privacy policy and README for local article storage
 - [x] automated live-package validation in Chrome and Safari modes
 - [x] manual macOS Chrome and Safari validation
-- [ ] Windows Chrome validation
+- [x] Windows 11 Chrome validation using the exact RC1 ZIP, with expected System-voice fallback when WebGPU was unavailable
 - [ ] physical iPad/iPhone Safari test
 
 ### Version 2.8.1: media-complete offline snapshots

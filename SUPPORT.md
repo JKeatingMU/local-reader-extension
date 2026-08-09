@@ -11,6 +11,7 @@
 ## Natural and Premium voice troubleshooting
 
 - Natural (Kokoro) speech requires a WebGPU-capable Chrome browser and graphics adapter.
+- If **Natural (Kokoro)** is greyed out in the Voice menu, that Chrome session has not exposed the WebGPU capability Textuary needs. System voices remain fully available.
 - The first activation downloads and caches approximately 330 MB of model data. Check the internet connection and allow time for the progress message to complete.
 - The first passage is slower than later passages. Performance varies by GPU; Textuary prepares one passage ahead to reduce pauses.
 - If Natural speech fails, open **Voice** and switch **Speech engine** to **System**. Article reading and system read-aloud do not depend on the Kokoro model.
