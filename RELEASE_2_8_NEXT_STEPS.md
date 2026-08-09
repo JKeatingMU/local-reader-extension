@@ -67,6 +67,8 @@ Submitted 9 August 2026 under publisher **J. G. Keating**. Chrome Web Store item
 
 ## 6. Prepare Safari/App Store distribution
 
+Status: **repository preparation complete; paid App Store distribution deferred by choice on 9 August 2026**. Textuary continues to work through the local packaged Safari installation. Resume this section only if the user later chooses to join the paid Apple Developer Program.
+
 - [x] Decide that the first Apple release is macOS-only; iPhone/iPad support will not be claimed without physical-device testing.
 - [ ] Confirm Apple Developer Program membership and agreements.
 - [x] Assign production bundle identifiers and version/build numbers; signing awaits the Apple team.
@@ -78,7 +80,7 @@ Submitted 9 August 2026 under publisher **J. G. Keating**. Chrome Web Store item
 - [ ] Test the uploaded build locally or through TestFlight.
 - [ ] Complete compliance questions and submit for App Review.
 
-Repository audit completed 9 August 2026: the unsigned Release archive succeeds as a universal `arm64`/`x86_64` macOS application containing the Safari extension. The packaged app declares Productivity as its category and `ITSAppUsesNonExemptEncryption = NO`. No valid local code-signing identity is currently installed, so the remaining build work begins with Apple Developer membership and Xcode team configuration. See [`store/apple/SUBMISSION_CHECKLIST.md`](store/apple/SUBMISSION_CHECKLIST.md).
+Repository audit completed 9 August 2026: the unsigned Release archive succeeds as a universal `arm64`/`x86_64` macOS application containing the Safari extension. The packaged app declares Productivity as its category and `ITSAppUsesNonExemptEncryption = NO`. No valid local code-signing identity is currently installed. Public Apple distribution is deferred rather than blocked by a technical defect; the remaining build work begins with paid Apple Developer membership and Xcode team configuration whenever the user chooses to resume it. See [`store/apple/SUBMISSION_CHECKLIST.md`](store/apple/SUBMISSION_CHECKLIST.md).
 
 ## 7. Validate iPad/iPhone before claiming support
 

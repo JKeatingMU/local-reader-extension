@@ -112,7 +112,7 @@ Preparation completed on 9 August 2026:
 - removed unused file-access and outgoing-network entitlements from the macOS targets
 - prepared Apple-specific product copy, privacy rationale, reviewer instructions and a submission checklist under [`store/apple`](store/apple)
 
-The next Apple action is account-side: confirm Apple Developer Program membership, add the Apple team to Xcode, then create and upload a signed App Store Connect build. The current Mac has no valid code-signing identity installed.
+Public Apple distribution was deliberately deferred on 9 August 2026 because the account has no paid Apple Developer Program membership and the user does not want to add an annual fee for the free extension yet. The local packaged Safari installation remains the supported personal route. When the App Store work is resumed, the next action is account-side: join the program, add the Apple team to Xcode, then create and upload a signed App Store Connect build.
 
 ## Suggested sequence
 

@@ -4,6 +4,8 @@ Prepared for Textuary 2.8.0 on 9 August 2026.
 
 The first Apple release is deliberately **macOS-only**. iPhone and iPad support remain outside the listing until the physical-device workflow has been built and tested.
 
+**Current status:** prepared but deliberately deferred. The user chose on 9 August 2026 to continue with Chrome Web Store distribution and retain the local Safari installation rather than pay for Apple Developer Program membership for this free extension. Preserve this checklist as the restart point.
+
 ## Completed in the repository
 
 - [x] macOS containing app and Safari Web Extension targets
@@ -82,9 +84,9 @@ The first Apple release is deliberately **macOS-only**. iPhone and iPad support 
 - [ ] Preserve screenshots and the exact text of any reviewer question before changing the build or declarations.
 - [ ] After approval, inspect the staged product page and manually release the version.
 
-## Current blocker
+## Deferred account dependency
 
-The local Mac currently has no valid code-signing identity. Repository preparation and unsigned archive validation are complete, but signing, upload and App Store Connect record creation require the account owner to have an active Apple Developer Program membership and add that account/team to Xcode.
+The local Mac currently has no valid code-signing identity. Repository preparation and unsigned archive validation are complete, but signing, upload and App Store Connect record creation require the account owner to join the paid Apple Developer Program and add that account/team to Xcode. This is a conscious distribution decision, not a Textuary defect.
 
 ## Verification command
 
