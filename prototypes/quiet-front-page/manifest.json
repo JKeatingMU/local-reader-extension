@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Quiet Front Page — Textuary Lab",
+  "short_name": "Quiet Front Page",
+  "version": "0.1.0",
+  "description": "An experimental local cleaner for newspaper landing and section pages.",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "action": {
+    "default_title": "Open Quiet Front Page"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Alt+Shift+F",
+        "mac": "Alt+Shift+F"
+      },
+      "description": "Clean the current newspaper front page"
+    }
+  },
+  "browser_specific_settings": {
+    "safari": {
+      "strict_min_version": "15.4"
+    }
+  }
+}

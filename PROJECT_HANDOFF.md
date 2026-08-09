@@ -133,6 +133,12 @@ Chrome is waiting on Google. Mac App Store repository preparation is complete fo
 
 The detailed distribution sequence is in [`RELEASE_2_8_NEXT_STEPS.md`](RELEASE_2_8_NEXT_STEPS.md) and [`STORE_PUBLISHING_ROADMAP.md`](STORE_PUBLISHING_ROADMAP.md).
 
+## Pre-2.9 Quiet Front Page experiment
+
+An isolated local extension prototype now lives at [`prototypes/quiet-front-page`](prototypes/quiet-front-page). It converts newspaper home and section pages into an ordered image-and-headline list, preserving original publisher links. It does not modify the submitted Textuary 2.8 runtime or package.
+
+The first implementation uses generic semantic and repeated-card heuristics rather than publisher-specific adapters. Automated fixture coverage validates story filtering, deduplication, lazy images, order, responsive width and all view controls. A live Irish Mirror homepage run produced a clean list of 80 same-publication stories with images and no duplicate links. The next step is manual testing across a small, varied set of newspaper home and section pages before deciding whether it should remain a companion, become a Textuary mode or be abandoned.
+
 ## Planned version 2.9
 
 Version 2.9 augments saved reading rather than changing extraction. The agreed scope is:

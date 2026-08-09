@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta property="og:site_name" content="The Morning Ledger">
+  <title>The Morning Ledger — News, culture and ideas</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; color: #202020; background: #fff; font-family: Arial, sans-serif; }
+    .demo-control { position: sticky; top: 0; z-index: 20; display: flex; justify-content: center; padding: 10px; color: #fff; background: #202020; }
+    .demo-control button { padding: 10px 16px; color: #fff; border: 1px solid #777; border-radius: 6px; background: #333; font-weight: 700; cursor: pointer; }
+    .site-header { padding: 22px 5vw; color: white; background: #a51624; }
+    .site-header strong { font: 800 38px Georgia, serif; }
+    nav { display: flex; gap: 28px; padding: 14px 5vw; border-bottom: 1px solid #bbb; font-weight: 700; }
+    nav a { color: inherit; text-decoration: none; }
+    .ticker { padding: 12px 5vw; color: #fff; background: #333; }
+    .page { display: grid; grid-template-columns: 1fr 280px; gap: 28px; width: min(1180px, 92vw); margin: 30px auto; }
+    .advert { display: grid; place-items: center; min-height: 180px; color: #777; border: 1px dashed #999; background: #f3f3f3; letter-spacing: .14em; }
+    .stories { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+    article { border: 1px solid #d6d6d6; background: white; box-shadow: 0 8px 20px rgba(0,0,0,.08); }
+    article img { display: block; width: 100%; aspect-ratio: 16/10; object-fit: cover; }
+    article div { padding: 18px; }
+    article h2, article h3 { margin: 0; font: 700 27px/1.1 Georgia, serif; }
+    article a { color: inherit; text-decoration: none; }
+    article p { color: #555; line-height: 1.5; }
+    article time { color: #a51624; font-size: 13px; font-weight: 700; }
+    .newsletter { margin-top: 24px; padding: 24px; color: white; background: #265a87; }
+    footer { padding: 50px 5vw; color: #eee; background: #222; }
+    @media (max-width: 760px) { .page { grid-template-columns: 1fr; } .stories { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="demo-control"><button id="open-quiet" type="button">Open Quiet Front Page prototype</button></div>
+  <header class="site-header"><strong>The Morning Ledger</strong></header>
+  <nav aria-label="Primary navigation">
+    <a href="/news">News</a><a href="/world">World</a><a href="/culture">Culture</a><a href="/science">Science</a><a href="/opinion">Opinion</a>
+  </nav>
+  <div class="ticker">LIVE: Updates, promotions, weather, newsletters and considerably more motion than anyone requested.</div>
+  <main class="page">
+    <section class="stories" aria-label="Top stories">
+      <article>
+        <img src="assets/coast.svg" alt="A quiet path following a bright Atlantic coastline">
+        <div><h2><a href="stories/coastal-path.html">A forgotten coastal path is becoming a treasured public space again</a></h2><time>18 minutes ago</time><p>Local volunteers have restored a peaceful route connecting three villages along the Atlantic shore.</p></div>
+      </article>
+      <article>
+        <img src="assets/city.svg" alt="People walking through a calm city square">
+        <div><h2><a href="stories/city-square.html">The city square redesigned around conversation rather than traffic</a></h2><time>42 minutes ago</time><p>A modest civic project shows how seating, trees and slower streets can change the rhythm of a neighbourhood.</p></div>
+      </article>
+      <article>
+        <img src="assets/books.svg" alt="Books arranged beside a reading lamp">
+        <div><h3><a href="stories/library-hours.html">Why late library opening hours are drawing an entirely new readership</a></h3><p>Evening access has made the local library part study room, part refuge and part cultural meeting place.</p></div>
+      </article>
+      <article>
+        <img src="assets/garden.svg" alt="A community garden in summer">
+        <div><h3><a href="stories/community-garden.html">The small community garden producing much more than vegetables</a></h3><time>Today</time><p>Residents describe how an overlooked strip of land became the most sociable place on their street.</p></div>
+      </article>
+      <article>
+        <div><h3><a href="stories/radio-archive.html">Thousands of historic radio recordings will become freely available this autumn</a></h3><p>The newly catalogued collection spans oral history, music, drama and decades of everyday voices.</p></div>
+      </article>
+      <article>
+        <img data-src="assets/river.svg" src="assets/placeholder.svg" alt="A river passing through woodland">
+        <div><h3><a href="stories/river-project.html">Citizen scientists map the remarkable return of wildlife to an urban river</a></h3><p>Five years of careful observation reveal a waterway recovering in ways few researchers expected.</p></div>
+      </article>
+    </section>
+    <aside>
+      <div class="advert">ADVERTISEMENT</div>
+      <section class="newsletter"><h2>Get every alert immediately</h2><p>Newsletters, competitions, partner messages and a daily cascade of notifications.</p><a href="/subscribe">Subscribe now</a></section>
+      <div class="advert" style="margin-top:24px">ADVERTISEMENT</div>
+    </aside>
+  </main>
+  <footer><a href="/privacy">Privacy</a> · <a href="/cookies">Cookies</a> · <a href="/contact">Contact us</a></footer>
+  <script>
+    document.getElementById("open-quiet").addEventListener("click", () => {
+      const script = document.createElement("script");
+      script.src = "../quiet.js";
+      document.head.append(script);
+    });
+  </script>
+</body>
+</html>

@@ -76,6 +76,8 @@ For the current release, store-review status, known limitations and exact resume
 
 See [the store-publishing and product roadmap](STORE_PUBLISHING_ROADMAP.md) for the planned Chrome Web Store and Safari App Store releases and the proposed reading-experience, offline-library and export features.
 
+An intentionally separate local experiment, [Quiet Front Page — Textuary Lab](prototypes/quiet-front-page), turns newspaper home and section pages into calm image-and-headline lists. It is not part of the submitted Textuary 2.8 package.
+
 - `v1.0.0` is the preserved Daily Mail-specific implementation.
 - `v2.0.0` introduced the generic Local Reader implementation.
 - `v2.1.0` adds comparison with the original page HTML for more resilient extraction.

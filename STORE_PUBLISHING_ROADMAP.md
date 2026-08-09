@@ -227,6 +227,23 @@ Next Chrome action: monitor the verified developer email and dashboard, answer a
 - evaluate whether video should remain linked rather than cached because of storage cost
 - update privacy and store disclosures if storage behaviour or permissions change
 
+### Pre-2.9 experiment: Quiet Front Page — Textuary Lab
+
+This remains a separate locally loaded prototype while the Chrome Web Store reviews Textuary 2.8. Its purpose is to test whether Textuary's quiet-reading idea also works for newspaper home and section pages without changing the released article reader.
+
+- [x] create a standalone Manifest V3 prototype using only `activeTab` and `scripting`
+- [x] infer story cards from semantic headings, links, images and repeated page structure
+- [x] preserve approximate editorial order and original publisher links
+- [x] resolve ordinary and common lazy-loaded images
+- [x] exclude obvious navigation, advertising, newsletter and duplicate-link furniture
+- [x] provide comfortable, compact and headlines-only views
+- [x] validate extraction and controls against an intentionally cluttered local fixture
+- [x] validate generic live extraction against the Irish Mirror homepage
+- [ ] manually test several home and section pages across publishers in Chrome
+- [ ] decide whether this should remain a companion extension, become a Textuary mode or stop at the experiment
+
+Prototype and installation notes: [`prototypes/quiet-front-page`](prototypes/quiet-front-page)
+
 ### Version 2.9: personal reading archive
 
 Detailed design: [`VERSION_2_9_PLAN.md`](VERSION_2_9_PLAN.md)
