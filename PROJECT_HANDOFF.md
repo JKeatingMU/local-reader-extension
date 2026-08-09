@@ -137,7 +137,7 @@ The detailed distribution sequence is in [`RELEASE_2_8_NEXT_STEPS.md`](RELEASE_2
 
 An isolated local extension prototype now lives at [`prototypes/quiet-front-page`](prototypes/quiet-front-page). It converts newspaper home and section pages into an ordered image-and-headline list, preserving original publisher links. It does not modify the submitted Textuary 2.8 runtime or package.
 
-The first implementation uses generic semantic and repeated-card heuristics rather than publisher-specific adapters. Automated fixture coverage validates story filtering, deduplication, lazy images, order, responsive width and all view controls. A live Irish Mirror homepage run produced a clean list of 80 same-publication stories with images and no duplicate links. The next step is manual testing across a small, varied set of newspaper home and section pages before deciding whether it should remain a companion, become a Textuary mode or be abandoned.
+The implementation uses generic semantic and repeated-card heuristics rather than publisher-specific adapters. Automated fixture coverage validates story filtering, deduplication, lazy images, order, responsive width and all view controls. A live Irish Mirror homepage run produced a clean list of 80 same-publication stories with images and no duplicate links. Manual testing then succeeded across seven newspaper sites. Version 0.2 responds to that test with smaller default headlines and images, three typeface and text-size choices, and quiet placeholders for image-less stories. The next decision is whether it should remain a companion, become a Textuary mode or stop at the experiment.
 
 ## Planned version 2.9
 

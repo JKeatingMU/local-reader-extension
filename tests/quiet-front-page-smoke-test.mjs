@@ -5,6 +5,8 @@ const port = Number(process.argv[2] || 9352);
 const fixtureUrl = process.argv[3];
 const screenshotPath = process.argv[4] || "/private/tmp/quiet-front-page-preview.png";
 const mode = process.argv[5] || "fixture";
+const viewportWidth = Number(process.argv[6] || 1280);
+const viewportHeight = Number(process.argv[7] || 800);
 if (!fixtureUrl) {
   throw new Error("Usage: node tests/quiet-front-page-smoke-test.mjs <debug-port> <fixture-url> [screenshot-path]");
 }
@@ -39,8 +41,8 @@ function call(method, params = {}) {
 await call("Page.enable");
 await call("Runtime.enable");
 await call("Emulation.setDeviceMetricsOverride", {
-  width: 1280,
-  height: 800,
+  width: viewportWidth,
+  height: viewportHeight,
   deviceScaleFactor: 1,
   mobile: false
 });
@@ -69,10 +71,15 @@ const inspectionResult = await call("Runtime.evaluate", {
       storyCount: Number(root?.dataset.storyCount),
       cards: quiet?.querySelectorAll('.qfp-story').length || 0,
       images: quiet?.querySelectorAll('.qfp-story img').length || 0,
+      media: quiet?.querySelectorAll('.qfp-media').length || 0,
+      placeholders: quiet?.querySelectorAll('.qfp-placeholder').length || 0,
       imageSources: [...(quiet?.querySelectorAll('.qfp-story img') || [])].map((image) => image.src),
       links: [...(quiet?.querySelectorAll('.qfp-story h2 a') || [])].map((link) => ({ text: link.textContent.trim(), href: link.href })),
       summaries: quiet?.querySelectorAll('.qfp-summary:not(.qfp-summary-muted)').length || 0,
       toolbarButtons: quiet?.querySelectorAll('.qfp-toolbar button').length || 0,
+      toolbarMenus: quiet?.querySelectorAll('.qfp-toolbar details').length || 0,
+      headlineSize: parseFloat(getComputedStyle(quiet?.querySelector('.qfp-story h2')).fontSize),
+      mediaWidth: Math.round(quiet?.querySelector('.qfp-media')?.getBoundingClientRect().width || 0),
       pageWidth: shell?.scrollWidth || 0,
       viewportWidth: innerWidth
     });
@@ -86,6 +93,8 @@ if (mode === "fixture") {
   assert(inspection.storyCount === 6, `expected 6 stories, found ${inspection.storyCount}`);
   assert(inspection.cards === 6, `expected 6 cards, found ${inspection.cards}`);
   assert(inspection.images === 5, `expected 5 story images, found ${inspection.images}`);
+  assert(inspection.media === 6, "every fixture story should retain a media column");
+  assert(inspection.placeholders === 1, `expected one image placeholder, found ${inspection.placeholders}`);
   assert(inspection.imageSources.some((url) => url.endsWith("/river.svg")), "lazy-loaded river image was not promoted");
   assert(!inspection.imageSources.some((url) => url.endsWith("/placeholder.svg")), "placeholder image survived extraction");
   assert(inspection.links.length === 6, "story links were not deduplicated");
@@ -93,6 +102,10 @@ if (mode === "fixture") {
   assert(inspection.links[0].text.startsWith("A forgotten coastal path"), "editorial order was not preserved");
   assert(inspection.links.at(-1).text.startsWith("Citizen scientists"), "last story order changed");
   assert(inspection.summaries === 6, "story summaries were not retained");
+  assert(inspection.headlineSize <= 34, `default headline is still oversized at ${inspection.headlineSize}px`);
+  if (inspection.viewportWidth >= 900) {
+    assert(inspection.mediaWidth <= 330, `default story image is still oversized at ${inspection.mediaWidth}px`);
+  }
 } else {
   const sourceHost = new URL(fixtureUrl).hostname.replace(/^www\./, "");
   assert(inspection.storyCount >= 8, `expected at least 8 live stories, found ${inspection.storyCount}`);
@@ -101,14 +114,49 @@ if (mode === "fixture") {
   assert(inspection.links.length === inspection.storyCount, "live story links were not deduplicated");
   assert(inspection.links.every(({ href }) => new URL(href).hostname.replace(/^www\./, "") === sourceHost), "a cross-publication link survived extraction");
 }
-assert(inspection.toolbarButtons === 3, "quiet-view controls are incomplete");
+assert(inspection.toolbarButtons === 5, "quiet-view controls are incomplete");
+assert(inspection.toolbarMenus === 1, "display menu is missing");
 assert(inspection.pageWidth <= inspection.viewportWidth, "quiet view has horizontal overflow");
 
 const screenshot = await call("Page.captureScreenshot", { format: "png" });
 await writeFile(screenshotPath, Buffer.from(screenshot.data, "base64"));
+let placeholderScreenshotPath = null;
+let displayScreenshotPath = null;
 
 let controls = null;
 if (mode === "fixture") {
+  await call("Runtime.evaluate", {
+    expression: `document.querySelector('#textuary-quiet-front-page').shadowRoot
+      .querySelector('.qfp-placeholder').scrollIntoView({ block: 'center' })`,
+    returnByValue: true
+  });
+  await new Promise((resolveWait) => setTimeout(resolveWait, 100));
+  const placeholderScreenshot = await call("Page.captureScreenshot", { format: "png" });
+  placeholderScreenshotPath = screenshotPath.replace(/\.png$/i, "-placeholder.png");
+  await writeFile(placeholderScreenshotPath, Buffer.from(placeholderScreenshot.data, "base64"));
+
+  await call("Runtime.evaluate", {
+    expression: `(() => {
+      const quiet = document.querySelector('#textuary-quiet-front-page').shadowRoot;
+      quiet.querySelector('.qfp-display').open = true;
+    })()`,
+    returnByValue: true
+  });
+  await new Promise((resolveWait) => setTimeout(resolveWait, 100));
+  const displayScreenshot = await call("Page.captureScreenshot", { format: "png" });
+  displayScreenshotPath = screenshotPath.replace(/\.png$/i, "-display.png");
+  await writeFile(displayScreenshotPath, Buffer.from(displayScreenshot.data, "base64"));
+
+  await call("Runtime.evaluate", {
+    expression: `(() => {
+      const quiet = document.querySelector('#textuary-quiet-front-page').shadowRoot;
+      const font = quiet.getElementById('qfp-font');
+      font.value = 'clean';
+      font.dispatchEvent(new Event('change', { bubbles: true }));
+      quiet.getElementById('qfp-size-up').click();
+    })()`,
+    returnByValue: true
+  });
   const controlRectsResult = await call("Runtime.evaluate", {
     expression: `JSON.stringify(['qfp-detail', 'qfp-density'].map((id) => {
       const rect = document.querySelector('#textuary-quiet-front-page').shadowRoot.getElementById(id).getBoundingClientRect();
@@ -128,19 +176,26 @@ if (mode === "fixture") {
       return JSON.stringify({
         headlinesOnly: shell.classList.contains('qfp-headlines-only'),
         compact: shell.classList.contains('qfp-compact'),
+        cleanTypeface: shell.classList.contains('qfp-font-clean'),
+        largeText: shell.classList.contains('qfp-font-large'),
         detailLabel: quiet.getElementById('qfp-detail').textContent,
-        densityLabel: quiet.getElementById('qfp-density').textContent
+        densityLabel: quiet.getElementById('qfp-density').textContent,
+        sizeLabel: quiet.getElementById('qfp-size-label').textContent,
+        sizeIncreaseDisabled: quiet.getElementById('qfp-size-up').disabled
       });
     })()`,
     returnByValue: true
   });
   controls = JSON.parse(controlResult.result.value);
   assert(controls.headlinesOnly && controls.compact, "view controls did not update the layout");
+  assert(controls.cleanTypeface, "typeface control did not update the layout");
+  assert(controls.largeText, "text-size control did not update the layout");
   assert(controls.detailLabel === "Show summaries", "summary control label did not update");
   assert(controls.densityLabel === "Comfortable view", "density control label did not update");
+  assert(controls.sizeLabel === "Large" && controls.sizeIncreaseDisabled, "text-size state did not update");
 }
 
-console.log(JSON.stringify({ ...inspection, controls, screenshotPath }, null, 2));
+console.log(JSON.stringify({ ...inspection, controls, screenshotPath, placeholderScreenshotPath, displayScreenshotPath }, null, 2));
 socket.close();
 
 function assert(condition, message) {

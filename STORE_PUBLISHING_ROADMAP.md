@@ -237,9 +237,11 @@ This remains a separate locally loaded prototype while the Chrome Web Store revi
 - [x] resolve ordinary and common lazy-loaded images
 - [x] exclude obvious navigation, advertising, newsletter and duplicate-link furniture
 - [x] provide comfortable, compact and headlines-only views
+- [x] refine the default image and headline scale after seven-publisher manual testing
+- [x] add typeface and text-size controls plus placeholders for image-less stories
 - [x] validate extraction and controls against an intentionally cluttered local fixture
 - [x] validate generic live extraction against the Irish Mirror homepage
-- [ ] manually test several home and section pages across publishers in Chrome
+- [x] manually test seven newspaper home and section pages in Chrome
 - [ ] decide whether this should remain a companion extension, become a Textuary mode or stop at the experiment
 
 Prototype and installation notes: [`prototypes/quiet-front-page`](prototypes/quiet-front-page)
