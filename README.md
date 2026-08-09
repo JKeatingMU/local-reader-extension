@@ -72,6 +72,8 @@ Chrome Web Store preparation materials are under [`store/chrome`](store/chrome),
 
 ## Versions and development
 
+For the current release, store-review status, known limitations and exact resume steps, start with the [project handoff](PROJECT_HANDOFF.md).
+
 See [the store-publishing and product roadmap](STORE_PUBLISHING_ROADMAP.md) for the planned Chrome Web Store and Safari App Store releases and the proposed reading-experience, offline-library and export features.
 
 - `v1.0.0` is the preserved Daily Mail-specific implementation.
