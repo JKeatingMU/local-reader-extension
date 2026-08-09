@@ -57,6 +57,7 @@ Stores the user's selected theme, typography, speech engine, voice, speech speed
 
 ## Privacy declarations
 
+- Dashboard data categories: **Location**, **Web history**, **User activity** and **Website content**. Location covers ordinary IP/request metadata received by Hugging Face only when the user opts into the Natural-voice model download. The other categories cover the user-selected page and URL plus locally retained reading progress for explicitly saved articles.
 - Website content and the active page URL are processed locally solely to provide the reader feature requested by the user.
 - Theme, typography, voice and speech-speed preferences are stored locally through browser extension storage.
 - Clean article HTML, its original URL, metadata and reading state are stored locally only after the user explicitly chooses **Save article**. Saved entries are not uploaded or synchronised by Textuary and can be individually deleted or cleared from the Library.

@@ -18,6 +18,8 @@ In the packaged Safari version, Premium (Apple) speech passes short article pass
 
 ## Collection, transmission and sharing
 
+Textuary's use of information received from Chrome APIs adheres to the [Chrome Web Store User Data Policy](https://developer.chrome.com/docs/webstore/program-policies/user-data), including its Limited Use requirements. Textuary uses that information only to provide or improve its user-facing reading, listening, printing and local Library features.
+
 Textuary does not:
 
 - transmit article text, page URLs or browsing activity to the developer
