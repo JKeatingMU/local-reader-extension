@@ -30,7 +30,7 @@ Updated for Textuary 2.8.0 on 9 August 2026.
 - [x] refresh all listing screenshots from the finished 2.8 interface
 - [x] refresh the detailed description, `storage` justification and reviewer instructions for version 2.8
 - [x] re-run package and store-asset validation after the refresh
-- [ ] merge the release candidate to `main`, tag `v2.8.0` and publish a GitHub release
+- [x] merge the release candidate to `main`, tag `v2.8.0` and publish a GitHub release
 
 ## Required before submission
 

@@ -1,6 +1,6 @@
 # Textuary 2.8 Release Next Steps
 
-Status: release preparation after successful macOS Chrome and Safari validation
+Status: version 2.8.0 released after successful macOS Chrome, packaged Safari and Windows 11 validation
 
 This checklist records the work required before beginning Textuary 2.9. Version 2.8 is functionally complete and has passed macOS Chrome, packaged Safari and Windows 11 validation; the remaining work is final release preparation and store submission.
 
@@ -39,13 +39,15 @@ Result recorded 9 August 2026: Windows 11 validation passed using RC1 from commi
 
 ## 4. Create the final release
 
-- [ ] Merge `feature/safari-native-premium-voices` into `main` without losing the preserved history.
-- [ ] Confirm all manifests, package metadata and Xcode targets use version 2.8.0 and an appropriate build number.
-- [ ] Run the complete automated checks and `npm run release:chrome`.
-- [ ] Test the exact generated ZIP on macOS and Windows rather than relying only on the working directory.
-- [ ] Create a checksum for the final ZIP.
-- [ ] Tag `v2.8.0`.
-- [ ] Create a GitHub release containing release notes, the Chrome ZIP and the checksum.
+- [x] Merge `feature/safari-native-premium-voices` into `main` without losing the preserved history.
+- [x] Confirm all manifests, package metadata and Xcode targets use version 2.8.0 and an appropriate build number.
+- [x] Run the complete automated checks and `npm run release:chrome`.
+- [x] Verify the exact generated ZIP on macOS and compare its unpacked contents byte-for-byte with the Windows-tested RC1 package.
+- [x] Create a checksum for the final ZIP.
+- [x] Tag `v2.8.0`.
+- [x] Create a GitHub release containing release notes, the Chrome ZIP and the checksum.
+
+Released 9 August 2026: [Textuary 2.8.0](https://github.com/JKeatingMU/local-reader-extension/releases/tag/v2.8.0). Final Chrome ZIP SHA-256: `4d8fdb8478d8e3c0a91f1a3c484040816bccb6842eae3d73066ecef9102ea0cf`. The rebuilt ZIP container differs from RC1 because of archive metadata, but its unpacked runtime files have no differences from the package validated on Windows 11.
 
 ## 5. Submit to the Chrome Web Store
 
