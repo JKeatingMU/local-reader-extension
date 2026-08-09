@@ -12,7 +12,7 @@ const screenshotTheme = process.argv[9] || "light";
 const screenshotState = process.argv[10] || "reader";
 const speechPlatform = process.argv[11] || "chrome";
 if (!fixtureUrl) {
-  throw new Error("Usage: node tests/chrome-smoke-test.mjs <debug-port> <fixture-url> [fixture-name] [source-root] [screenshot-path] [width] [height] [light|dark] [reader|settings|voice] [chrome|safari]");
+  throw new Error("Usage: node tests/chrome-smoke-test.mjs <debug-port> <fixture-url> [fixture-name] [source-root] [screenshot-path] [width] [height] [light|dark] [reader|settings|voice|voice-natural] [chrome|safari]");
 }
 
 const targets = await fetch(`http://127.0.0.1:${port}/json/list`).then((response) => response.json());
@@ -428,6 +428,14 @@ await call("Runtime.evaluate", {
       rate.value = '1';
       rate.dispatchEvent(new Event('change'));
     }
+    if (${JSON.stringify(screenshotState)} === 'voice-natural' && engine) {
+      engine.value = 'kokoro';
+      engine.dispatchEvent(new Event('change'));
+      if (voice) {
+        voice.value = 'bf_emma';
+        voice.dispatchEvent(new Event('change'));
+      }
+    }
     const theme = document.querySelector('#lr-theme');
     if (theme) {
       theme.value = ${JSON.stringify(screenshotTheme)} === 'dark' ? 'evening' : 'paper';
@@ -436,7 +444,8 @@ await call("Runtime.evaluate", {
     const settings = document.querySelector('.lr-settings');
     if (settings) settings.open = ${JSON.stringify(screenshotState)} === 'settings';
     const voiceSettings = document.querySelector('.lr-voice-settings');
-    if (voiceSettings) voiceSettings.open = ${JSON.stringify(screenshotState)} === 'voice';
+    if (voiceSettings) voiceSettings.open = ${JSON.stringify(screenshotState)}.startsWith('voice');
+    for (const notice of document.querySelectorAll('.lr-speech-status')) notice.hidden = true;
   })()`,
   returnByValue: true
 });

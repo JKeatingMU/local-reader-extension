@@ -1,5 +1,8 @@
+import { writeFile } from "node:fs/promises";
+
 const port = Number(process.argv[2] || 9333);
 const fixtureOrigin = process.argv[3] || "http://127.0.0.1:8767";
+const screenshotPath = process.argv[4];
 const targets = await fetch(`http://127.0.0.1:${port}/json/list`).then((response) => response.json());
 const page = targets.find((target) => target.type === "page");
 if (!page) throw new Error("No Chrome page target found");
@@ -60,6 +63,12 @@ const savedArticle = {
 
 await call("Page.enable");
 await call("Runtime.enable");
+await call("Emulation.setDeviceMetricsOverride", {
+  width: 1280,
+  height: 800,
+  deviceScaleFactor: 1,
+  mobile: false
+});
 await call("Page.addScriptToEvaluateOnNewDocument", {
   source: `(() => {
     const values = {
@@ -114,6 +123,11 @@ const libraryView = await evaluate(`(() => {
 await new Promise((resolve) => setTimeout(resolve, 100));
 const libraryState = await evaluate(`JSON.stringify(globalThis.__textuaryLibraryValues.textuarySavedArticles.articles[0])`);
 const libraryResult = { ...libraryView, state: libraryState };
+
+if (screenshotPath) {
+  const screenshot = await call("Page.captureScreenshot", { format: "png" });
+  await writeFile(screenshotPath, Buffer.from(screenshot.data, "base64"));
+}
 
 await call("Page.navigate", { url: `${fixtureOrigin}/saved.html?id=article-test` });
 await new Promise((resolve) => setTimeout(resolve, 1400));

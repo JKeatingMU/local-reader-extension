@@ -5,6 +5,8 @@ const assets = [
   ["icons/icon-128-store.png", 128, 128],
   ["store/chrome/assets/reader-light-1280x800.png", 1280, 800],
   ["store/chrome/assets/reader-dark-1280x800.png", 1280, 800],
+  ["store/chrome/assets/reader-voice-1280x800.png", 1280, 800],
+  ["store/chrome/assets/library-1280x800.png", 1280, 800],
   ["store/chrome/assets/promo-small-440x280.png", 440, 280]
 ];
 

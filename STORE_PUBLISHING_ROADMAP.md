@@ -6,7 +6,7 @@ Textuary can be distributed through both the Chrome Web Store and Apple's App St
 
 ## Current position
 
-Version 2.5.0 remains the preserved release candidate on `main`. Chrome's Kokoro work is preserved on `feature/kokoro-natural-voices`. The current `feature/safari-native-premium-voices` branch has now passed manual macOS Chrome and Safari testing through version 2.7.1. Version 2.8.0 begins the local reading-library phase while retaining:
+Version 2.5.0 remains preserved on `main`. Chrome's Kokoro work is preserved on `feature/kokoro-natural-voices`. The current `feature/safari-native-premium-voices` branch is the version 2.8.0 release candidate and has passed manual macOS Chrome and packaged Safari validation. It includes:
 
 - Manifest V3 extension
 - compatible with Chrome and Safari
@@ -126,11 +126,12 @@ Completed on 6 August 2026:
 - manual macOS Chrome listening and reader validation, including Kokoro voices
 - manual packaged macOS Safari validation with Selena Premium
 - manual Chrome and Safari validation of complete headlines, images and video cleanup
+- manual macOS Chrome and packaged Safari validation of the complete 2.8 Library, toolbar, printing and read-aloud interface
+- refreshed 2.8 Chrome Store listing, permission disclosures and six validated store assets
 
 Still required before Chrome submission:
 
 - complete the Windows Chrome validation
-- refresh the listing screenshots and copy if version 2.8 becomes the first submitted build
 - complete the developer account, dashboard, upload and review steps in [`store/chrome/SUBMISSION_CHECKLIST.md`](store/chrome/SUBMISSION_CHECKLIST.md)
 
 ## Product roadmap after publication
@@ -179,7 +180,7 @@ Still required before Chrome submission:
 - [x] automated Chrome and Safari-mode media regression tests
 - [x] manual Safari test against the Daily Mail comparison article
 
-### Version 2.8: personal reading library — ready for manual validation 8 August 2026
+### Version 2.8: personal reading library — completed on macOS 9 August 2026
 
 - [x] save clean article text locally without an account
 - [x] reopen a saved article in the full Textuary reading experience
@@ -194,7 +195,7 @@ Still required before Chrome submission:
 - [x] standalone print stylesheet with one-inch layout, selected reader typeface and page-break rules
 - [x] update the privacy policy and README for local article storage
 - [x] automated live-package validation in Chrome and Safari modes
-- [ ] manual macOS Chrome and Safari validation
+- [x] manual macOS Chrome and Safari validation
 - [ ] Windows Chrome validation
 - [ ] physical iPad/iPhone Safari test
 
