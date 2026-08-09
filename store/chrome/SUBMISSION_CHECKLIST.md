@@ -32,19 +32,21 @@ Updated for Textuary 2.8.0 on 9 August 2026.
 - [x] re-run package and store-asset validation after the refresh
 - [x] merge the release candidate to `main`, tag `v2.8.0` and publish a GitHub release
 
-## Required before submission
+## Submission status
 
 - [x] complete Windows 11 Chrome validation using the exact RC1 ZIP; optional Kokoro generation remains untested where WebGPU is available
-- [ ] register and configure the Chrome Web Store developer account
-- [ ] confirm the developer/publisher display name
-- [ ] upload the generated ZIP from `dist/chrome`
-- [ ] complete the dashboard privacy fields consistently with `PRIVACY.md`
-- [ ] upload the prepared screenshots and promotional tile
-- [ ] select public distribution and supported regions
-- [ ] review the rendered listing for clarity and cropping
-- [ ] submit for review with deferred publishing enabled
+- [x] register and configure the Chrome Web Store developer account
+- [x] confirm the developer/publisher display name as **J. G. Keating**
+- [x] upload the generated ZIP from `dist/chrome`
+- [x] complete the dashboard privacy fields consistently with `PRIVACY.md`
+- [x] upload the prepared screenshots and promotional tile
+- [x] select free, public distribution in all supported regions
+- [x] review the rendered listing for clarity and cropping
+- [x] submit for review with deferred publishing enabled on 9 August 2026
 - [ ] respond to any reviewer questions
 - [ ] manually publish after approval
+
+Chrome Web Store item ID: `jgckcgnhfjjpcdbenhgfcdgfnkojkdca`. Current status: **Pending review**. Once approved, the staged release must be manually published within 30 days.
 
 ## Release verification commands
 

@@ -53,15 +53,17 @@ Released 9 August 2026: [Textuary 2.8.0](https://github.com/JKeatingMU/local-rea
 
 Account-owner actions:
 
-- [ ] Register and configure the Chrome Web Store developer account.
-- [ ] Confirm the public developer/publisher display name.
-- [ ] Complete any required registration payment and account verification.
-- [ ] Upload the final 2.8 ZIP and prepared assets.
-- [ ] Complete the Store Listing, Privacy and Distribution sections.
-- [ ] Select public, free distribution and the intended supported regions.
-- [ ] Review the rendered listing and screenshot cropping.
-- [ ] Submit with deferred publishing if a manual release after approval is preferred.
+- [x] Register and configure the Chrome Web Store developer account.
+- [x] Confirm the public developer/publisher display name.
+- [x] Complete any required registration payment and account verification.
+- [x] Upload the final 2.8 ZIP and prepared assets.
+- [x] Complete the Store Listing, Privacy and Distribution sections.
+- [x] Select public, free distribution and all supported regions.
+- [x] Review the rendered listing and screenshot cropping.
+- [x] Submit with deferred publishing so the release remains manual after approval.
 - [ ] Respond to reviewer questions and approve publication.
+
+Submitted 9 August 2026 under publisher **J. G. Keating**. Chrome Web Store item ID: `jgckcgnhfjjpcdbenhgfcdgfnkojkdca`. Dashboard status: **Pending review**. Automatic publication is disabled; an approved staged release must be published manually within 30 days.
 
 ## 6. Prepare Safari/App Store distribution
 

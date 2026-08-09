@@ -1,12 +1,12 @@
 # Textuary Store Publishing and Product Roadmap
 
-Last reviewed: 8 August 2026
+Last reviewed: 9 August 2026
 
 Textuary can be distributed through both the Chrome Web Store and Apple's App Store. Chrome accepts a packaged browser extension directly. Safari distribution uses a signed macOS or iOS application containing the Safari Web Extension.
 
 ## Current position
 
-Version 2.5.0 remains preserved on `main`. Chrome's Kokoro work is preserved on `feature/kokoro-natural-voices`. The current `feature/safari-native-premium-voices` branch is the version 2.8.0 release candidate and has passed manual macOS Chrome and packaged Safari validation. It includes:
+Version 2.8.0 is released on GitHub and merged into `main`. It passed manual macOS Chrome, packaged Safari and Windows 11 Chrome validation. Its Chrome Web Store item was submitted with deferred publishing on 9 August 2026 and is pending review. It includes:
 
 - Manifest V3 extension
 - compatible with Chrome and Safari
@@ -80,6 +80,8 @@ Chrome is the more direct first release.
 
 All Chrome items undergo review. Review duration varies, and Google warned in April 2026 that a submission surge was causing extended review times.
 
+Submission status on 9 August 2026: **Pending review**, under publisher **J. G. Keating**, item ID `jgckcgnhfjjpcdbenhgfcdgfnkojkdca`. Automatic publication is disabled. If approved, the staged release must be manually published within 30 days.
+
 ## Safari and the App Store
 
 Safari extensions are distributed in the Extensions category of Apple's App Store, not through a separate Safari extension gallery. Permanent distribution requires a signed containing application.
@@ -131,9 +133,15 @@ Completed on 6 August 2026:
 - manual macOS Chrome and packaged Safari validation of the complete 2.8 Library, toolbar, printing and read-aloud interface
 - refreshed 2.8 Chrome Store listing, permission disclosures and six validated store assets
 
-Still required before Chrome submission:
+Completed on 9 August 2026:
 
-- complete the developer account, dashboard, upload and review steps in [`store/chrome/SUBMISSION_CHECKLIST.md`](store/chrome/SUBMISSION_CHECKLIST.md)
+- registered and verified the Chrome Web Store developer account under publisher **J. G. Keating**
+- uploaded the validated 2.8.0 Chrome package, listing copy, icon, four screenshots and promotional tile
+- completed the privacy, distribution and reviewer-test declarations
+- selected free, public availability in all regions
+- submitted item `jgckcgnhfjjpcdbenhgfcdgfnkojkdca` for review with deferred publishing
+
+Next Chrome action: monitor the verified developer email and dashboard, answer any reviewer questions, and manually publish within 30 days after approval.
 
 ## Product roadmap after publication
 
