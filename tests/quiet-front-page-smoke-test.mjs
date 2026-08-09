@@ -151,6 +151,9 @@ if (mode === "fixture") {
   assert(inspection.links.length === 6, "story links were not deduplicated");
   assert(inspection.links.every(({ href }) => new URL(href).hostname === "127.0.0.1"), "an external link survived extraction");
   assert(inspection.links[0].text.startsWith("A forgotten coastal path"), "editorial order was not preserved");
+  assert(inspection.links[1].text.startsWith("The city square redesigned"), "the empty overlay link was not paired with its sibling headline");
+  assert(new URL(inspection.links[1].href).pathname === "/cities/city-square.html", "the overlay story received the wrong destination");
+  assert(!inspection.links.some(({ href }) => href.includes("ambiguous-package")), "an ambiguous overlay card was incorrectly accepted");
   assert(inspection.links.at(-1).text.startsWith("Citizen scientists"), "last story order changed");
   assert(inspection.sections.length === 6, "fixture stories are missing section labels");
   assert(inspection.sections.every(Boolean), "an empty fixture section label was rendered");

@@ -25,6 +25,9 @@
     article a { color: inherit; text-decoration: none; }
     article p { color: #555; line-height: 1.5; }
     article time { color: #a51624; font-size: 13px; font-weight: 700; }
+    .overlay-story { position: relative; }
+    .overlay-story .story-overlay { position: absolute; inset: 0; z-index: 2; }
+    .overlay-story .story-title { display: block; margin: 0; font: 700 27px/1.1 Georgia, serif; }
     .newsletter { margin-top: 24px; padding: 24px; color: white; background: #265a87; }
     footer { padding: 50px 5vw; color: #eee; background: #222; }
     @media (max-width: 760px) { .page { grid-template-columns: 1fr; } .stories { grid-template-columns: 1fr; } }
@@ -43,9 +46,10 @@
         <img src="assets/coast.svg" alt="A quiet path following a bright Atlantic coastline">
         <div><h2><a href="/travel/coastal-path.html">A forgotten coastal path is becoming a treasured public space again</a></h2><time>18 minutes ago</time><p>Local volunteers have restored a peaceful route connecting three villages along the Atlantic shore.</p></div>
       </article>
-      <article>
+      <article class="overlay-story">
+        <a class="story-overlay" href="/cities/city-square.html" aria-hidden="true"></a>
         <img src="assets/city.svg" alt="People walking through a calm city square">
-        <div><h2><a href="/cities/city-square.html">The city square redesigned around conversation rather than traffic</a></h2><time>42 minutes ago</time><p>A modest civic project shows how seating, trees and slower streets can change the rhythm of a neighbourhood.</p></div>
+        <div><span class="story-title">The city square redesigned around conversation rather than traffic</span><time>42 minutes ago</time><p>A modest civic project shows how seating, trees and slower streets can change the rhythm of a neighbourhood.</p></div>
       </article>
       <article>
         <img src="assets/books.svg" alt="Books arranged beside a reading lamp">
@@ -61,6 +65,10 @@
       <article>
         <img data-src="assets/river.svg" src="assets/placeholder.svg" alt="A river passing through woodland">
         <div><h3><a href="/science/river-project.html">Citizen scientists map the remarkable return of wildlife to an urban river</a></h3><p>Five years of careful observation reveal a waterway recovering in ways few researchers expected.</p></div>
+      </article>
+      <article class="overlay-story">
+        <a class="story-overlay" href="/promotions/ambiguous-package.html" aria-hidden="true"></a>
+        <div><span class="story-title">Two unrelated headlines deliberately share this promotional package</span><span class="story-title">A second plausible title makes the destination too ambiguous</span></div>
       </article>
     </section>
     <aside>

@@ -33,20 +33,27 @@
       const url = storyUrl(anchor.getAttribute("href"));
       if (!url || url === canonicalUrl(sourceUrl)) return;
 
-      const heading = headlineElement(anchor);
-      const headline = normalizedText(
+      let heading = headlineElement(anchor);
+      let headline = normalizedText(
         heading?.textContent || anchor.getAttribute("aria-label") || anchor.textContent
       );
-      if (!isPlausibleHeadline(headline)) return;
-
-      const container = findStoryContainer(anchor, heading);
+      let container = null;
+      let overlayLink = false;
+      if (isPlausibleHeadline(headline)) {
+        container = findStoryContainer(anchor, heading);
+      } else {
+        const overlayStory = findOverlayStory(anchor);
+        if (!overlayStory) return;
+        ({ container, heading, headline } = overlayStory);
+        overlayLink = true;
+      }
       if (!container || isPageFurniture(container)) return;
 
       const image = findStoryImage(container, headline);
       const summary = findSummary(container, headline);
       const time = findTime(container);
       const section = findStorySection(anchor, container, url);
-      const score = storyScore({ anchor, heading, container, image, summary, url });
+      const score = storyScore({ anchor, heading, container, image, summary, url, overlayLink });
       if (score < 5) return;
 
       const candidate = { url, headline, image, summary, time, section, score, order };
@@ -106,6 +113,47 @@
   function headlineElement(anchor) {
     if (/^H[1-4]$/.test(anchor.tagName)) return anchor;
     return anchor.querySelector("h1, h2, h3, h4") || anchor.closest("h1, h2, h3, h4");
+  }
+
+  function findOverlayStory(anchor) {
+    const ownLabel = normalizedText(anchor.getAttribute("aria-label") || anchor.textContent);
+    if (ownLabel.length > 8) return null;
+
+    let current = anchor.parentElement;
+    for (let depth = 0; current && depth < 5; depth += 1, current = current.parentElement) {
+      if (isPageFurniture(current)) return null;
+      const links = current.querySelectorAll("a[href]").length;
+      const textLength = normalizedText(current.textContent).length;
+      if (links > 4 || textLength > 1200) break;
+
+      const candidates = [...current.querySelectorAll([
+        "h1", "h2", "h3", "h4", "[role='heading']",
+        "[class*='headline']", "[class*='title']"
+      ].join(","))];
+      const distinct = new Map();
+      for (const candidate of candidates) {
+        if (candidate === anchor || candidate.contains(anchor) || isPageFurniture(candidate)) continue;
+        const text = normalizedText(candidate.textContent);
+        if (!isPlausibleHeadline(text)) continue;
+        const existing = distinct.get(text);
+        distinct.set(text, preferredHeadlineNode(existing, candidate));
+      }
+
+      if (distinct.size === 1) {
+        const [headline, heading] = distinct.entries().next().value;
+        return { container: current, heading, headline };
+      }
+      if (/^(?:MAIN|SECTION|BODY)$/.test(current.tagName)) break;
+    }
+    return null;
+  }
+
+  function preferredHeadlineNode(existing, candidate) {
+    if (!existing) return candidate;
+    if (existing.contains(candidate)) return candidate;
+    if (candidate.contains(existing)) return existing;
+    const weight = (node) => (/^H[1-4]$/.test(node.tagName) ? 3 : node.getAttribute("role") === "heading" ? 2 : 1);
+    return weight(candidate) > weight(existing) ? candidate : existing;
   }
 
   function isPlausibleHeadline(value) {
@@ -303,9 +351,10 @@
     return Object.values(value).some(jsonContainsArticleType);
   }
 
-  function storyScore({ anchor, heading, container, image, summary, url }) {
+  function storyScore({ anchor, heading, container, image, summary, url, overlayLink }) {
     let score = 0;
     if (heading) score += ({ H1: 4, H2: 3, H3: 2, H4: 1 })[heading.tagName] || 1;
+    if (overlayLink) score += 2;
     if (container.tagName === "ARTICLE") score += 3;
     if (image) score += 3;
     if (summary) score += 1;

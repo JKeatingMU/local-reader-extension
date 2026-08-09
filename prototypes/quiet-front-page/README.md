@@ -25,6 +25,7 @@ The prototype uses only `activeTab` and `scripting`. It has no persistent site a
 - offer Editorial, Book and Clean typefaces plus three coordinated text-and-image sizes for the current view
 - give image-less stories a quiet newspaper placeholder so the list keeps its visual rhythm
 - label each selected story with a section inferred from its original publisher URL
+- pair empty full-card overlay links with a single credible sibling headline in the same bounded story card
 - detect likely individual articles before extraction and offer a Textuary hand-off instead
 
 Story links open the publisher's original article. When Quiet Front Page is invoked directly on a likely article, it asks the reader to press `Option+Shift+R` on macOS or `Alt+Shift+R` elsewhere, or click Textuary in the browser toolbar. The hand-off automatically disappears when Textuary opens.
