@@ -12,7 +12,18 @@ This is an isolated local prototype for cleaning newspaper home and section page
 
 Open a newspaper home or section page and click the prototype's toolbar button. Click it a second time, or choose **Original page**, to reload the publisher's page.
 
-The prototype uses only `activeTab` and `scripting`. It has no persistent site access, storage, analytics, request blocking or publisher-specific adapters.
+## Install locally in Safari on macOS
+
+1. Open `safari/QuietFrontPage/Quiet Front Page/Quiet Front Page.xcodeproj` from the repository root.
+2. In Xcode, select the **Quiet Front Page (macOS)** scheme and **My Mac** as the destination.
+3. Press **Run**. The small Quiet Front Page containing app will open.
+4. Choose **Quit and Open Safari Extensions Preferences…** in that app.
+5. In Safari's extension settings, enable **Quiet Front Page** and allow it access to the website you are viewing when Safari asks.
+6. Open a newspaper home or section page and click the Quiet Front Page toolbar button.
+
+The generated Xcode project also contains an iOS/iPadOS target. That target is available for later physical-device testing, but macOS Safari is the currently verified local setup. Xcode may need to remain installed, but it does not need to remain open after the locally signed app has been run and the extension enabled.
+
+The Chrome and Safari versions use only `activeTab` and `scripting`. They have no persistent site access, storage, analytics, request blocking or publisher-specific adapters.
 
 ## Current experiment
 

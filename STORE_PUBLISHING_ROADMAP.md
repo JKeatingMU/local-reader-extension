@@ -250,6 +250,10 @@ This remains a separate locally loaded prototype while the Chrome Web Store revi
 - [x] validate overlay-link extraction against a controlled ambiguous fixture and The Journal homepage
 - [x] validate article detection against both a controlled fixture and a live Irish Mirror article
 - [x] manually test seven newspaper home and section pages in Chrome
+- [x] create a separate multiplatform Safari Web Extension wrapper with distinct bundle identifiers and artwork
+- [x] verify the locally signed macOS Safari scheme builds successfully
+- [ ] manually validate Quiet Front Page in packaged macOS Safari
+- [ ] test the Quiet Front Page iOS/iPadOS target on a physical device
 - [ ] decide whether this should remain a companion extension, become a Textuary mode or stop at the experiment
 
 Prototype and installation notes: [`prototypes/quiet-front-page`](prototypes/quiet-front-page)

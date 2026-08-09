@@ -1,0 +1,999 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A9B9A2C030290C4C0022EC07 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9B9A2BF30290C4C0022EC07 /* AppDelegate.swift */; };
+		A9B9A2C230290C4C0022EC07 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9B9A2C130290C4C0022EC07 /* SceneDelegate.swift */; };
+		A9B9A2C530290C4C0022EC07 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A2C330290C4C0022EC07 /* LaunchScreen.storyboard */; };
+		A9B9A2C830290C4C0022EC07 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A2C630290C4C0022EC07 /* Main.storyboard */; };
+		A9B9A2D130290C4C0022EC07 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9B9A2D030290C4C0022EC07 /* AppDelegate.swift */; };
+		A9B9A2D430290C4C0022EC07 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A2D230290C4C0022EC07 /* Main.storyboard */; };
+		A9B9A2DB30290C4C0022EC07 /* Quiet Front Page Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A9B9A2DA30290C4C0022EC07 /* Quiet Front Page Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A9B9A2E530290C4C0022EC07 /* Quiet Front Page Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A9B9A2E430290C4C0022EC07 /* Quiet Front Page Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A9B9A2EA30290C4C0022EC07 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A2AF30290C4B0022EC07 /* Main.html */; };
+		A9B9A2EB30290C4C0022EC07 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A2AF30290C4B0022EC07 /* Main.html */; };
+		A9B9A2EC30290C4C0022EC07 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A2B130290C4B0022EC07 /* Icon.png */; };
+		A9B9A2ED30290C4C0022EC07 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A2B130290C4B0022EC07 /* Icon.png */; };
+		A9B9A2EE30290C4C0022EC07 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A2B230290C4B0022EC07 /* Style.css */; };
+		A9B9A2EF30290C4C0022EC07 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A2B230290C4B0022EC07 /* Style.css */; };
+		A9B9A2F030290C4C0022EC07 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A2B330290C4B0022EC07 /* Script.js */; };
+		A9B9A2F130290C4C0022EC07 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A2B330290C4B0022EC07 /* Script.js */; };
+		A9B9A2F230290C4C0022EC07 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9B9A2B430290C4B0022EC07 /* ViewController.swift */; };
+		A9B9A2F330290C4C0022EC07 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9B9A2B430290C4B0022EC07 /* ViewController.swift */; };
+		A9B9A2F430290C4C0022EC07 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A2B530290C4C0022EC07 /* Assets.xcassets */; };
+		A9B9A2F530290C4C0022EC07 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A2B530290C4C0022EC07 /* Assets.xcassets */; };
+		A9B9A2F630290C4C0022EC07 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9B9A2B730290C4C0022EC07 /* SafariWebExtensionHandler.swift */; };
+		A9B9A2F730290C4C0022EC07 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9B9A2B730290C4C0022EC07 /* SafariWebExtensionHandler.swift */; };
+		A9B9A31030290C4C0022EC07 /* demo in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A30930290C4C0022EC07 /* demo */; };
+		A9B9A31130290C4C0022EC07 /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A30A30290C4C0022EC07 /* background.js */; };
+		A9B9A31230290C4C0022EC07 /* icon.svg in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A30B30290C4C0022EC07 /* icon.svg */; };
+		A9B9A31330290C4C0022EC07 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A30C30290C4C0022EC07 /* README.md */; };
+		A9B9A31430290C4C0022EC07 /* icons in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A30D30290C4C0022EC07 /* icons */; };
+		A9B9A31530290C4C0022EC07 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A30E30290C4C0022EC07 /* manifest.json */; };
+		A9B9A31630290C4C0022EC07 /* quiet.js in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A30F30290C4C0022EC07 /* quiet.js */; };
+		A9B9A31730290C4C0022EC07 /* demo in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A30930290C4C0022EC07 /* demo */; };
+		A9B9A31830290C4C0022EC07 /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A30A30290C4C0022EC07 /* background.js */; };
+		A9B9A31930290C4C0022EC07 /* icon.svg in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A30B30290C4C0022EC07 /* icon.svg */; };
+		A9B9A31A30290C4C0022EC07 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A30C30290C4C0022EC07 /* README.md */; };
+		A9B9A31B30290C4C0022EC07 /* icons in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A30D30290C4C0022EC07 /* icons */; };
+		A9B9A31C30290C4C0022EC07 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A30E30290C4C0022EC07 /* manifest.json */; };
+		A9B9A31D30290C4C0022EC07 /* quiet.js in Resources */ = {isa = PBXBuildFile; fileRef = A9B9A30F30290C4C0022EC07 /* quiet.js */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A9B9A2DC30290C4C0022EC07 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A9B9A2A930290C4B0022EC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A9B9A2D930290C4C0022EC07;
+			remoteInfo = "Quiet Front Page Extension (iOS)";
+		};
+		A9B9A2E630290C4C0022EC07 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A9B9A2A930290C4B0022EC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A9B9A2E330290C4C0022EC07;
+			remoteInfo = "Quiet Front Page Extension (macOS)";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A9B9A2FD30290C4C0022EC07 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A9B9A2DB30290C4C0022EC07 /* Quiet Front Page Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A9B9A30430290C4C0022EC07 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A9B9A2E530290C4C0022EC07 /* Quiet Front Page Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		A9B9A2B030290C4B0022EC07 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
+		A9B9A2B130290C4B0022EC07 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		A9B9A2B230290C4B0022EC07 /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
+		A9B9A2B330290C4B0022EC07 /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
+		A9B9A2B430290C4B0022EC07 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		A9B9A2B530290C4C0022EC07 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A9B9A2B730290C4C0022EC07 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		A9B9A2BC30290C4C0022EC07 /* Quiet Front Page.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Quiet Front Page.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A9B9A2BF30290C4C0022EC07 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		A9B9A2C130290C4C0022EC07 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		A9B9A2C430290C4C0022EC07 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		A9B9A2C730290C4C0022EC07 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		A9B9A2C930290C4C0022EC07 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A9B9A2CE30290C4C0022EC07 /* Quiet Front Page.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Quiet Front Page.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A9B9A2D030290C4C0022EC07 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		A9B9A2D330290C4C0022EC07 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		A9B9A2D530290C4C0022EC07 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A9B9A2DA30290C4C0022EC07 /* Quiet Front Page Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Quiet Front Page Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A9B9A2DF30290C4C0022EC07 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A9B9A2E430290C4C0022EC07 /* Quiet Front Page Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Quiet Front Page Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A9B9A2E930290C4C0022EC07 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A9B9A30930290C4C0022EC07 /* demo */ = {isa = PBXFileReference; lastKnownFileType = folder; name = demo; path = "../../../../prototypes/quiet-front-page/demo"; sourceTree = "<group>"; };
+		A9B9A30A30290C4C0022EC07 /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = background.js; path = "../../../../prototypes/quiet-front-page/background.js"; sourceTree = "<group>"; };
+		A9B9A30B30290C4C0022EC07 /* icon.svg */ = {isa = PBXFileReference; lastKnownFileType = text; name = icon.svg; path = "../../../../prototypes/quiet-front-page/icon.svg"; sourceTree = "<group>"; };
+		A9B9A30C30290C4C0022EC07 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = "../../../../prototypes/quiet-front-page/README.md"; sourceTree = "<group>"; };
+		A9B9A30D30290C4C0022EC07 /* icons */ = {isa = PBXFileReference; lastKnownFileType = folder; name = icons; path = "../../../../prototypes/quiet-front-page/icons"; sourceTree = "<group>"; };
+		A9B9A30E30290C4C0022EC07 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = "../../../../prototypes/quiet-front-page/manifest.json"; sourceTree = "<group>"; };
+		A9B9A30F30290C4C0022EC07 /* quiet.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = quiet.js; path = "../../../../prototypes/quiet-front-page/quiet.js"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A9B9A2B930290C4C0022EC07 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A9B9A2CB30290C4C0022EC07 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A9B9A2D730290C4C0022EC07 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A9B9A2E130290C4C0022EC07 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A9B9A2A830290C4B0022EC07 = {
+			isa = PBXGroup;
+			children = (
+				A9B9A2AD30290C4B0022EC07 /* Shared (App) */,
+				A9B9A2B630290C4C0022EC07 /* Shared (Extension) */,
+				A9B9A2BE30290C4C0022EC07 /* iOS (App) */,
+				A9B9A2CF30290C4C0022EC07 /* macOS (App) */,
+				A9B9A2DE30290C4C0022EC07 /* iOS (Extension) */,
+				A9B9A2E830290C4C0022EC07 /* macOS (Extension) */,
+				A9B9A2BD30290C4C0022EC07 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A9B9A2AD30290C4B0022EC07 /* Shared (App) */ = {
+			isa = PBXGroup;
+			children = (
+				A9B9A2B430290C4B0022EC07 /* ViewController.swift */,
+				A9B9A2B530290C4C0022EC07 /* Assets.xcassets */,
+				A9B9A2AE30290C4B0022EC07 /* Resources */,
+			);
+			path = "Shared (App)";
+			sourceTree = "<group>";
+		};
+		A9B9A2AE30290C4B0022EC07 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A9B9A2AF30290C4B0022EC07 /* Main.html */,
+				A9B9A2B130290C4B0022EC07 /* Icon.png */,
+				A9B9A2B230290C4B0022EC07 /* Style.css */,
+				A9B9A2B330290C4B0022EC07 /* Script.js */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		A9B9A2B630290C4C0022EC07 /* Shared (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				A9B9A30830290C4C0022EC07 /* Resources */,
+				A9B9A2B730290C4C0022EC07 /* SafariWebExtensionHandler.swift */,
+			);
+			path = "Shared (Extension)";
+			sourceTree = "<group>";
+		};
+		A9B9A2BD30290C4C0022EC07 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A9B9A2BC30290C4C0022EC07 /* Quiet Front Page.app */,
+				A9B9A2CE30290C4C0022EC07 /* Quiet Front Page.app */,
+				A9B9A2DA30290C4C0022EC07 /* Quiet Front Page Extension.appex */,
+				A9B9A2E430290C4C0022EC07 /* Quiet Front Page Extension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A9B9A2BE30290C4C0022EC07 /* iOS (App) */ = {
+			isa = PBXGroup;
+			children = (
+				A9B9A2BF30290C4C0022EC07 /* AppDelegate.swift */,
+				A9B9A2C130290C4C0022EC07 /* SceneDelegate.swift */,
+				A9B9A2C330290C4C0022EC07 /* LaunchScreen.storyboard */,
+				A9B9A2C630290C4C0022EC07 /* Main.storyboard */,
+				A9B9A2C930290C4C0022EC07 /* Info.plist */,
+			);
+			path = "iOS (App)";
+			sourceTree = "<group>";
+		};
+		A9B9A2CF30290C4C0022EC07 /* macOS (App) */ = {
+			isa = PBXGroup;
+			children = (
+				A9B9A2D030290C4C0022EC07 /* AppDelegate.swift */,
+				A9B9A2D230290C4C0022EC07 /* Main.storyboard */,
+				A9B9A2D530290C4C0022EC07 /* Info.plist */,
+			);
+			path = "macOS (App)";
+			sourceTree = "<group>";
+		};
+		A9B9A2DE30290C4C0022EC07 /* iOS (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				A9B9A2DF30290C4C0022EC07 /* Info.plist */,
+			);
+			path = "iOS (Extension)";
+			sourceTree = "<group>";
+		};
+		A9B9A2E830290C4C0022EC07 /* macOS (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				A9B9A2E930290C4C0022EC07 /* Info.plist */,
+			);
+			path = "macOS (Extension)";
+			sourceTree = "<group>";
+		};
+		A9B9A30830290C4C0022EC07 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A9B9A30930290C4C0022EC07 /* demo */,
+				A9B9A30A30290C4C0022EC07 /* background.js */,
+				A9B9A30B30290C4C0022EC07 /* icon.svg */,
+				A9B9A30C30290C4C0022EC07 /* README.md */,
+				A9B9A30D30290C4C0022EC07 /* icons */,
+				A9B9A30E30290C4C0022EC07 /* manifest.json */,
+				A9B9A30F30290C4C0022EC07 /* quiet.js */,
+			);
+			name = Resources;
+			path = "Shared (Extension)";
+			sourceTree = SOURCE_ROOT;
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A9B9A2BB30290C4C0022EC07 /* Quiet Front Page (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A9B9A2FE30290C4C0022EC07 /* Build configuration list for PBXNativeTarget "Quiet Front Page (iOS)" */;
+			buildPhases = (
+				A9B9A2B830290C4C0022EC07 /* Sources */,
+				A9B9A2B930290C4C0022EC07 /* Frameworks */,
+				A9B9A2BA30290C4C0022EC07 /* Resources */,
+				A9B9A2FD30290C4C0022EC07 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A9B9A2DD30290C4C0022EC07 /* PBXTargetDependency */,
+			);
+			name = "Quiet Front Page (iOS)";
+			packageProductDependencies = (
+			);
+			productName = "Quiet Front Page (iOS)";
+			productReference = A9B9A2BC30290C4C0022EC07 /* Quiet Front Page.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A9B9A2CD30290C4C0022EC07 /* Quiet Front Page (macOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A9B9A30530290C4C0022EC07 /* Build configuration list for PBXNativeTarget "Quiet Front Page (macOS)" */;
+			buildPhases = (
+				A9B9A2CA30290C4C0022EC07 /* Sources */,
+				A9B9A2CB30290C4C0022EC07 /* Frameworks */,
+				A9B9A2CC30290C4C0022EC07 /* Resources */,
+				A9B9A30430290C4C0022EC07 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A9B9A2E730290C4C0022EC07 /* PBXTargetDependency */,
+			);
+			name = "Quiet Front Page (macOS)";
+			packageProductDependencies = (
+			);
+			productName = "Quiet Front Page (macOS)";
+			productReference = A9B9A2CE30290C4C0022EC07 /* Quiet Front Page.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A9B9A2D930290C4C0022EC07 /* Quiet Front Page Extension (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A9B9A2FA30290C4C0022EC07 /* Build configuration list for PBXNativeTarget "Quiet Front Page Extension (iOS)" */;
+			buildPhases = (
+				A9B9A2D630290C4C0022EC07 /* Sources */,
+				A9B9A2D730290C4C0022EC07 /* Frameworks */,
+				A9B9A2D830290C4C0022EC07 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Quiet Front Page Extension (iOS)";
+			packageProductDependencies = (
+			);
+			productName = "Quiet Front Page Extension (iOS)";
+			productReference = A9B9A2DA30290C4C0022EC07 /* Quiet Front Page Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		A9B9A2E330290C4C0022EC07 /* Quiet Front Page Extension (macOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A9B9A30130290C4C0022EC07 /* Build configuration list for PBXNativeTarget "Quiet Front Page Extension (macOS)" */;
+			buildPhases = (
+				A9B9A2E030290C4C0022EC07 /* Sources */,
+				A9B9A2E130290C4C0022EC07 /* Frameworks */,
+				A9B9A2E230290C4C0022EC07 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Quiet Front Page Extension (macOS)";
+			packageProductDependencies = (
+			);
+			productName = "Quiet Front Page Extension (macOS)";
+			productReference = A9B9A2E430290C4C0022EC07 /* Quiet Front Page Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A9B9A2A930290C4B0022EC07 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2660;
+				LastUpgradeCheck = 2660;
+				TargetAttributes = {
+					A9B9A2BB30290C4C0022EC07 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+					A9B9A2CD30290C4C0022EC07 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+					A9B9A2D930290C4C0022EC07 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+					A9B9A2E330290C4C0022EC07 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+				};
+			};
+			buildConfigurationList = A9B9A2AC30290C4B0022EC07 /* Build configuration list for PBXProject "Quiet Front Page" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A9B9A2A830290C4B0022EC07;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = A9B9A2BD30290C4C0022EC07 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A9B9A2BB30290C4C0022EC07 /* Quiet Front Page (iOS) */,
+				A9B9A2CD30290C4C0022EC07 /* Quiet Front Page (macOS) */,
+				A9B9A2D930290C4C0022EC07 /* Quiet Front Page Extension (iOS) */,
+				A9B9A2E330290C4C0022EC07 /* Quiet Front Page Extension (macOS) */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A9B9A2BA30290C4C0022EC07 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A9B9A2EC30290C4C0022EC07 /* Icon.png in Resources */,
+				A9B9A2C530290C4C0022EC07 /* LaunchScreen.storyboard in Resources */,
+				A9B9A2EA30290C4C0022EC07 /* Main.html in Resources */,
+				A9B9A2F030290C4C0022EC07 /* Script.js in Resources */,
+				A9B9A2F430290C4C0022EC07 /* Assets.xcassets in Resources */,
+				A9B9A2C830290C4C0022EC07 /* Main.storyboard in Resources */,
+				A9B9A2EE30290C4C0022EC07 /* Style.css in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A9B9A2CC30290C4C0022EC07 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A9B9A2ED30290C4C0022EC07 /* Icon.png in Resources */,
+				A9B9A2EF30290C4C0022EC07 /* Style.css in Resources */,
+				A9B9A2D430290C4C0022EC07 /* Main.storyboard in Resources */,
+				A9B9A2F130290C4C0022EC07 /* Script.js in Resources */,
+				A9B9A2F530290C4C0022EC07 /* Assets.xcassets in Resources */,
+				A9B9A2EB30290C4C0022EC07 /* Main.html in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A9B9A2D830290C4C0022EC07 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A9B9A31830290C4C0022EC07 /* background.js in Resources */,
+				A9B9A31D30290C4C0022EC07 /* quiet.js in Resources */,
+				A9B9A31930290C4C0022EC07 /* icon.svg in Resources */,
+				A9B9A31A30290C4C0022EC07 /* README.md in Resources */,
+				A9B9A31B30290C4C0022EC07 /* icons in Resources */,
+				A9B9A31C30290C4C0022EC07 /* manifest.json in Resources */,
+				A9B9A31730290C4C0022EC07 /* demo in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A9B9A2E230290C4C0022EC07 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A9B9A31130290C4C0022EC07 /* background.js in Resources */,
+				A9B9A31630290C4C0022EC07 /* quiet.js in Resources */,
+				A9B9A31230290C4C0022EC07 /* icon.svg in Resources */,
+				A9B9A31330290C4C0022EC07 /* README.md in Resources */,
+				A9B9A31430290C4C0022EC07 /* icons in Resources */,
+				A9B9A31530290C4C0022EC07 /* manifest.json in Resources */,
+				A9B9A31030290C4C0022EC07 /* demo in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A9B9A2B830290C4C0022EC07 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A9B9A2F230290C4C0022EC07 /* ViewController.swift in Sources */,
+				A9B9A2C030290C4C0022EC07 /* AppDelegate.swift in Sources */,
+				A9B9A2C230290C4C0022EC07 /* SceneDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A9B9A2CA30290C4C0022EC07 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A9B9A2F330290C4C0022EC07 /* ViewController.swift in Sources */,
+				A9B9A2D130290C4C0022EC07 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A9B9A2D630290C4C0022EC07 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A9B9A2F630290C4C0022EC07 /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A9B9A2E030290C4C0022EC07 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A9B9A2F730290C4C0022EC07 /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A9B9A2DD30290C4C0022EC07 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A9B9A2D930290C4C0022EC07 /* Quiet Front Page Extension (iOS) */;
+			targetProxy = A9B9A2DC30290C4C0022EC07 /* PBXContainerItemProxy */;
+		};
+		A9B9A2E730290C4C0022EC07 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A9B9A2E330290C4C0022EC07 /* Quiet Front Page Extension (macOS) */;
+			targetProxy = A9B9A2E630290C4C0022EC07 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		A9B9A2AF30290C4B0022EC07 /* Main.html */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A9B9A2B030290C4B0022EC07 /* Base */,
+			);
+			name = Main.html;
+			sourceTree = "<group>";
+		};
+		A9B9A2C330290C4C0022EC07 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A9B9A2C430290C4C0022EC07 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		A9B9A2C630290C4C0022EC07 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A9B9A2C730290C4C0022EC07 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		A9B9A2D230290C4C0022EC07 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A9B9A2D330290C4C0022EC07 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		A9B9A2F830290C4C0022EC07 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A9B9A2F930290C4C0022EC07 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		A9B9A2FB30290C4C0022EC07 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Quiet Front Page Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.3.1;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jgkeating.quietfrontpage.Extension;
+				PRODUCT_NAME = "Quiet Front Page Extension";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A9B9A2FC30290C4C0022EC07 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Quiet Front Page Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.3.1;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jgkeating.quietfrontpage.Extension;
+				PRODUCT_NAME = "Quiet Front Page Extension";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A9B9A2FF30290C4C0022EC07 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Quiet Front Page";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.3.1;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jgkeating.quietfrontpage;
+				PRODUCT_NAME = "Quiet Front Page";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A9B9A30030290C4C0022EC07 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Quiet Front Page";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.3.1;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jgkeating.quietfrontpage;
+				PRODUCT_NAME = "Quiet Front Page";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A9B9A30230290C4C0022EC07 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Quiet Front Page Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 0.3.1;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jgkeating.quietfrontpage.Extension;
+				PRODUCT_NAME = "Quiet Front Page Extension";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A9B9A30330290C4C0022EC07 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Quiet Front Page Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 0.3.1;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jgkeating.quietfrontpage.Extension;
+				PRODUCT_NAME = "Quiet Front Page Extension";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		A9B9A30630290C4C0022EC07 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Quiet Front Page";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 0.3.1;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jgkeating.quietfrontpage;
+				PRODUCT_NAME = "Quiet Front Page";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A9B9A30730290C4C0022EC07 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Quiet Front Page";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 0.3.1;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jgkeating.quietfrontpage;
+				PRODUCT_NAME = "Quiet Front Page";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A9B9A2AC30290C4B0022EC07 /* Build configuration list for PBXProject "Quiet Front Page" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A9B9A2F830290C4C0022EC07 /* Debug */,
+				A9B9A2F930290C4C0022EC07 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A9B9A2FA30290C4C0022EC07 /* Build configuration list for PBXNativeTarget "Quiet Front Page Extension (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A9B9A2FB30290C4C0022EC07 /* Debug */,
+				A9B9A2FC30290C4C0022EC07 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A9B9A2FE30290C4C0022EC07 /* Build configuration list for PBXNativeTarget "Quiet Front Page (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A9B9A2FF30290C4C0022EC07 /* Debug */,
+				A9B9A30030290C4C0022EC07 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A9B9A30130290C4C0022EC07 /* Build configuration list for PBXNativeTarget "Quiet Front Page Extension (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A9B9A30230290C4C0022EC07 /* Debug */,
+				A9B9A30330290C4C0022EC07 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A9B9A30530290C4C0022EC07 /* Build configuration list for PBXNativeTarget "Quiet Front Page (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A9B9A30630290C4C0022EC07 /* Debug */,
+				A9B9A30730290C4C0022EC07 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A9B9A2A930290C4B0022EC07 /* Project object */;
+}
