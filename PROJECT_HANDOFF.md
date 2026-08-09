@@ -112,7 +112,7 @@ xcodebuild -quiet \
   build
 ```
 
-The unsigned Safari build passes. Xcode currently reports non-fatal warnings about `AVSpeechSynthesizer` not conforming to `Sendable` and an unused `profile` value.
+The unsigned Safari build and universal Release archive pass. Xcode currently reports only a non-fatal SDK concurrency warning about `AVSpeechSynthesizer` not conforming to `Sendable`; the earlier unused `profile` warning has been removed.
 
 ## Store materials
 
@@ -121,12 +121,15 @@ The unsigned Safari build passes. Xcode currently reports non-fatal warnings abo
 - Asset inventory: [`store/chrome/ASSETS.md`](store/chrome/ASSETS.md)
 - Screenshots and promotional tile: `store/chrome/assets/`
 - Store icon: `icons/icon-128-store.png`
+- Mac App Store listing: [`store/apple/LISTING.md`](store/apple/LISTING.md)
+- Mac App Store submission checklist: [`store/apple/SUBMISSION_CHECKLIST.md`](store/apple/SUBMISSION_CHECKLIST.md)
+- Mac App Store asset plan: [`store/apple/ASSETS.md`](store/apple/ASSETS.md)
 - Privacy policy: [`PRIVACY.md`](PRIVACY.md)
 - Support guide: [`SUPPORT.md`](SUPPORT.md)
 
 ## Next release work
 
-Chrome is waiting on Google. The next distribution project is the signed Safari/App Store release. The recommended first Apple release is macOS-only because that is the proven target. It still requires Apple Developer Program membership, production bundle identifiers and signing, an App Store Connect record, archive/upload, store screenshots and declarations. iPhone/iPad support must not be claimed until a physical-device build and responsive extension workflow have been tested.
+Chrome is waiting on Google. Mac App Store repository preparation is now complete for a macOS-only first Apple release: production bundle identifiers, version/build metadata, Productivity category, export-compliance declaration, universal unsigned Release archive, listing copy and the submission checklist are in place. The local Mac has no valid code-signing identity, so the next Apple action is to confirm Apple Developer Program membership, add the Apple team to Xcode, create the App Store Connect record and upload a signed archive. iPhone/iPad support must not be claimed until a physical-device build and responsive extension workflow have been tested.
 
 The detailed distribution sequence is in [`RELEASE_2_8_NEXT_STEPS.md`](RELEASE_2_8_NEXT_STEPS.md) and [`STORE_PUBLISHING_ROADMAP.md`](STORE_PUBLISHING_ROADMAP.md).
 

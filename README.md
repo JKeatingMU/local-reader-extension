@@ -58,7 +58,7 @@ Readability 0.6.0, DOMPurify 3.4.13, the Kokoro.js 1.2.1 browser runtime and its
 
 See the [privacy policy](PRIVACY.md) and [support guide](SUPPORT.md) for the public store disclosures and help information.
 
-Chrome Web Store preparation materials are under [`store/chrome`](store/chrome), including the draft listing, approved-size artwork and submission checklist. The remaining release, Windows and account-owner work is recorded in [`RELEASE_2_8_NEXT_STEPS.md`](RELEASE_2_8_NEXT_STEPS.md).
+Chrome Web Store records are under [`store/chrome`](store/chrome). Mac App Store listing copy, asset guidance and the signed-submission checklist are under [`store/apple`](store/apple). The remaining account-owner work is recorded in [`RELEASE_2_8_NEXT_STEPS.md`](RELEASE_2_8_NEXT_STEPS.md).
 
 ## Troubleshooting
 

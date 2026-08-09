@@ -429,10 +429,10 @@ await call("Runtime.evaluate", {
       rate.dispatchEvent(new Event('change'));
     }
     if (${JSON.stringify(screenshotState)} === 'voice-natural' && engine) {
-      engine.value = 'kokoro';
+      engine.value = ${JSON.stringify(speechPlatform)} === 'safari' ? 'apple' : 'kokoro';
       engine.dispatchEvent(new Event('change'));
       if (voice) {
-        voice.value = 'bf_emma';
+        voice.value = ${JSON.stringify(speechPlatform)} === 'safari' ? 'com.apple.voice.premium.selena' : 'bf_emma';
         voice.dispatchEvent(new Event('change'));
       }
     }

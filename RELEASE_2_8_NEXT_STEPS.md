@@ -67,15 +67,18 @@ Submitted 9 August 2026 under publisher **J. G. Keating**. Chrome Web Store item
 
 ## 6. Prepare Safari/App Store distribution
 
-- [ ] Decide whether the first Apple release is macOS-only or also claims iPhone/iPad support. A macOS-only first release is the lower-risk route.
+- [x] Decide that the first Apple release is macOS-only; iPhone/iPad support will not be claimed without physical-device testing.
 - [ ] Confirm Apple Developer Program membership and agreements.
-- [ ] Assign production bundle identifiers, signing and version/build numbers.
-- [ ] Complete the containing application and extension icons.
+- [x] Assign production bundle identifiers and version/build numbers; signing awaits the Apple team.
+- [x] Complete the containing application and extension icons.
 - [ ] Create the App Store Connect record.
 - [ ] Archive and upload the signed application.
-- [ ] Add product screenshots, support URL, privacy policy and data-practice declarations.
+- [x] Prepare Apple-specific listing copy, reviewer notes, support URL, privacy policy and data-practice rationale.
+- [ ] Capture the Safari Premium-voice screenshot and upload the complete product screenshot set.
 - [ ] Test the uploaded build locally or through TestFlight.
 - [ ] Complete compliance questions and submit for App Review.
+
+Repository audit completed 9 August 2026: the unsigned Release archive succeeds as a universal `arm64`/`x86_64` macOS application containing the Safari extension. The packaged app declares Productivity as its category and `ITSAppUsesNonExemptEncryption = NO`. No valid local code-signing identity is currently installed, so the remaining build work begins with Apple Developer membership and Xcode team configuration. See [`store/apple/SUBMISSION_CHECKLIST.md`](store/apple/SUBMISSION_CHECKLIST.md).
 
 ## 7. Validate iPad/iPhone before claiming support
 

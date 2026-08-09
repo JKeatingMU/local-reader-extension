@@ -103,6 +103,17 @@ Safari extensions are distributed in the Extensions category of Apple's App Stor
 5. Declare the app's data practices accurately; the current extension does not transmit article content or analytics off the device.
 6. Select the build, complete compliance questions and submit it for App Review.
 
+Preparation completed on 9 August 2026:
+
+- selected a macOS-only first release
+- retained explicit app and extension identifiers `com.jgkeating.textuary` and `com.jgkeating.textuary.Extension`
+- verified a universal unsigned Release archive for Apple Silicon and Intel Macs
+- added the Productivity category and non-exempt-encryption declaration to the packaged app
+- removed unused file-access and outgoing-network entitlements from the macOS targets
+- prepared Apple-specific product copy, privacy rationale, reviewer instructions and a submission checklist under [`store/apple`](store/apple)
+
+The next Apple action is account-side: confirm Apple Developer Program membership, add the Apple team to Xcode, then create and upload a signed App Store Connect build. The current Mac has no valid code-signing identity installed.
+
 ## Suggested sequence
 
 1. Prepare the shared privacy policy, copy, artwork and release packaging.
@@ -253,4 +264,8 @@ The technical packages, tests, artwork drafts and listing copy can be prepared i
 - [Chrome Web Store privacy fields](https://developer.chrome.com/docs/webstore/cws-dashboard-privacy)
 - [Distribute a Safari web extension](https://developer.apple.com/documentation/safariservices/distributing-your-safari-web-extension)
 - [Package Safari Web Extensions with App Store Connect](https://developer.apple.com/documentation/safariservices/packaging-and-distributing-safari-web-extensions-with-app-store-connect)
+- [Create a new App Store Connect app record](https://developer.apple.com/help/app-store-connect/create-an-app-record/add-a-new-app/)
+- [Mac screenshot specifications](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications/)
+- [Manage App Privacy](https://developer.apple.com/help/app-store-connect/manage-app-information/manage-app-privacy/)
+- [EU Digital Services Act trader requirements](https://developer.apple.com/help/app-store-connect/manage-compliance-information/manage-european-union-digital-services-act-trader-requirements/)
 - [Apple Developer Program membership details](https://developer.apple.com/programs/whats-included/)

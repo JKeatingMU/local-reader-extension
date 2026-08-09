@@ -7,7 +7,8 @@ const assets = [
   ["store/chrome/assets/reader-dark-1280x800.png", 1280, 800],
   ["store/chrome/assets/reader-voice-1280x800.png", 1280, 800],
   ["store/chrome/assets/library-1280x800.png", 1280, 800],
-  ["store/chrome/assets/promo-small-440x280.png", 440, 280]
+  ["store/chrome/assets/promo-small-440x280.png", 440, 280],
+  ["store/apple/assets/reader-premium-1280x800.png", 1280, 800]
 ];
 
 for (const [path, expectedWidth, expectedHeight] of assets) {
