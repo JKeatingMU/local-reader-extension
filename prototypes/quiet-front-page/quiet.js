@@ -34,8 +34,9 @@
       if (!url || url === canonicalUrl(sourceUrl)) return;
 
       let heading = headlineElement(anchor);
-      let headline = normalizedText(
-        heading?.textContent || anchor.getAttribute("aria-label") || anchor.textContent
+      let headline = headlineText(
+        heading || anchor,
+        anchor.getAttribute("aria-label") || anchor.textContent
       );
       let container = null;
       let overlayLink = false;
@@ -133,7 +134,7 @@
       const distinct = new Map();
       for (const candidate of candidates) {
         if (candidate === anchor || candidate.contains(anchor) || isPageFurniture(candidate)) continue;
-        const text = normalizedText(candidate.textContent);
+        const text = headlineText(candidate, candidate.textContent);
         if (!isPlausibleHeadline(text)) continue;
         const existing = distinct.get(text);
         distinct.set(text, preferredHeadlineNode(existing, candidate));
@@ -163,6 +164,40 @@
     if (/^(?:home|news|sport|sports|politics|business|culture|opinion|lifestyle|more|menu|subscribe|sign in|log in|read more)$/i.test(value)) return false;
     if (/^(?:advertisement|sponsored|promoted|partner content)\b/i.test(value)) return false;
     return /[\p{L}\p{N}]/u.test(value);
+  }
+
+  function headlineText(node, fallback = "") {
+    if (!node?.cloneNode) return normalizedText(fallback);
+
+    const clone = node.cloneNode(true);
+    const firstText = firstMeaningfulTextNode(clone);
+    if (firstText) {
+      const leadingBadge = [...clone.querySelectorAll("*")].find((element) => {
+        if (!element.contains(firstText)) return false;
+        if (!/^premium$/i.test(normalizedText(element.textContent))) return false;
+        if (/^(?:EM|STRONG|B|I)$/.test(element.tagName)) return false;
+        const signature = [
+          element.className,
+          element.id,
+          element.getAttribute("aria-label"),
+          element.getAttribute("title"),
+          element.getAttribute("data-testid"),
+          element.getAttribute("role")
+        ].filter(Boolean).join(" ");
+        return /premium|subscriber|paywall|lock|badge|label|icon/i.test(signature)
+          || Boolean(element.querySelector("svg, img, use"));
+      });
+      leadingBadge?.remove();
+    }
+
+    return normalizedText(clone.textContent) || normalizedText(fallback);
+  }
+
+  function firstMeaningfulTextNode(root) {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    let node = walker.nextNode();
+    while (node && !normalizedText(node.nodeValue)) node = walker.nextNode();
+    return node;
   }
 
   function findStoryContainer(anchor, heading) {

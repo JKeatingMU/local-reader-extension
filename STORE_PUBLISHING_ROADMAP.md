@@ -242,6 +242,7 @@ This remains a separate locally loaded prototype while the Chrome Web Store revi
 - [x] coordinate image and placeholder scale with the selected text size
 - [x] label selected stories with publisher sections inferred from their original URLs
 - [x] support empty full-card overlay links when one unambiguous sibling headline shares the same bounded card
+- [x] exclude a leading standalone Premium access badge from extracted headline text
 - [x] distinguish likely article pages using metadata, structured data and long-form body signals
 - [x] replace misleading article-page extraction with a Textuary shortcut/toolbar hand-off
 - [x] validate extraction and controls against an intentionally cluttered local fixture
@@ -252,7 +253,7 @@ This remains a separate locally loaded prototype while the Chrome Web Store revi
 - [x] manually test seven newspaper home and section pages in Chrome
 - [x] create a separate multiplatform Safari Web Extension wrapper with distinct bundle identifiers and artwork
 - [x] verify the locally signed macOS Safari scheme builds successfully
-- [ ] manually validate Quiet Front Page in packaged macOS Safari
+- [x] manually validate Quiet Front Page in packaged macOS Safari
 - [ ] test the Quiet Front Page iOS/iPadOS target on a physical device
 - [ ] decide whether this should remain a companion extension, become a Textuary mode or stop at the experiment
 
