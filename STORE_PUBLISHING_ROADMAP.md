@@ -1,16 +1,16 @@
-# Textuary Store Publishing and Product Roadmap
+# Textuary and Quiet Front Page Publishing and Product Roadmap
 
-Last reviewed: 9 August 2026
+Last reviewed: 11 August 2026
 
-Textuary can be distributed through both the Chrome Web Store and Apple's App Store. Chrome accepts a packaged browser extension directly. Safari distribution uses a signed macOS or iOS application containing the Safari Web Extension.
+Textuary and Quiet Front Page are separate companion extensions. **QFP quietens discovery; Textuary quietens reading.** Both can be distributed through the Chrome Web Store, while Safari distribution uses signed macOS or iOS applications containing their Safari Web Extensions.
 
 ## Current position
 
-Version 2.8.0 is released on GitHub and merged into `main`. It passed manual macOS Chrome, packaged Safari and Windows 11 Chrome validation. Its Chrome Web Store item was submitted with deferred publishing on 9 August 2026 and is pending review. It includes:
+Version 2.8.0 is released on GitHub, merged into `main` and publicly published in the Chrome Web Store. It passed manual macOS Chrome, packaged Safari and Windows 11 Chrome validation. Google approved its deferred submission, and it was manually published on 11 August 2026. It includes:
 
 - Manifest V3 extension
 - compatible with Chrome and Safari
-- minimal `activeTab` and `scripting` permissions
+- narrow `activeTab`, `scripting` and `storage` permissions
 - no account, analytics or advertising
 - article content is processed locally
 - Readability and DOMPurify are included locally rather than loaded remotely
@@ -80,7 +80,7 @@ Chrome is the more direct first release.
 
 All Chrome items undergo review. Review duration varies, and Google warned in April 2026 that a submission surge was causing extended review times.
 
-Submission status on 9 August 2026: **Pending review**, under publisher **J. G. Keating**, item ID `jgckcgnhfjjpcdbenhgfcdgfnkojkdca`. Automatic publication is disabled. If approved, the staged release must be manually published within 30 days.
+Publication status on 11 August 2026: **Published — public**, under publisher **J. G. Keating**, item ID `jgckcgnhfjjpcdbenhgfcdgfnkojkdca`. The item was submitted with deferred publication on 9 August, approved by Google, and manually released on 11 August.
 
 ## Safari and the App Store
 
@@ -116,13 +116,13 @@ Public Apple distribution was deliberately deferred on 9 August 2026 because the
 
 ## Suggested sequence
 
-1. Prepare the shared privacy policy, copy, artwork and release packaging.
-2. Complete and record the Windows Chrome validation.
-3. Submit the proven desktop version to the Chrome Web Store.
-4. Create and test the permanent macOS Safari package.
-5. Submit the Safari version to the App Store.
-6. Refresh store copy, screenshots and privacy disclosures for the 2.8 local Library if it is included in the first public release.
-7. Continue with media-complete offline snapshots and the version 2.9 personal-archive design while the first submissions are being reviewed.
+1. [x] Prepare Textuary's privacy policy, copy, artwork and release packaging.
+2. [x] Complete and record Textuary's Windows Chrome validation.
+3. [x] Submit, obtain approval for and publicly release Textuary through the Chrome Web Store.
+4. [x] Create and test the permanent local macOS Safari package.
+5. [ ] Prepare and submit Quiet Front Page 1.0 as a separate Chrome Web Store companion.
+6. [ ] Submit either Safari extension to Apple's App Store only if paid Apple Developer Program membership becomes worthwhile.
+7. [ ] Continue Textuary 2.9 personal-archive implementation without altering the published 2.8 package in place.
 
 ## Current publishing progress
 
@@ -152,7 +152,14 @@ Completed on 9 August 2026:
 - selected free, public availability in all regions
 - submitted item `jgckcgnhfjjpcdbenhgfcdgfnkojkdca` for review with deferred publishing
 
-Next Chrome action: monitor the verified developer email and dashboard, answer any reviewer questions, and manually publish within 30 days after approval.
+Completed on 11 August 2026:
+
+- Google accepted the Textuary submission without a requested package or listing change
+- manually confirmed publication from the deferred-release dialog
+- dashboard confirmed **Success — publish request submitted**
+- dashboard status changed to **Published — public**
+
+Next Textuary Chrome actions: confirm public listing propagation, perform a clean-profile store installation, and monitor installs, reviews, support reports and policy notifications.
 
 ## Product roadmap after publication
 
@@ -227,9 +234,9 @@ Next Chrome action: monitor the verified developer email and dashboard, answer a
 - evaluate whether video should remain linked rather than cached because of storage cost
 - update privacy and store disclosures if storage behaviour or permissions change
 
-### Pre-2.9 experiment: Quiet Front Page — Textuary Lab
+### Quiet Front Page 1.0: companion release
 
-This remains a separate locally loaded prototype while the Chrome Web Store reviews Textuary 2.8. Its purpose is to test whether Textuary's quiet-reading idea also works for newspaper home and section pages without changing the released article reader.
+Quiet Front Page has successfully proved the companion concept and will remain a separate extension: **QFP quietens discovery; Textuary quietens reading.** It cleans newspaper home and section pages without changing the published article reader. The current 0.3.2 implementation is the release candidate foundation; the next task is to turn the Textuary Lab prototype into a standalone QFP 1.0 product and Chrome Web Store submission.
 
 - [x] create a standalone Manifest V3 prototype using only `activeTab` and `scripting`
 - [x] infer story cards from semantic headings, links, images and repeated page structure
@@ -254,8 +261,23 @@ This remains a separate locally loaded prototype while the Chrome Web Store revi
 - [x] create a separate multiplatform Safari Web Extension wrapper with distinct bundle identifiers and artwork
 - [x] verify the locally signed macOS Safari scheme builds successfully
 - [x] manually validate Quiet Front Page in packaged macOS Safari
+- [x] decide that Quiet Front Page remains a standalone companion extension
 - [ ] test the Quiet Front Page iOS/iPadOS target on a physical device
-- [ ] decide whether this should remain a companion extension, become a Textuary mode or stop at the experiment
+
+#### QFP 1.0 Chrome release preparation
+
+- [ ] finalise the standalone store name, short summary and product description
+- [ ] replace **Textuary Lab** prototype wording in user-facing QFP identity and documentation
+- [ ] freeze the 1.0 feature scope and bump the manifest and Safari wrapper versions together
+- [ ] test the exact unpacked release candidate on Windows Chrome
+- [ ] repeat a focused macOS Chrome regression across representative newspaper layouts
+- [ ] create QFP store screenshots, a 128-pixel icon and a 440 × 280 promotional tile
+- [ ] prepare QFP-specific privacy, support, permission and single-purpose declarations
+- [ ] create a clean allowlisted Chrome release ZIP with automated package validation and checksum
+- [ ] create a versioned GitHub release and installation notes
+- [ ] upload under publisher **J. G. Keating** and complete the Store Listing, Privacy, Distribution and test-instructions sections
+- [ ] submit with deferred publication, preserve any reviewer correspondence, and manually inspect the accepted listing before release
+- [ ] publish QFP publicly after approval and perform a clean-profile store installation
 
 Prototype and installation notes: [`prototypes/quiet-front-page`](prototypes/quiet-front-page)
 
