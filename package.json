@@ -7,7 +7,10 @@
     "vendor": "node scripts/vendor-dependencies.mjs",
     "check": "node --check background.js && node --check reader.js && node --check library.js && node --check vendor/kokoro.web.js && node --check tests/chrome-smoke-test.mjs && node --check tests/library-smoke-test.mjs && node --check tests/kokoro-webgpu-test.mjs && node --check tests/fixture-server.mjs && node --check tests/vendor-runtime-compatibility-test.mjs && node --check scripts/package-extension.mjs && node scripts/validate-store-assets.mjs && node tests/background-compatibility-test.mjs && node tests/vendor-runtime-compatibility-test.mjs",
     "package:chrome": "node scripts/package-extension.mjs",
-    "release:chrome": "npm run check && npm run package:chrome"
+    "release:chrome": "npm run check && npm run package:chrome",
+    "check:qfp": "node --check prototypes/quiet-front-page/background.js && node --check prototypes/quiet-front-page/quiet.js && node --check tests/quiet-front-page-smoke-test.mjs && node --check tests/quiet-front-page-extension-test.mjs && node --check scripts/package-quiet-front-page.mjs && node --check scripts/validate-qfp-release.mjs && node --check scripts/validate-qfp-store-assets.mjs && node scripts/validate-qfp-release.mjs && node scripts/validate-qfp-store-assets.mjs",
+    "package:qfp": "node scripts/package-quiet-front-page.mjs",
+    "release:qfp": "npm run check:qfp && npm run package:qfp"
   },
   "devDependencies": {
     "@huggingface/transformers": "3.5.1",

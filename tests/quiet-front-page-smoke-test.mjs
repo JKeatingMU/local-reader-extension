@@ -183,6 +183,7 @@ let placeholderScreenshotPath = null;
 let displayScreenshotPath = null;
 let smallScreenshotPath = null;
 let largeScreenshotPath = null;
+let compactScreenshotPath = null;
 let sizeScale = null;
 
 let controls = null;
@@ -199,7 +200,9 @@ if (mode === "fixture") {
 
   await call("Runtime.evaluate", {
     expression: `(() => {
-      const quiet = document.querySelector('#textuary-quiet-front-page').shadowRoot;
+      const host = document.querySelector('#textuary-quiet-front-page');
+      const quiet = host.shadowRoot;
+      host.scrollTop = 0;
       quiet.querySelector('.qfp-display').open = true;
     })()`,
     returnByValue: true
@@ -300,6 +303,20 @@ if (mode === "fixture") {
   assert(controls.detailLabel === "Show summaries", "summary control label did not update");
   assert(controls.densityLabel === "Comfortable view", "density control label did not update");
   assert(controls.sizeLabel === "Large" && controls.sizeIncreaseDisabled, "text-size state did not update");
+
+  await call("Runtime.evaluate", {
+    expression: `(() => {
+      const host = document.querySelector('#textuary-quiet-front-page');
+      const quiet = host.shadowRoot;
+      quiet.getElementById('qfp-size-down').click();
+      host.scrollTop = Math.max(0, quiet.querySelector('.qfp-stories').offsetTop - 72);
+    })()`,
+    returnByValue: true
+  });
+  await new Promise((resolveWait) => setTimeout(resolveWait, 100));
+  const compactScreenshot = await call("Page.captureScreenshot", { format: "png" });
+  compactScreenshotPath = screenshotPath.replace(/\.png$/i, "-compact.png");
+  await writeFile(compactScreenshotPath, Buffer.from(compactScreenshot.data, "base64"));
 }
 
 console.log(JSON.stringify({
@@ -310,7 +327,8 @@ console.log(JSON.stringify({
   placeholderScreenshotPath,
   displayScreenshotPath,
   smallScreenshotPath,
-  largeScreenshotPath
+  largeScreenshotPath,
+  compactScreenshotPath
 }, null, 2));
 socket.close();
 

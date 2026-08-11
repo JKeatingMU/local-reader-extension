@@ -468,7 +468,7 @@
         </header>
         <main>
           <header class="qfp-intro">
-            <p class="qfp-eyebrow">TEXTUARY LAB</p>
+            <p class="qfp-eyebrow">QUIET FRONT PAGE</p>
             <h1>${escapeHtml(publication)}</h1>
             <p class="qfp-deck">A quieter front page with ${items.length} selected stories, labelled by section.</p>
             <p class="qfp-source">${escapeHtml(originalTitle)}</p>
@@ -477,7 +477,7 @@
             ${items.map(storyMarkup).join("")}
           </section>
         </main>
-        <footer class="qfp-footer">Quiet Front Page is an experimental local Textuary view. Story links open the publisher's original page.</footer>
+        <footer class="qfp-footer">A calmer view of the stories already on this page. Links open the publisher's original article.</footer>
       </div>
     `;
     document.documentElement.append(host);
@@ -553,9 +553,9 @@
       <style>${handoffStyles()}</style>
       <div class="qfp-handoff-backdrop">
         <section class="qfp-handoff" role="dialog" aria-modal="true" aria-labelledby="qfp-handoff-title">
-          <p class="qfp-handoff-eyebrow">TEXTUARY LAB</p>
+          <p class="qfp-handoff-eyebrow">QUIET FRONT PAGE</p>
           <h1 id="qfp-handoff-title">This looks like an article</h1>
-          <p class="qfp-handoff-copy">Quiet Front Page is designed for newspaper home and section pages. Textuary is the calmer reading view for this page.</p>
+          <p class="qfp-handoff-copy">Quiet Front Page is designed for newspaper home and section pages. Its companion Textuary provides the calmer reading view for individual articles.</p>
           <div class="qfp-textuary-action">
             <strong>Open in Textuary</strong>
             <span>Press ${shortcut} or click Textuary in Chrome's toolbar.</span>

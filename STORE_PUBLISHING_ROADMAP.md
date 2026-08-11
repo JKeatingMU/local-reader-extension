@@ -236,7 +236,7 @@ Next Textuary Chrome actions: confirm public listing propagation, perform a clea
 
 ### Quiet Front Page 1.0: companion release
 
-Quiet Front Page has successfully proved the companion concept and will remain a separate extension: **QFP quietens discovery; Textuary quietens reading.** It cleans newspaper home and section pages without changing the published article reader. The current 0.3.2 implementation is the release candidate foundation; the next task is to turn the Textuary Lab prototype into a standalone QFP 1.0 product and Chrome Web Store submission.
+Quiet Front Page has successfully proved the companion concept and remains a separate extension: **QFP quietens discovery; Textuary quietens reading.** It cleans newspaper home and section pages without changing the published article reader. The standalone 1.0.0 release candidate now has final product identity, matched Chrome and Safari versions, store materials, privacy and support documents, reproducible packaging and automated exact-package verification.
 
 - [x] create a standalone Manifest V3 prototype using only `activeTab` and `scripting`
 - [x] infer story cards from semantic headings, links, images and repeated page structure
@@ -266,20 +266,22 @@ Quiet Front Page has successfully proved the companion concept and will remain a
 
 #### QFP 1.0 Chrome release preparation
 
-- [ ] finalise the standalone store name, short summary and product description
-- [ ] replace **Textuary Lab** prototype wording in user-facing QFP identity and documentation
-- [ ] freeze the 1.0 feature scope and bump the manifest and Safari wrapper versions together
+- [x] finalise the standalone store name, short summary and product description
+- [x] replace **Textuary Lab** prototype wording in user-facing QFP identity and documentation
+- [x] freeze the 1.0 feature scope and bump the manifest and Safari wrapper versions together
 - [ ] test the exact unpacked release candidate on Windows Chrome
 - [ ] repeat a focused macOS Chrome regression across representative newspaper layouts
-- [ ] create QFP store screenshots, a 128-pixel icon and a 440 × 280 promotional tile
-- [ ] prepare QFP-specific privacy, support, permission and single-purpose declarations
-- [ ] create a clean allowlisted Chrome release ZIP with automated package validation and checksum
+- [x] create QFP store screenshots, a 128-pixel icon and a 440 × 280 promotional tile
+- [x] prepare QFP-specific privacy, support, permission and single-purpose declarations
+- [x] create a clean allowlisted Chrome release ZIP with automated package validation and checksum
+- [x] test toolbar-shortcut activation, identity, permissions, extraction and links using the exact staged Chrome package
+- [x] build the version-matched macOS Safari wrapper successfully
 - [ ] create a versioned GitHub release and installation notes
 - [ ] upload under publisher **J. G. Keating** and complete the Store Listing, Privacy, Distribution and test-instructions sections
 - [ ] submit with deferred publication, preserve any reviewer correspondence, and manually inspect the accepted listing before release
 - [ ] publish QFP publicly after approval and perform a clean-profile store installation
 
-Prototype and installation notes: [`prototypes/quiet-front-page`](prototypes/quiet-front-page)
+Product and local-installation notes: [`prototypes/quiet-front-page`](prototypes/quiet-front-page)
 
 ### Version 2.9: personal reading archive
 

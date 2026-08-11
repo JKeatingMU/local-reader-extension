@@ -76,7 +76,7 @@ For the current release, store-review status, known limitations and exact resume
 
 See [the store-publishing and product roadmap](STORE_PUBLISHING_ROADMAP.md) for the planned Chrome Web Store and Safari App Store releases and the proposed reading-experience, offline-library and export features.
 
-An intentionally separate local experiment, [Quiet Front Page — Textuary Lab](prototypes/quiet-front-page), turns newspaper home and section pages into calm, section-labelled image-and-headline lists and directs likely article pages back to Textuary. It is not part of the submitted Textuary 2.8 package.
+[Quiet Front Page — Clean News Homepages](prototypes/quiet-front-page) is a standalone companion extension that turns newspaper home and section pages into calm, section-labelled image-and-headline lists and directs likely article pages to Textuary. **QFP quietens discovery; Textuary quietens reading.** Quiet Front Page has its own 1.0 package, privacy policy and release process; it is not part of the published Textuary 2.8 package.
 
 - `v1.0.0` is the preserved Daily Mail-specific implementation.
 - `v2.0.0` introduced the generic Local Reader implementation.
