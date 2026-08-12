@@ -23,11 +23,13 @@ Prepared for Quiet Front Page 1.0.0 on 11 August 2026.
 - [x] complete the allowlisted Chrome packaging script and archive checksum
 - [x] validate the exact staged Chrome manifest and file inventory
 - [x] activate and inspect the exact staged package in an isolated macOS Chrome for Testing profile
-- [ ] run the complete macOS Chrome release-candidate regression
+- [x] run the complete macOS Chrome release-candidate regression
 - [x] build the version-matched macOS Safari wrapper
 - [ ] test the exact release candidate on Windows Chrome
 - [ ] commit the Windows result and freeze the final 1.0.0 release commit
 - [ ] create and publish the versioned GitHub release
+
+RC1 Windows download: <https://github.com/JKeatingMU/local-reader-extension/releases/download/qfp-v1.0.0-rc1/quiet-front-page-1.0.0.zip>
 
 ## Chrome Web Store submission
 
