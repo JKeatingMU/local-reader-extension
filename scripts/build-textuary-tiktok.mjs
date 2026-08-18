@@ -208,7 +208,7 @@ function endCardHtml() {
   .promise { font-size: 34px; font-weight: 800; letter-spacing: .11em; margin-top: 92px; }
   .line { background: #79b9e8; height: 2px; margin-top: 82px; opacity: .65; width: 880px; }
   .cta { background: #79b9e8; border-radius: 999px; color: #07131f; font-size: 31px; font-weight: 900; margin-top: 88px; padding: 22px 34px; }
-  .search { font-size: 27px; margin-top: 38px; opacity: .78; }
+  .search { font-size: 35px; font-weight: 650; margin-top: 38px; opacity: .92; }
 </style></head><body>
   <img class="icon" src="${pathToFileURL(icon).href}" alt=""><div class="brand">TEXTUARY</div>
   <h1>Article Reader<br>&amp; Text Sanctuary</h1><div class="promise">READ. &nbsp;LISTEN. &nbsp;SAVE.</div>
