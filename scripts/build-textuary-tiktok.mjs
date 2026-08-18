@@ -16,22 +16,24 @@ const silentVideo = join(outputRoot, "silent.mp4");
 const finalVideo = join(outputRoot, "textuary-tiktok-v1.mp4");
 const coverImage = join(outputRoot, "textuary-tiktok-cover.png");
 const contactSheet = join(outputRoot, "textuary-tiktok-contact-sheet.png");
+const narrationPause = 0.38;
+const endDuration = 6.7;
 
 const scenes = [
   {
-    name: "01-hook", duration: 3.2, image: beforeImage,
+    name: "01-hook", duration: 5.0, image: beforeImage,
     background: "#07131f", accent: "#79b9e8", text: "#f7f2e8",
-    kicker: "LOVE READING ONLINE?", headline: "Hate everything around\nthe article?",
+    kicker: "LOVE READING ARTICLES ONLINE?", headline: "Hate all the distractions\naround them?",
     subline: "The story is in there somewhere.", url: "daily-scroll.example/article"
   },
   {
-    name: "02-click", duration: 2.4, image: join(projectRoot, "store", "chrome", "assets", "reader-light-1280x800.png"),
+    name: "02-click", duration: 1.7, image: join(projectRoot, "store", "chrome", "assets", "reader-light-1280x800.png"),
     background: "#eee8dd", accent: "#0d4a86", text: "#17191c",
     kicker: "ONE CLICK.", headline: "The noise steps aside.",
     subline: "The article stays. Everything gets room to breathe.", url: "Textuary · Reader view", badge: "TEXTUARY ON"
   },
   {
-    name: "03-read", duration: 3.4, image: join(projectRoot, "store", "chrome", "assets", "reader-dark-1280x800.png"),
+    name: "03-read", duration: 1.7, image: join(projectRoot, "store", "chrome", "assets", "reader-dark-1280x800.png"),
     background: "#101313", accent: "#e3b35d", text: "#f5eee2",
     kicker: "READ", headline: "A calm place to read\nat your pace.",
     subline: "Typography, themes and progress—without distraction.", url: "Textuary · Evening view"
@@ -43,12 +45,24 @@ const scenes = [
     subline: "Private read-aloud controls stay close when you need them.", url: "Textuary · Voice controls"
   },
   {
-    name: "05-save", duration: 2.2, image: join(projectRoot, "store", "chrome", "assets", "library-1280x800.png"),
+    name: "05-save", duration: 3.1, image: join(projectRoot, "store", "chrome", "assets", "library-1280x800.png"),
     background: "#101313", accent: "#79b9e8", text: "#f5eee2",
     kicker: "SAVE", headline: "A private local Library.\nNo account.",
     subline: "Keep clean article snapshots for later.", url: "Textuary · Local Library"
   }
 ];
+
+const narrationSegments = [
+  "Love reading newspaper articles online, but hate all the distractions around them?",
+  "One click turns a busy page into a calm place to read.",
+  "Listen with your favourite voice.",
+  "Save articles privately without an account.",
+  "Textuary.",
+  "Your article reader and text sanctuary.",
+  "Free for Chrome in the Extensions Store."
+];
+
+const videoDuration = scenes.reduce((total, scene) => total + scene.duration, endDuration);
 
 await rm(outputRoot, { recursive: true, force: true });
 await mkdir(sceneRoot, { recursive: true });
@@ -72,22 +86,21 @@ const endImage = join(sceneRoot, "06-end.png");
 const endVideo = join(sceneRoot, "06-end.mp4");
 await writeFile(endHtml, endCardHtml());
 await capture(chrome, endHtml, endImage, 1080, 1920);
-await animateScene(endImage, endVideo, 4.6, false, true);
+await animateScene(endImage, endVideo, endDuration, false, true);
 sceneVideos.push(endVideo);
 
 const concatFile = join(outputRoot, "scenes.txt");
 await writeFile(concatFile, sceneVideos.map((path) => `file '${path}'`).join("\n") + "\n");
 await run("ffmpeg", ["-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", concatFile, "-c", "copy", silentVideo]);
 
-const narration = "Love reading online, but hate everything around the article? One click turns a busy page into a calm place to read. Listen with your favourite voice. Save articles privately, without an account. Textuary. Your article reader and text sanctuary. Free on the Chrome Web Store.";
-await run("say", ["-v", "Serena (Premium)", "-r", "175", "-o", voiceover, narration]);
+await renderNarration(narrationSegments, voiceover);
 
 await run("ffmpeg", [
   "-y", "-loglevel", "error",
-  "-f", "lavfi", "-i", "sine=frequency=220:duration=18:sample_rate=44100",
-  "-f", "lavfi", "-i", "sine=frequency=277.18:duration=18:sample_rate=44100",
-  "-f", "lavfi", "-i", "sine=frequency=329.63:duration=18:sample_rate=44100",
-  "-filter_complex", "[0:a]volume=0.010[a0];[1:a]volume=0.008[a1];[2:a]volume=0.007[a2];[a0][a1][a2]amix=inputs=3:duration=longest,afade=t=in:st=0:d=1.2,afade=t=out:st=15.8:d=2.2[out]",
+  "-f", "lavfi", "-i", `sine=frequency=220:duration=${videoDuration}:sample_rate=44100`,
+  "-f", "lavfi", "-i", `sine=frequency=277.18:duration=${videoDuration}:sample_rate=44100`,
+  "-f", "lavfi", "-i", `sine=frequency=329.63:duration=${videoDuration}:sample_rate=44100`,
+  "-filter_complex", `[0:a]volume=0.010[a0];[1:a]volume=0.008[a1];[2:a]volume=0.007[a2];[a0][a1][a2]amix=inputs=3:duration=longest,afade=t=in:st=0:d=1.2,afade=t=out:st=${videoDuration - 2.2}:d=2.2[out]`,
   "-map", "[out]", "-c:a", "pcm_s16le", ambient
 ]);
 
@@ -95,7 +108,7 @@ await run("ffmpeg", [
   "-y", "-loglevel", "error", "-i", silentVideo, "-i", voiceover, "-i", ambient,
   "-filter_complex", "[1:a]adelay=260|260,volume=1.08[voice];[2:a]volume=0.9[bed];[voice][bed]amix=inputs=2:duration=longest:dropout_transition=0[aout]",
   "-map", "0:v", "-map", "[aout]", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k",
-  "-t", "18", "-movflags", "+faststart", finalVideo
+  "-t", String(videoDuration), "-movflags", "+faststart", finalVideo
 ]);
 
 await run("ffmpeg", ["-y", "-loglevel", "error", "-ss", "0.8", "-i", finalVideo, "-frames:v", "1", coverImage]);
@@ -125,6 +138,29 @@ async function animateScene(imagePath, videoPath, duration, fadeIn, fadeOut) {
     "-y", "-loglevel", "error", "-loop", "1", "-framerate", "30", "-i", imagePath,
     "-vf", filters.join(","), "-frames:v", String(frames),
     "-c:v", "libx264", "-preset", "slow", "-crf", "16", "-pix_fmt", "yuv420p", videoPath
+  ]);
+}
+
+async function renderNarration(sentences, outputPath) {
+  const narrationRoot = join(outputRoot, "narration");
+  await mkdir(narrationRoot, { recursive: true });
+  const clips = [];
+  for (const [index, sentence] of sentences.entries()) {
+    const clip = join(narrationRoot, `${String(index + 1).padStart(2, "0")}.aiff`);
+    await run("say", ["-v", "Serena (Premium)", "-r", "175", "-o", clip, sentence]);
+    clips.push(clip);
+  }
+
+  const pauseLabels = Array.from({ length: clips.length - 1 }, (_, index) => `[pause${index}]`).join("");
+  const concatInputs = clips.map((_, index) => {
+    const pause = index < clips.length - 1 ? `[pause${index}]` : "";
+    return `[${index}:a]${pause}`;
+  }).join("");
+  await run("ffmpeg", [
+    "-y", "-loglevel", "error",
+    ...clips.flatMap((clip) => ["-i", clip]),
+    "-filter_complex", `aevalsrc=0:d=${narrationPause}:s=22050:c=mono,asplit=${clips.length - 1}${pauseLabels};${concatInputs}concat=n=${clips.length * 2 - 1}:v=0:a=1[out]`,
+    "-map", "[out]", "-c:a", "pcm_s16be", outputPath
   ]);
 }
 

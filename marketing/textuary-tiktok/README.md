@@ -1,6 +1,6 @@
 # Textuary TikTok video
 
-This production creates an 18-second, 1080 × 1920 vertical video advertising Textuary with genuine extension screenshots and a wholly synthetic source article.
+This production creates a 20.4-second, 1080 × 1920 vertical video advertising Textuary with genuine extension screenshots and a wholly synthetic source article.
 
 ## Creative structure
 
@@ -11,7 +11,7 @@ This production creates an 18-second, 1080 × 1920 vertical video advertising Te
 5. Private local Library
 6. Chrome Web Store end card
 
-The narration is generated locally with the installed **Serena (Premium)** Apple voice. Captions carry the main message when the video is viewed without sound. No publisher branding, third-party article text, analytics claim, gating claim or advertising-removal claim appears in the creative.
+The narration is generated locally with the installed **Serena (Premium)** Apple voice. Each sentence is rendered separately with controlled pauses for natural cadence. Captions carry the main message when the video is viewed without sound. No publisher branding, third-party article text, analytics claim, gating claim or advertising-removal claim appears in the creative.
 
 ## Build
 
