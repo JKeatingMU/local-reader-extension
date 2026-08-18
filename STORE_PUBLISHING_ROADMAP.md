@@ -120,7 +120,7 @@ Public Apple distribution was deliberately deferred on 9 August 2026 because the
 2. [x] Complete and record Textuary's Windows Chrome validation.
 3. [x] Submit, obtain approval for and publicly release Textuary through the Chrome Web Store.
 4. [x] Create and test the permanent local macOS Safari package.
-5. [ ] Prepare and submit Quiet Front Page 1.0 as a separate Chrome Web Store companion.
+5. [x] Prepare and submit Quiet Front Page 1.0 as a separate Chrome Web Store companion.
 6. [ ] Submit either Safari extension to Apple's App Store only if paid Apple Developer Program membership becomes worthwhile.
 7. [ ] Continue Textuary 2.9 personal-archive implementation without altering the published 2.8 package in place.
 
@@ -278,9 +278,12 @@ Quiet Front Page has successfully proved the companion concept and remains a sep
 - [x] build the version-matched macOS Safari wrapper successfully
 - [x] publish the exact 1.0.0 candidate ZIP as GitHub prerelease `qfp-v1.0.0-rc1` for Windows validation
 - [x] create a versioned GitHub release and installation notes
-- [ ] upload under publisher **J. G. Keating** and complete the Store Listing, Privacy, Distribution and test-instructions sections
-- [ ] submit with deferred publication, preserve any reviewer correspondence, and manually inspect the accepted listing before release
+- [x] upload under publisher **J. G. Keating** and complete the Store Listing, Privacy, Distribution and test-instructions sections
+- [x] submit with deferred publication on 18 August 2026
+- [ ] preserve any reviewer correspondence and manually inspect the accepted listing before release
 - [ ] publish QFP publicly after approval and perform a clean-profile store installation
+
+Chrome Web Store status on 18 August 2026: **Pending review**, item ID `fhkoanbpogkplikofjfdfanlfmnldadc`. Automatic publication is disabled. If accepted, the staged approval must be published within the dashboard's stated 30-day window.
 
 Product and local-installation notes: [`prototypes/quiet-front-page`](prototypes/quiet-front-page)
 

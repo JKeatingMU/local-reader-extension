@@ -1,6 +1,8 @@
 # Quiet Front Page Chrome Web Store Submission Checklist
 
-Prepared for Quiet Front Page 1.0.0 on 11 August 2026; release validation completed on 18 August 2026.
+Prepared for Quiet Front Page 1.0.0 on 11 August 2026; release validation and Chrome Web Store submission completed on 18 August 2026.
+
+Current store status: **Pending review** with deferred publication. Item ID: `fhkoanbpogkplikofjfdfanlfmnldadc`.
 
 ## Completed in the repository
 
@@ -35,17 +37,19 @@ Final release: <https://github.com/JKeatingMU/local-reader-extension/releases/ta
 
 ## Chrome Web Store submission
 
-- [ ] add a new item under publisher **J. G. Keating**
-- [ ] upload the generated QFP ZIP from `dist/chrome`
-- [ ] complete the listing category and subcategory using the current dashboard choices
-- [ ] complete the privacy fields consistently with `QUIET_FRONT_PAGE_PRIVACY.md`
-- [ ] upload the prepared icon, screenshots and promotional tile
-- [ ] select free, public distribution in all supported regions
-- [ ] review the rendered listing for clarity and cropping
-- [ ] submit for review with deferred publishing enabled
+- [x] add a new item under publisher **J. G. Keating**
+- [x] upload the generated QFP ZIP from `dist/chrome`
+- [x] complete the listing category and subcategory using the current dashboard choices
+- [x] complete the privacy fields consistently with `QUIET_FRONT_PAGE_PRIVACY.md`
+- [x] upload the prepared icon, screenshots and promotional tile
+- [x] select free, public distribution in all supported regions
+- [x] review the rendered listing for clarity and cropping
+- [x] submit for review with deferred publishing enabled
 - [ ] preserve and respond to any reviewer questions
 - [ ] inspect the accepted public listing preview and manually publish
 - [ ] install once from the public store in a clean Chrome profile
+
+The dashboard confirmed submission on 18 August 2026 and warned that a staged item expires 30 days after it passes review.
 
 ## Release verification commands
 

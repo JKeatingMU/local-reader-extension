@@ -1,12 +1,12 @@
 # Textuary Project Handoff
 
-Snapshot date: 11 August 2026
+Snapshot date: 18 August 2026
 
 This is the canonical restart point for Textuary. Read this file first in a new working session, then follow the linked plans for detailed release or feature work.
 
 ## Milestone reached
 
-Textuary 2.8.0 is a tested Chrome and Safari article reader with a private local Library and read-aloud support. It is released on GitHub and publicly published in the Chrome Web Store.
+Textuary 2.8.0 is a tested Chrome and Safari article reader with a private local Library and read-aloud support. It is released on GitHub and publicly published in the Chrome Web Store. Quiet Front Page 1.0.0 is released on GitHub and pending Chrome Web Store review with deferred publication.
 
 The product relationship is now settled: **QFP quietens discovery; Textuary quietens reading.** Quiet Front Page remains a separate companion extension rather than becoming a Textuary mode.
 
@@ -132,7 +132,7 @@ The unsigned Safari build and universal Release archive pass. Xcode currently re
 
 ## Next release work
 
-Textuary's first public Chrome release is complete. Quiet Front Page 1.0.0 is packaged and validated on macOS and Windows 11 Chrome; its remaining release work is the Chrome Web Store submission. Textuary 2.9 remains the next major feature release, not an urgent change to the newly published 2.8 package.
+Textuary's first public Chrome release is complete. Quiet Front Page 1.0.0 is packaged, validated on macOS and Windows 11 Chrome, and pending Chrome Web Store review. Its remaining release work is to preserve any reviewer correspondence, inspect the accepted listing and publish it manually within the staged approval window. Textuary 2.9 remains the next major feature release, not an urgent change to the published 2.8 package.
 
 Mac App Store repository preparation is complete for a macOS-only first Apple release: production bundle identifiers, version/build metadata, Productivity category, export-compliance declaration, universal unsigned Release archive, listing copy and the submission checklist are in place. Public Apple distribution was deliberately deferred on 9 August 2026 because the account has no paid Apple Developer Program membership and the user does not want to add the annual fee for this free extension yet. Textuary remains available to the user through the proven local Xcode/Safari installation. When revisited, the next Apple action is to enrol, add the Apple team to Xcode, create the App Store Connect record and upload a signed archive. iPhone/iPad support must not be claimed until a physical-device build and responsive extension workflow have been tested.
 
@@ -150,7 +150,9 @@ The 1.0.0 release is staged reproducibly by `npm run release:qfp`. Its Chrome pa
 
 The Windows candidate remains preserved as GitHub prerelease [`qfp-v1.0.0-rc1`](https://github.com/JKeatingMU/local-reader-extension/releases/tag/qfp-v1.0.0-rc1). The final tested package is published separately as [`qfp-v1.0.0`](https://github.com/JKeatingMU/local-reader-extension/releases/tag/qfp-v1.0.0), keeping QFP's tags distinct from Textuary's release series.
 
-Store copy, reviewer instructions, privacy declarations and five validated assets are under [`store/qfp`](store/qfp). The public privacy and support documents are [`QUIET_FRONT_PAGE_PRIVACY.md`](QUIET_FRONT_PAGE_PRIVACY.md) and [`QUIET_FRONT_PAGE_SUPPORT.md`](QUIET_FRONT_PAGE_SUPPORT.md). The next active step is to create the separate QFP item under publisher **J. G. Keating** and work through the prepared Chrome Web Store submission checklist.
+Store copy, reviewer instructions, privacy declarations and five validated assets are under [`store/qfp`](store/qfp). The public privacy and support documents are [`QUIET_FRONT_PAGE_PRIVACY.md`](QUIET_FRONT_PAGE_PRIVACY.md) and [`QUIET_FRONT_PAGE_SUPPORT.md`](QUIET_FRONT_PAGE_SUPPORT.md).
+
+QFP was submitted under publisher **J. G. Keating** on 18 August 2026. Chrome Web Store item ID: `fhkoanbpogkplikofjfdfanlfmnldadc`. Status at submission: **Pending review**. It is free, public, available in all listed and unlisted regions, and uses deferred publication. The dashboard states that an accepted staged item expires 30 days after passing review, so do not leave an approval unpublished beyond that window.
 
 ## Planned version 2.9
 
@@ -176,5 +178,5 @@ At the beginning of the next session:
 1. Read this handoff and check `git status` and the current branch.
 2. Confirm Textuary's public Chrome Web Store listing has propagated and install it once from a clean Chrome profile.
 3. Preserve any Chrome Web Store policy email, support report or dashboard warning before changing code or declarations.
-4. Submit Quiet Front Page 1.0.0 to the Chrome Web Store using [`store/qfp/SUBMISSION_CHECKLIST.md`](store/qfp/SUBMISSION_CHECKLIST.md), preferably with deferred publishing.
+4. Monitor Quiet Front Page item `fhkoanbpogkplikofjfdfanlfmnldadc`; preserve any reviewer message, inspect the accepted listing, then publish manually before the 30-day staged approval expires.
 5. Keep Textuary 2.9 schema and migration work isolated from the published 2.8 package.
