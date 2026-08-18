@@ -269,7 +269,7 @@ Quiet Front Page has successfully proved the companion concept and remains a sep
 - [x] finalise the standalone store name, short summary and product description
 - [x] replace **Textuary Lab** prototype wording in user-facing QFP identity and documentation
 - [x] freeze the 1.0 feature scope and bump the manifest and Safari wrapper versions together
-- [ ] test the exact unpacked release candidate on Windows Chrome
+- [x] test the exact unpacked release candidate on Windows 11 Chrome
 - [x] repeat a focused macOS Chrome regression across representative newspaper layouts
 - [x] create QFP store screenshots, a 128-pixel icon and a 440 × 280 promotional tile
 - [x] prepare QFP-specific privacy, support, permission and single-purpose declarations
@@ -277,7 +277,7 @@ Quiet Front Page has successfully proved the companion concept and remains a sep
 - [x] test toolbar-shortcut activation, identity, permissions, extraction and links using the exact staged Chrome package
 - [x] build the version-matched macOS Safari wrapper successfully
 - [x] publish the exact 1.0.0 candidate ZIP as GitHub prerelease `qfp-v1.0.0-rc1` for Windows validation
-- [ ] create a versioned GitHub release and installation notes
+- [x] create a versioned GitHub release and installation notes
 - [ ] upload under publisher **J. G. Keating** and complete the Store Listing, Privacy, Distribution and test-instructions sections
 - [ ] submit with deferred publication, preserve any reviewer correspondence, and manually inspect the accepted listing before release
 - [ ] publish QFP publicly after approval and perform a clean-profile store installation

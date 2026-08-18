@@ -2,7 +2,7 @@
 
 Quiet Front Page turns busy newspaper home and section pages into calm, ordered visual story lists while preserving original publisher links. It is the discovery companion to [Textuary](../../README.md): **QFP quietens discovery; Textuary quietens reading.**
 
-Version 1.0.0 is the current release candidate. It has a standalone Chrome package and a version-matched macOS Safari wrapper; the remaining public-release checkpoints are fresh manual Chrome tests on macOS and Windows.
+Version 1.0.0 is the current release. Its exact Chrome package passed manual testing on macOS and Windows 11, and it has a version-matched macOS Safari wrapper. Download it from the [`qfp-v1.0.0` GitHub release](https://github.com/JKeatingMU/local-reader-extension/releases/tag/qfp-v1.0.0).
 
 ## Install locally in Chrome
 
@@ -62,7 +62,7 @@ From the repository root:
 npm run release:qfp
 ```
 
-This validates the identity, permissions, runtime inventory and store assets, then creates an allowlisted staging directory and ZIP under `dist/chrome`. Use the exact staged package for final manual tests before creating the versioned GitHub release.
+This validates the identity, permissions, runtime inventory and store assets, then creates an allowlisted staging directory and ZIP under `dist/chrome`.
 
 ## Privacy and support
 

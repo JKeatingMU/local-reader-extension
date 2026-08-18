@@ -1,6 +1,6 @@
 # Quiet Front Page Chrome Web Store Submission Checklist
 
-Prepared for Quiet Front Page 1.0.0 on 11 August 2026.
+Prepared for Quiet Front Page 1.0.0 on 11 August 2026; release validation completed on 18 August 2026.
 
 ## Completed in the repository
 
@@ -25,11 +25,13 @@ Prepared for Quiet Front Page 1.0.0 on 11 August 2026.
 - [x] activate and inspect the exact staged package in an isolated macOS Chrome for Testing profile
 - [x] run the complete macOS Chrome release-candidate regression
 - [x] build the version-matched macOS Safari wrapper
-- [ ] test the exact release candidate on Windows Chrome
-- [ ] commit the Windows result and freeze the final 1.0.0 release commit
-- [ ] create and publish the versioned GitHub release
+- [x] test the exact release candidate on Windows 11 Chrome
+- [x] commit the Windows result and freeze the final 1.0.0 release commit
+- [x] create and publish the versioned GitHub release
 
 RC1 Windows download: <https://github.com/JKeatingMU/local-reader-extension/releases/download/qfp-v1.0.0-rc1/quiet-front-page-1.0.0.zip>
+
+Final release: <https://github.com/JKeatingMU/local-reader-extension/releases/tag/qfp-v1.0.0>
 
 ## Chrome Web Store submission
 

@@ -132,7 +132,7 @@ The unsigned Safari build and universal Release archive pass. Xcode currently re
 
 ## Next release work
 
-Textuary's first public Chrome release is complete. Quiet Front Page 1.0.0 RC1 is now packaged and has passed its fresh manual macOS Chrome check; its remaining release gates are exact-package Windows Chrome validation, the final versioned GitHub release and Chrome Web Store submission. Textuary 2.9 remains the next major feature release, not an urgent change to the newly published 2.8 package.
+Textuary's first public Chrome release is complete. Quiet Front Page 1.0.0 is packaged and validated on macOS and Windows 11 Chrome; its remaining release work is the Chrome Web Store submission. Textuary 2.9 remains the next major feature release, not an urgent change to the newly published 2.8 package.
 
 Mac App Store repository preparation is complete for a macOS-only first Apple release: production bundle identifiers, version/build metadata, Productivity category, export-compliance declaration, universal unsigned Release archive, listing copy and the submission checklist are in place. Public Apple distribution was deliberately deferred on 9 August 2026 because the account has no paid Apple Developer Program membership and the user does not want to add the annual fee for this free extension yet. Textuary remains available to the user through the proven local Xcode/Safari installation. When revisited, the next Apple action is to enrol, add the Apple team to Xcode, create the App Store Connect record and upload a signed archive. iPhone/iPad support must not be claimed until a physical-device build and responsive extension workflow have been tested.
 
@@ -146,11 +146,11 @@ The implementation uses generic semantic and repeated-card heuristics rather tha
 
 A separate multiplatform Safari Web Extension wrapper lives at [`safari/QuietFrontPage/Quiet Front Page`](safari/QuietFrontPage/Quiet%20Front%20Page). It has distinct Quiet Front Page bundle identifiers and artwork and references the shared extension sources. Manual macOS Safari testing passed on 10 August 2026, and the version-matched 1.0.0 macOS scheme completed a fresh unsigned build on 11 August. The physical iPhone/iPad target still needs testing but is not a blocker for a Chrome release.
 
-The 1.0.0 release candidate is staged reproducibly by `npm run release:qfp`. Its Chrome package contains only the manifest, service worker, page renderer and four required runtime icons. Automated checks validate the public identity, exact `activeTab` and `scripting` permissions, absence of persistent site access and storage, store-asset dimensions, staged file inventory, keyboard-shortcut activation, six-story fixture extraction and original links. Current candidate output: `dist/chrome/quiet-front-page-1.0.0.zip`, 20,885 bytes, SHA-256 `fff5cab7e4c1d51994c6db495fc74c68ff4df85773f5a5cc8714e9a4610b9d5c`. Two consecutive builds produced the same checksum. Manual macOS Chrome validation passed on 11 August 2026.
+The 1.0.0 release is staged reproducibly by `npm run release:qfp`. Its Chrome package contains only the manifest, service worker, page renderer and four required runtime icons. Automated checks validate the public identity, exact `activeTab` and `scripting` permissions, absence of persistent site access and storage, store-asset dimensions, staged file inventory, keyboard-shortcut activation, six-story fixture extraction and original links. Final output: `dist/chrome/quiet-front-page-1.0.0.zip`, 20,885 bytes, SHA-256 `fff5cab7e4c1d51994c6db495fc74c68ff4df85773f5a5cc8714e9a4610b9d5c`. Repeated builds produced the same checksum. Manual macOS Chrome validation passed on 11 August 2026, and the exact RC1 ZIP passed Windows 11 Chrome validation on 18 August 2026.
 
-The exact ZIP is attached to the GitHub prerelease [`qfp-v1.0.0-rc1`](https://github.com/JKeatingMU/local-reader-extension/releases/tag/qfp-v1.0.0-rc1) for the Windows 11 test. It targets commit `5f2a621` and remains explicitly marked as a prerelease until Windows validation is complete.
+The Windows candidate remains preserved as GitHub prerelease [`qfp-v1.0.0-rc1`](https://github.com/JKeatingMU/local-reader-extension/releases/tag/qfp-v1.0.0-rc1). The final tested package is published separately as [`qfp-v1.0.0`](https://github.com/JKeatingMU/local-reader-extension/releases/tag/qfp-v1.0.0), keeping QFP's tags distinct from Textuary's release series.
 
-Store copy, reviewer instructions, privacy declarations and five validated assets are under [`store/qfp`](store/qfp). The public privacy and support documents are [`QUIET_FRONT_PAGE_PRIVACY.md`](QUIET_FRONT_PAGE_PRIVACY.md) and [`QUIET_FRONT_PAGE_SUPPORT.md`](QUIET_FRONT_PAGE_SUPPORT.md). Do not tag or create the GitHub release until the exact package has passed the fresh manual macOS and Windows Chrome checkpoints.
+Store copy, reviewer instructions, privacy declarations and five validated assets are under [`store/qfp`](store/qfp). The public privacy and support documents are [`QUIET_FRONT_PAGE_PRIVACY.md`](QUIET_FRONT_PAGE_PRIVACY.md) and [`QUIET_FRONT_PAGE_SUPPORT.md`](QUIET_FRONT_PAGE_SUPPORT.md). The next active step is to create the separate QFP item under publisher **J. G. Keating** and work through the prepared Chrome Web Store submission checklist.
 
 ## Planned version 2.9
 
@@ -176,5 +176,5 @@ At the beginning of the next session:
 1. Read this handoff and check `git status` and the current branch.
 2. Confirm Textuary's public Chrome Web Store listing has propagated and install it once from a clean Chrome profile.
 3. Preserve any Chrome Web Store policy email, support report or dashboard warning before changing code or declarations.
-4. Run the fresh manual macOS Chrome pass, then test the exact Quiet Front Page 1.0.0 ZIP on Windows Chrome using [`store/qfp/SUBMISSION_CHECKLIST.md`](store/qfp/SUBMISSION_CHECKLIST.md).
+4. Submit Quiet Front Page 1.0.0 to the Chrome Web Store using [`store/qfp/SUBMISSION_CHECKLIST.md`](store/qfp/SUBMISSION_CHECKLIST.md), preferably with deferred publishing.
 5. Keep Textuary 2.9 schema and migration work isolated from the published 2.8 package.
