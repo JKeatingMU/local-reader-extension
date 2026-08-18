@@ -10,7 +10,8 @@
     "release:chrome": "npm run check && npm run package:chrome",
     "check:qfp": "node --check prototypes/quiet-front-page/background.js && node --check prototypes/quiet-front-page/quiet.js && node --check tests/quiet-front-page-smoke-test.mjs && node --check tests/quiet-front-page-extension-test.mjs && node --check scripts/package-quiet-front-page.mjs && node --check scripts/validate-qfp-release.mjs && node --check scripts/validate-qfp-store-assets.mjs && node scripts/validate-qfp-release.mjs && node scripts/validate-qfp-store-assets.mjs",
     "package:qfp": "node scripts/package-quiet-front-page.mjs",
-    "release:qfp": "npm run check:qfp && npm run package:qfp"
+    "release:qfp": "npm run check:qfp && npm run package:qfp",
+    "marketing:tiktok": "node scripts/build-textuary-tiktok.mjs"
   },
   "devDependencies": {
     "@huggingface/transformers": "3.5.1",
