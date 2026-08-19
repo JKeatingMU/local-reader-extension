@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Morning Ledger — News, culture and ideas</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { background: #f6f4ef; color: #202020; font-family: Arial, sans-serif; margin: 0; }
+    .utility { background: #171717; color: #fff; display: flex; font-size: 12px; justify-content: space-between; padding: 9px 4vw; }
+    .breaking { background: #e2bb3d; color: #181818; font-size: 12px; font-weight: 800; letter-spacing: .06em; padding: 9px 4vw; }
+    header { align-items: center; background: #a51624; color: #fff; display: flex; justify-content: space-between; padding: 22px 4vw; }
+    header strong { font: 800 40px Georgia, serif; }
+    header button { background: #fff; border: 0; border-radius: 4px; font-weight: 800; padding: 11px 15px; }
+    nav { background: #fff; border-bottom: 1px solid #bbb; display: flex; font-size: 13px; font-weight: 800; gap: 27px; padding: 14px 4vw; }
+    .ticker { background: #333; color: #fff; font-size: 13px; padding: 11px 4vw; }
+    .advert-wide { align-items: center; background: repeating-linear-gradient(-45deg,#eee 0,#eee 10px,#f7f7f7 10px,#f7f7f7 20px); color: #888; display: flex; font-size: 11px; height: 65px; justify-content: center; letter-spacing: .16em; }
+    main { display: grid; gap: 22px; grid-template-columns: minmax(0,1fr) 270px; margin: 24px auto 80px; width: min(1180px,92vw); }
+    .lead { background: #fff; border: 1px solid #d5d2cb; box-shadow: 0 8px 22px #00000012; grid-column: 1; }
+    .lead img { display: block; height: 260px; object-fit: cover; width: 100%; }
+    .lead-copy { padding: 19px 22px 22px; }
+    .label { color: #a51624; font-size: 11px; font-weight: 900; letter-spacing: .14em; }
+    h1 { font: 800 37px/1.02 Georgia, serif; margin: 9px 0; }
+    .lead p, article p { color: #595959; line-height: 1.42; margin-bottom: 0; }
+    .cards { display: grid; gap: 18px; grid-column: 1; grid-template-columns: repeat(2,minmax(0,1fr)); }
+    article { background: #fff; border: 1px solid #d5d2cb; box-shadow: 0 8px 20px #0000000d; }
+    article img { display: block; height: 145px; object-fit: cover; width: 100%; }
+    article div { padding: 15px; }
+    article h2 { font: 700 23px/1.08 Georgia, serif; margin: 5px 0 8px; }
+    aside { grid-column: 2; grid-row: 1 / span 2; }
+    .ad { align-items: center; background: #eee; border: 1px dashed #999; color: #777; display: flex; height: 165px; justify-content: center; letter-spacing: .14em; }
+    .newsletter { background: #265a87; color: #fff; margin-top: 18px; padding: 22px; }
+    .newsletter h2 { font: 700 24px Georgia, serif; margin-top: 0; }
+    .newsletter button { background: #fff; border: 0; color: #16466f; font-weight: 800; padding: 10px 13px; }
+    .trending { background: #fff; border: 1px solid #d5d2cb; margin-top: 18px; padding: 20px; }
+    .trending h3 { font: 700 21px Georgia, serif; margin-top: 0; }
+    .trending ol { line-height: 1.4; padding-left: 22px; }
+    .alert { background: #145b8e; border-radius: 999px; bottom: 70px; box-shadow: 0 8px 24px #0005; color: #fff; font-size: 13px; font-weight: 800; padding: 14px 19px; position: fixed; right: 22px; }
+    .cookies { align-items: center; background: #171717; bottom: 0; color: #fff; display: flex; font-size: 13px; gap: 18px; justify-content: center; left: 0; padding: 14px; position: fixed; right: 0; z-index: 3; }
+    .cookies button { background: #e2bb3d; border: 0; font-weight: 800; padding: 9px 13px; }
+  </style>
+</head>
+<body>
+  <div class="utility"><span>Wednesday, 19 August</span><span>Newsletters · Weather · Podcasts · Games · Account</span></div>
+  <div class="breaking">BREAKING · LIVE UPDATES · MARKETS MOVE AGAIN · SUBSCRIBE FOR UNLIMITED ACCESS</div>
+  <header><strong>The Morning Ledger</strong><button>Sign in · Subscribe</button></header>
+  <nav>Latest&nbsp;&nbsp; World&nbsp;&nbsp; Ireland&nbsp;&nbsp; Money&nbsp;&nbsp; Culture&nbsp;&nbsp; Life&nbsp;&nbsp; Science&nbsp;&nbsp; Opinion</nav>
+  <div class="ticker">LIVE: Updates, promotions, weather, newsletters and considerably more motion than anyone requested.</div>
+  <div class="advert-wide">ADVERTISEMENT · DISCOVER SOMETHING NEW TODAY</div>
+  <main>
+    <section class="lead">
+      <img src="../../prototypes/quiet-front-page/demo/assets/coast.svg" alt="">
+      <div class="lead-copy"><span class="label">TRAVEL &amp; PLACES</span><h1>A forgotten coastal path is becoming a treasured public space again</h1><p>Local volunteers have restored a peaceful route connecting three villages along the Atlantic shore.</p></div>
+    </section>
+    <section class="cards">
+      <article><img src="../../prototypes/quiet-front-page/demo/assets/city.svg" alt=""><div><span class="label">CITIES</span><h2>The city square redesigned around conversation rather than traffic</h2><p>A modest civic project changes the rhythm of a neighbourhood.</p></div></article>
+      <article><img src="../../prototypes/quiet-front-page/demo/assets/books.svg" alt=""><div><span class="label">CULTURE</span><h2>Why late library hours are drawing an entirely new readership</h2><p>Evening access turns a local library into a cultural meeting place.</p></div></article>
+    </section>
+    <aside><div class="ad">ADVERTISEMENT</div><section class="newsletter"><h2>Get every alert immediately</h2><p>Newsletters, competitions, partner messages and a daily cascade of notifications.</p><button>Join the newsletter</button></section><section class="trending"><h3>Most read right now</h3><ol><li>The morning briefing</li><li>Five stories to follow</li><li>What everyone is sharing</li></ol></section><div class="ad" style="margin-top:18px">ADVERTISEMENT</div></aside>
+  </main>
+  <div class="alert">Join the conversation</div>
+  <div class="cookies"><span>We use cookies to personalise your experience and show relevant promotions.</span><button>Manage choices</button><button>Accept all</button></div>
+</body>
+</html>
